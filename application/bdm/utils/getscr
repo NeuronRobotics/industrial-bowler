@@ -1,0 +1,2 @@
+#!/bin/sh
+dd bs=1 skip=72 if=/media/boot/boot.scr of=boot.cmd

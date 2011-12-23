@@ -1,0 +1,46 @@
+From da8a3acffdb7b855a97e179aa52197b2b8eb759d Mon Sep 17 00:00:00 2001
+From: Ash Charles <ash@gumstix.com>
+Date: Tue, 22 Mar 2011 19:35:00 -0700
+Subject: [PATCH] Flip touchscreen reported valeus around the x-axis as noted by Matthew Fisher http://old.nabble.com/android-froyo-touch-screen-co-ordinate-inverted-any-solution-td30994691.html#a30995434.  This is a bit of a hack but is better than nothing short of a tslib port
+
+---
+ drivers/input/touchscreen/ads7846.c |   15 +++++----------
+ 1 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/input/touchscreen/ads7846.c b/drivers/input/touchscreen/ads7846.c
+index 62da09a..a9365d2 100644
+--- a/drivers/input/touchscreen/ads7846.c
++++ b/drivers/input/touchscreen/ads7846.c
+@@ -135,12 +135,9 @@ struct ads7846 {
+ 	void			(*wait_for_sync)(void);
+ };
+ 
+-#ifdef CONFIG_MACH_OMAP3EVM
+-
+-#define OMAP3EVM_XMIN		0x136
+-#define OMAP3EVM_XMAX		0xe84
+-#define OMAP3EVM_YMIN		0x0d9
+-#define OMAP3EVM_YMAX		0xec6
++#ifdef CONFIG_MACH_OVERO
++#define OVERO_YMIN		0x0c8
++#define OVERO_YMAX		0xefd
+ 
+ #endif
+ 
+@@ -625,11 +622,9 @@ static void ads7846_rx(void *ads)
+ 		if (ts->swap_xy)
+ 			swap(x, y);
+ 
+-#ifdef CONFIG_MACH_OMAP3EVM
+-		x = pdata->x_max -
+-			((pdata->x_max * (x - OMAP3EVM_XMIN)) / (OMAP3EVM_XMAX- OMAP3EVM_XMIN));
++#ifdef CONFIG_MACH_OVERO
+ 		y = pdata->y_max -
+-			((pdata->y_max * (y - OMAP3EVM_YMIN)) / (OMAP3EVM_YMAX - OMAP3EVM_YMIN));
++			((pdata->y_max * (y - OVERO_YMIN)) / (OVERO_YMAX - OVERO_YMIN));
+ #endif
+ 
+ 		input_report_abs(input, ABS_X, x);
+-- 
+1.7.4.1
+

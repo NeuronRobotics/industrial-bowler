@@ -1,0 +1,31 @@
+diff -ruN a/SDK/Rules.make b/SDK/Rules.make
+--- a/SDK/Rules.make	2010-07-12 17:07:34.169628678 +0400
++++ b/SDK/Rules.make	2010-07-12 17:16:58.777607587 +0400
+@@ -4,20 +4,20 @@
+ 
+ ################# FIELDS MODIFIABLE BY THE USER ###############################
+ #set home area HOME (relative location for all SDK operations)
+-HOME=INVALIDVAL
++HOME:=$(INSTALL_DIR)
+ #Current Directory where Graphics SDK is installed
+-GRAPHICS_INSTALL_DIR=$(HOME)/OMAP35x_Android_Graphics_SDK_3_01_00_03
++GRAPHICS_INSTALL_DIR=$(INSTALL_DIR)
+ #Android Specific
+ #Path of Android Root FS
+-ANDROID_ROOT=$(HOME)/INVALIDVAL
++ANDROID_ROOT:=$(PRODUCT_DIR)
+ #set toolchain root path for arm-eabi
+-CSTOOL_DIR=INVALIDVAL
+-CSTOOL_PREFIX=arm-eabi-
+-CSTOOL_PATH=$(CSTOOL_DIR)/bin
++CSTOOL_DIR=
++CSTOOL_PREFIX:=$(TOOLS_PREFIX)
++CSTOOL_PATH=
+ CSTOOL_LIBSTDC++_PATH=$(CSTOOL_DIR)/arm-none-linux-gnueabi/libc/usr/lib
+ 
+ #set the kernel installation path
+-KERNEL_INSTALL_DIR=$(HOME)/INVALIDVAL
++KERNEL_INSTALL_DIR:=$(KERNEL_DIR)
+ TARGETFS_INSTALL_DIR=$(ANDROID_ROOT)
+ 
+ GFX_TARGETFS_KERMOD_PATH=$(TARGETFS_INSTALL_DIR)/lib/modules/2.6.32

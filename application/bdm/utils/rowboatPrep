@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cp ../rowboat-android/kernel/arch/arm/boot/uImage rowboat/
+cp ../rowboat-android/out/target/product/beagleboard/rootfs.tar.bz2 rowboat/
+
+cp defaultImg/* .
+cp rowboat/* .
+
+echo "[ Changing the splash screen ]"
+bzcat rootfs.tar.bz2  > rootfs.tar
+rm rootfs.tar.bz2
+tar --delete  --file=rootfs.tar       initlogo.rle.keep
+cp utils/initlogo.rle.keep .
+tar --append  --file=rootfs.tar initlogo.rle.keep
+echo "[ Compressing new rootfs ]"
+bzip2 -z rootfs.tar
+echo "[ Updating boot paramaters ]"
+SOURCE=utils/androidboot.cmd
+DEST=boot.scr
+mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Android Boot" -d ${SOURCE} $DEST

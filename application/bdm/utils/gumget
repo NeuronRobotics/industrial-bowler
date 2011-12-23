@@ -1,0 +1,55 @@
+#!/bin/bash
+SERVER="http://cumulus.gumstix.org/images/android"
+SOURCE="${SERVER}/current"
+
+# We need curl.  Use curl as it allows for restarting downloads.
+command -v curl > /dev/null
+if [[ ! ($?) ]]; then
+   echo "'curl' utility not found. On Ubuntu, install with"
+   echo "    sudo apt-get install curl"
+fi
+
+# If no argument given, grab latest build.
+if [[ -z $1 ]]; then
+    echo "[ Downloading latest images from ${SERVER} ]"
+else
+    SOURCE=${SERVER}/$1
+    echo "[ Downloading images from ${SOURCE} ]"
+fi
+
+rm MLO
+rm u-boot.bin
+rm uImage
+rm boot.scr
+rm rootfs.tar.bz2
+rm md5sums.txt
+
+curl -O -# -C - ${SOURCE}/MLO
+curl -O -# -C - ${SOURCE}/u-boot.bin
+curl -O -# -C - ${SOURCE}/uImage
+curl -O -# -C - ${SOURCE}/boot.scr
+curl -O -# -C - ${SOURCE}/rootfs.tar.bz2
+curl -O -# -C - ${SOURCE}/md5sums.txt
+
+echo "[ Verifying downloads ]"
+md5sum -c md5sums.txt
+
+echo "[ Changing the splash screen ]"
+bzcat ${PWD}/rootfs.tar.bz2  > rootfs.tar
+rm rootfs.tar.bz2
+tar --delete  --file=rootfs.tar       initlogo.rle.keep
+cp utils/initlogo.rle.keep .
+tar --append  --file=rootfs.tar initlogo.rle.keep
+echo "[ Compressing new rootfs ]"
+bzip2 -z rootfs.tar
+echo "[ Updating boot paramaters ]"
+SOURCE=${PWD}/utils/androidboot.cmd
+DEST=${PWD}/boot.scr
+mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Android Boot" -d ${SOURCE} $DEST
+
+cp MLO 			defaultImg/
+cp u-boot.bin 		defaultImg/
+cp uImage 		defaultImg/
+cp boot.scr 		defaultImg/
+cp rootfs.tar.bz2 	defaultImg/
+

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Clean and compile MLO, uboot, boot.scr, kernel, and SGX
+
+# this is rather fragile but provides a handy shortcut for
+# a fresh build.  In other cases, we should just use the
+# individual build systems as designed.
+export PATH=${PWD}/prebuilt/linux-x86/toolchain/arm-eabi-4.4.0/bin:$PATH
+export ARCH=arm
+export CROSS_COMPILE=arm-eabi-
+export OUTPUTDIR=${PWD}/out/target/product/overo
+export THREADS=4
+
+# Build MLO
+#make -C mlo distclean
+#make -C mlo overo_config
+#make -C mlo
+#gcc mlo/scripts/signGP.c -o mlo/signGP
+#mlo/signGP mlo/x-load.bin 0x40200800
+#cp mlo/x-load.bin.ift ${OUTPUTDIR}/MLO
+# The Android cross-compiler and x-loader don't currently like each other.
+# We're just going to use a pre-built binary for now.
+cp utils/MLO ${OUTPUTDIR}/MLO
+
+# Build u-boot
+#make -C uboot distclean
+#make -C uboot omap3_overo_config
+#make -C uboot -j${THREADS}
+#cp uboot/u-boot.bin ${OUTPUTDIR}
+cp utils/u-boot.bin ${OUTPUTDIR}/u-boot.bin
+
+# Build boot.scr
+source ${PWD}/utils/mkscript
+mv ${PWD}/boot.scr ${OUTPUTDIR}
+# add busybox
+cp ${PWD}/utils/busybox ${OUTPUTDIR}/system/bin/
+#./busybox --install will overwrite
+# edit init.rc to point console service to this shell
+# add vim
+tar -zxf ${PWD}/utils/vim-android.tar.gz -C ${OUTPUTDIR}
+
+# Build kernel
+make -C kernel mrproper
+make -C kernel overo_android_defconfig
+make -C kernel uImage -j${THREADS}
+cp kernel/arch/arm/boot/uImage ${OUTPUTDIR}
+make -C kernel modules
+cp kernel/drivers/net/wireless/libertas/libertas_sdio.ko ${OUTPUTDIR}/system/lib/modules/
+
+# Build SGX
+python utils/autoinstall.py
+#make -C external/ti_android_sgx_sdk OMAPES="3.x" ANDROID_ROOT_DIR=${PWD} TOOLS_PREFIX="prebuilt/linux-x86/toolchain/arm-eabi-4.4.0/bin/arm-eabi-" TARGET_PRODUCT="overo"
+

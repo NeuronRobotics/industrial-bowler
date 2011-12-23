@@ -1,0 +1,6 @@
+#!/bin/sh
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 <boot.cmd>"
+  exit -1
+fi
+mkimage -A arm -T script -C none -n "My Gumstix" -d $1 /media/boot/boot.scr
