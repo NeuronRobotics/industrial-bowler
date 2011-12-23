@@ -10,8 +10,8 @@ export TARGET_SIMULATOR=false
 export TARGET_TOOLS_PREFIX=$PWD/utils/android-toolchain-eabi/bin/arm-eabi-
 
 
-repo init -u ${MANIFEST_REPO} -b ${MANIFEST_BRANCH} -m ${MANIFEST_FILENAME}
-repo sync -j4
+#repo init -u ${MANIFEST_REPO} -b ${MANIFEST_BRANCH} -m ${MANIFEST_FILENAME}
+#repo sync -j4
 
 if (test -d out/target/common/docs/gen) then
 	echo dir ok
@@ -26,11 +26,11 @@ else
 fi
 #this sets up the x/y swap
 cp kernel/drivers/input/touchscreen/ads7846.c utils/backup/ads7846.c.$(date +'%F_%T')
-cp utils/linero-overo/ads7846.c kernel/drivers/input/touchscreen/  
+cp utils/linero-overo/ads7846.c kernel/drivers/input/touchscreen/ads7846.c 
 
 #this adds the kernel bindings for the 3.4inch screen
 cp kernel/arch/arm/configs/android_omap3_defconfig utils/backup/android_omap3_defconfig.$(date +'%F_%T')
-cp utils/linero-overo/android_omap3_defconfig kernel/arch/arm/configs 
+cp utils/linero-overo/android_omap3_defconfig kernel/arch/arm/configs/android_omap3_defconfig
 
 #this adds the mapping for the buttons
 cp device/linaro/overo/gpio-keys.kl utils/backup/gpio-keys.kl.$(date +'%F_%T')
@@ -42,9 +42,9 @@ cp utils/linero-overo/board-overo.c kernel/arch/arm/mach-omap2/board-overo.c
 
 #USB edits
 cp utils/linero-overo/android_composite.h kernel/include/linux/usb/
-
+sudo make -C kernel clean
 sudo chmod -R 777 *
-if (make boottarball systemtarball userdatatarball ) then
+if (make boottarball systemtarball userdatatarball -j3) then
 	sudo chmod -R 777 *
 	sudo linaro-android-media-create --mmc /dev/sdc --dev beagle --system out/target/product/overo/system.tar.bz2 --userdata out/target/product/overo/userdata.tar.bz2 --boot out/target/product/overo/boot.tar.bz2
 	if (test -d mnt) then
@@ -58,5 +58,6 @@ if (make boottarball systemtarball userdatatarball ) then
 	sudo cp utils/linero-overo/u-boot.bin ./mnt/
 	sudo umount ./mnt/
 else
+	sudo chmod -R 777 *
 	echo "[make failed]"
 fi

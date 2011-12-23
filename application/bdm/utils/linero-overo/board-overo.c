@@ -71,7 +71,7 @@
 #define OVERO_SMSC911X2_CS     4
 #define OVERO_SMSC911X2_GPIO   65
 
-#ifdef CONFIG_USB_ANDROID
+#if defined(CONFIG_USB_ANDROID) || defined(CONFIG_USB_G_ANDROID)
 
 #define GOOGLE_VENDOR_ID		0x18d1
 #define GOOGLE_PRODUCT_ID		0x9018
@@ -570,7 +570,7 @@ static void __init overo_init(void)
 			     ARRAY_SIZE(overo_nand_partitions));
 	usb_musb_init(NULL);
 	usbhs_init(&usbhs_bdata);
-#ifdef CONFIG_USB_ANDROID
+#if defined(CONFIG_USB_ANDROID) || defined(CONFIG_USB_G_ANDROID)
         overo_android_gadget_init();
 #endif
 	overo_spi_init();
