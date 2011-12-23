@@ -57,6 +57,7 @@
 #include "sdram-micron-mt46h32m32lf-6.h"
 #include "hsmmc.h"
 #include "common-board-devices.h"
+#include <linux/usb/android_composite.h>
 
 #define OVERO_GPIO_BT_XGATE	15
 #define OVERO_GPIO_W2W_NRESET	16
@@ -69,6 +70,57 @@
 #define OVERO_SMSC911X_GPIO    176
 #define OVERO_SMSC911X2_CS     4
 #define OVERO_SMSC911X2_GPIO   65
+
+#ifdef CONFIG_USB_ANDROID
+
+#define GOOGLE_VENDOR_ID		0x18d1
+#define GOOGLE_PRODUCT_ID		0x9018
+#define GOOGLE_ADB_PRODUCT_ID		0x9015
+
+static char *usb_functions_adb[] = {
+	"adb",
+};
+
+static char *usb_functions_all[] = {
+	"adb",
+};
+
+static struct android_usb_product usb_products[] = {
+	{
+		.product_id	= GOOGLE_PRODUCT_ID,
+		.num_functions	= ARRAY_SIZE(usb_functions_adb),
+		.functions	= usb_functions_adb,
+	},
+};
+
+static struct android_usb_platform_data android_usb_pdata = {
+	.vendor_id		= GOOGLE_VENDOR_ID,
+	.product_id		= GOOGLE_ADB_PRODUCT_ID,
+	.functions		= usb_functions_all,
+	.products		= usb_products,
+	.version		= 0x0100,
+	.product_name		= "Bowler Deployment Module",
+	.manufacturer_name	= "Neuron Robotics",
+	.serial_number		= "Neuron-Robotics-20101129",
+	.num_functions		= ARRAY_SIZE(usb_functions_all),
+};
+
+static struct platform_device androidusb_device = {
+	.name	= "android_usb",
+	.id	= -1,
+	.dev	= {
+		.platform_data = &android_usb_pdata,
+	},
+};
+
+static void overo_android_gadget_init(void)
+{
+	platform_device_register(&androidusb_device);
+}
+#else
+#error USB not configured
+#endif
+
 
 #if defined(CONFIG_TOUCHSCREEN_ADS7846) || \
 	defined(CONFIG_TOUCHSCREEN_ADS7846_MODULE)
@@ -518,6 +570,9 @@ static void __init overo_init(void)
 			     ARRAY_SIZE(overo_nand_partitions));
 	usb_musb_init(NULL);
 	usbhs_init(&usbhs_bdata);
+#ifdef CONFIG_USB_ANDROID
+        overo_android_gadget_init();
+#endif
 	overo_spi_init();
 	overo_init_smsc911x();
 	overo_display_init();

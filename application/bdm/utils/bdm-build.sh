@@ -40,6 +40,9 @@ cp utils/linero-overo/gpio-keys.kl device/linaro/overo/gpio-keys.kl
 cp kernel/arch/arm/mach-omap2/board-overo.c utils/backup/board-overo.c.$(date +'%F_%T')
 cp utils/linero-overo/board-overo.c kernel/arch/arm/mach-omap2/board-overo.c
 
+#USB edits
+cp utils/linero-overo/android_composite.h kernel/include/linux/usb/
+
 sudo chmod -R 777 *
 if (make boottarball systemtarball userdatatarball ) then
 	sudo chmod -R 777 *
