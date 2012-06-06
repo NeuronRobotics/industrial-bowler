@@ -8,10 +8,11 @@ public class CrustCrawlerUnderwaterROV extends BowlerAbstractDeviceServer {
 	
 	private final DyIO dyio;
 
-	public CrustCrawlerUnderwaterROV(DyIO dyio) {
+	public CrustCrawlerUnderwaterROV(DyIO dyio, String videoFile) {
 		this.dyio = dyio;
-		
+		//TODO Kick off the video server using the string of what file to use
 	}
+
 
 	@Override
 	public void onSynchronusRecive(BowlerDatagram data) {

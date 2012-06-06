@@ -12,11 +12,15 @@ public class CrustCrawlerServer {
 	 */
 	public static void main(String[] args) {
 		try {
-			SerialConnection s=new SerialConnection("/dev/ttyDyIO0");
+			if(args.length != 2 || !args[0].contains("DyIO")  || !args[1].contains("video")) {
+				System.err.println("Usage Example: java -jar CrustCrawlerServer.jar /dev/DyIO0 /dev/video0");
+				System.exit(1);
+			}
+			SerialConnection s=new SerialConnection(args[0]);
 			DyIO dyio = new DyIO(s);
 			dyio.connect();
 			
-			new CrustCrawlerUnderwaterROV(dyio);
+			new CrustCrawlerUnderwaterROV(dyio, args[1]);
 			
 			while(s.isConnected()) {
 				ThreadUtil.wait(100);
