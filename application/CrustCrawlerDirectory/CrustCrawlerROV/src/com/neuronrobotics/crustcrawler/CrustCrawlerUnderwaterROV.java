@@ -25,7 +25,6 @@ public class CrustCrawlerUnderwaterROV extends BowlerAbstractDeviceServer {
 	}
 
 	private void init(BowlerAbstractConnection connection ) throws IOException {
-		Log.info("Starting BowlerCam Server");
 		try{
 	        Enumeration<?> e = NetworkInterface.getNetworkInterfaces();
 	        while(e.hasMoreElements()){
