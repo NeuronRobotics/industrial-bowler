@@ -5,7 +5,9 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+import com.neuronrobotics.sdk.commands.bcs.core.PingCommand;
 import com.neuronrobotics.sdk.commands.bcs.core.ReadyCommand;
+import com.neuronrobotics.sdk.commands.neuronrobotics.bowlercam.ImageCommand;
 import com.neuronrobotics.sdk.commands.neuronrobotics.bowlercam.ImageURLCommand;
 import com.neuronrobotics.sdk.common.BowlerAbstractConnection;
 import com.neuronrobotics.sdk.common.BowlerAbstractDeviceServer;
@@ -39,6 +41,14 @@ public class CrustCrawlerUnderwaterROV extends BowlerAbstractDeviceServer {
 		addNamespace("neuronrobotics.crustcrawler.urov.*;0.3;;");
 		setConnection(connection);
 		connect();
+	}
+	
+	private void asyncTest() {
+		try {
+			sendAsync(new PingCommand(),0x01);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
