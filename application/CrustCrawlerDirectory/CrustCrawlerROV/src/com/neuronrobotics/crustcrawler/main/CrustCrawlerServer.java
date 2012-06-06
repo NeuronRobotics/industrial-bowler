@@ -2,6 +2,7 @@ package com.neuronrobotics.crustcrawler.main;
 
 import com.neuronrobotics.crustcrawler.CrustCrawlerUnderwaterROV;
 import com.neuronrobotics.sdk.dyio.DyIO;
+import com.neuronrobotics.sdk.network.BowlerUDPServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
@@ -20,7 +21,7 @@ public class CrustCrawlerServer {
 			DyIO dyio = new DyIO(s);
 			dyio.connect();
 			
-			new CrustCrawlerUnderwaterROV(dyio, args[1]);
+			new CrustCrawlerUnderwaterROV(new BowlerUDPServer(),dyio, args[1]);
 			
 			while(s.isConnected()) {
 				ThreadUtil.wait(100);
