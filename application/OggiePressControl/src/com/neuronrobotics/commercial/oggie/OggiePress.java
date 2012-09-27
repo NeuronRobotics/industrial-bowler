@@ -27,7 +27,7 @@ public class OggiePress {
 		dyio=new DyIO();
 		dyio.enableDebug();
 		if (!ConnectionDialog.getBowlerDevice(dyio)){
-			System.exit(1);
+			System.out.println("Using virtual hardware");
 		}
 		hw = new PressHardware(dyio);
 		
