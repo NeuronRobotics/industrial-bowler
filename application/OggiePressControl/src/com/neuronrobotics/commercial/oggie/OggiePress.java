@@ -31,8 +31,7 @@ public class OggiePress {
 		}
 		hw = new PressHardware(dyio);
 		
-		frame.setSize(768, 480);
-		frame.setVisible(true);
+
 		frame.addWindowListener(new WindowAdapter() {
 			//On the close button
 			public void windowClosing(WindowEvent evt) {
@@ -71,6 +70,9 @@ public class OggiePress {
 		tabs.addTab("Press #2", press2);
 		tabs.addTab("Dual Press", both);
 		frame.setContentPane(tabs);
+		frame.setSize(900, 675);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 	}
 	
 	
