@@ -7,6 +7,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+
 public class DualPressControl extends JPanel implements IPressControler {
 
 	/**
@@ -16,10 +18,14 @@ public class DualPressControl extends JPanel implements IPressControler {
 	JCheckBox useDualPress = new JCheckBox("Use Dual Press Configuration");
 	private final SinglePressControl press1;
 	private final SinglePressControl press2;
+	private TableDisplay table;
 	public DualPressControl(PressHardware hw, SinglePressControl press1, SinglePressControl press2){
 		this.press1 = press1;
 		this.press2 = press2;
-		add(useDualPress);
+		setLayout(new MigLayout());
+		add(useDualPress,"wrap");
+		table = new TableDisplay("Dual Press");
+		add(table,"wrap");
 		useDualPress.addActionListener(new ActionListener() {
 			
 			@Override

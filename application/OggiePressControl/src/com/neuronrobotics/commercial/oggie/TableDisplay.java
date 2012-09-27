@@ -43,7 +43,7 @@ public class TableDisplay extends JPanel {
 		getTable().getColumnModel().getColumn(1).setPreferredWidth(56);
 
 		add(getTable(),"wrap");
-		setEditable(false);
+		setEditable(true);
 	}
 
 	public void setTransform(Matrix m){
@@ -133,6 +133,7 @@ public class TableDisplay extends JPanel {
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
+        	data[row][col] = new DecimalFormat( "000.000" ).format(Double.parseDouble(value.toString()));
 //        	if(col == 3 && row < 3){
 //        		data[row][col] = new DecimalFormat( "000.000" ).format(Double.parseDouble(value.toString()));	
 //        	} else if(row == 3){
