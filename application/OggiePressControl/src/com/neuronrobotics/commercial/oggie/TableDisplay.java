@@ -1,13 +1,23 @@
 package com.neuronrobotics.commercial.oggie;
 
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,13 +33,20 @@ public class TableDisplay extends JPanel {
 	private MyDefaultTableModel model = new MyDefaultTableModel();
 	private JTable table = new JTable(model);
 	private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+	private JComboBox< String> cycleName = new JComboBox<String>();
+	private JTextField tons = new JTextField("0.0");
+	private JButton save = new JButton("Save As...");
+	private RoundButton start = new RoundButton("Start");
+	private RoundButton abort = new RoundButton("Abort");
+	
+	private IPressControler press;
 	
 	private static final int width = 17;
 	private static final int hight = 2;
 	
-	public TableDisplay(String name){
+	public TableDisplay(String name,IPressControler p){
 		setLayout(new MigLayout());
-		add(new JLabel(name),"wrap");		
+		press=p;		
 		getTable().setBorder(BorderFactory.createLoweredBevelBorder());		
 		setBorder(BorderFactory.createLoweredBevelBorder());		
 		// Disable auto resizing
@@ -39,11 +56,64 @@ public class TableDisplay extends JPanel {
 //		TableColumn col = getTable().getColumnModel().getColumn(vColIndex);
 //		int width = 40;
 //		col.setPreferredWidth(width);		
-		getTable().getColumnModel().getColumn(0).setPreferredWidth(56);
-		getTable().getColumnModel().getColumn(1).setPreferredWidth(56);
-
-		add(getTable(),"wrap");
+		getTable().getColumnModel().getColumn(0).setPreferredWidth(70);
+		getTable().getColumnModel().getColumn(1).setPreferredWidth(70);
 		setEditable(true);
+		
+		start.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				ButtonModel aModel = start.getModel();
+				if(aModel.isArmed() && aModel.isPressed()){
+					System.out.println("Starting...");
+					double t = Double.parseDouble(tons.getText());
+					press.onCycleStart(getTableDataMatrix(),t );
+				}
+			}
+		});
+		
+		start.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				double t = Double.parseDouble(tons.getText());
+				double bound = .1;
+				if(		press.getCurrentPressure()>=t-bound && 
+						press.getCurrentPressure()<=t+bound){
+					
+				}
+			}
+		});
+		
+		JPanel tablePanel = new JPanel(new MigLayout());
+		JPanel controlsPanel = new JPanel(new MigLayout());
+		
+		tablePanel.add(new JLabel("Time(min)  Temp(F)"),"wrap");
+		tablePanel.add(getTable(),"wrap");
+		
+		controlsPanel.add(new JLabel("Cycle Name"));
+		controlsPanel.add(cycleName,"wrap");
+		controlsPanel.add(new JLabel("Pressure"));
+		controlsPanel.add(tons);
+		controlsPanel.add(new JLabel("Tons"),"wrap");
+		controlsPanel.add(save,"wrap");
+		controlsPanel.add(start,"wrap");
+		start.setColor(Color.green);
+		controlsPanel.add(abort,"wrap");
+		abort.setColor(Color.red);
+		abort.setEnabled(false);
+		
+		add(tablePanel);
+		add(controlsPanel);
+	}
+	
+	@Override
+	public void setEnabled(boolean b){
+		table.setEnabled(b);
+		tons.setEnabled(b);
+		start.setEnabled(b);
+		save.setEnabled(b);
+		cycleName.setEnabled(b);
+		abort.setEnabled(false);
 	}
 
 	public void setTransform(Matrix m){
