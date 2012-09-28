@@ -14,7 +14,9 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class PressGraph extends JPanel{
+import Jama.Matrix;
+
+public class PressGraph extends JPanel implements IPressHardwareListener{
 	
 	/**
 	 * 
@@ -29,7 +31,6 @@ public class PressGraph extends JPanel{
 	
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
-	private ValueAxis axis;
 	
 	
 	public PressGraph(String name){
@@ -40,7 +41,7 @@ public class PressGraph extends JPanel{
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				name, 
 				"Minutes", 
-				"Pressure(tons)/Tempreture(F)",
+				"Press(1/100th tons)/Temp(F)",
 				xyDataset, 
 				PlotOrientation.VERTICAL, 
 				true, 
@@ -49,16 +50,52 @@ public class PressGraph extends JPanel{
 		
 		chartPanel = new ChartPanel(chart);
 		XYPlot plot = (XYPlot) chart.getPlot();
-		axis = plot.getDomainAxis();
-		
-		chartPanel.setSize(new Dimension(125, 100));
-		
+		chartPanel.setPreferredSize(new java.awt.Dimension(600, 250));
 		add(chartPanel, BorderLayout.CENTER);
 		xyDataset.addSeries(targetPressure);
 		xyDataset.addSeries(targetTemp);
 		xyDataset.addSeries(measuredPressure);
 		xyDataset.addSeries(measuredTemp);
 		
+	}
+
+
+	@Override
+	public void onCycleStart(int index, CycleConfig config) {
+		startTime = System.currentTimeMillis();
+		double [] times = config.getTimes();
+		double [] temps = config.getTempretures();
+		double pressure = config.getPressure();
+		
+		for(int i=0;i<CycleConfig.dataSize;i++){
+			targetPressure.add(times[i], pressure*100);
+			targetTemp.add(times[i], temps[i]);
+		}
+		measuredPressure.clear();
+		measuredTemp.clear();
+	}
+
+
+	@Override
+	public void onAbortCycle(int i) {
+		targetPressure.clear();
+		targetTemp.clear();
+		measuredPressure.clear();
+		measuredTemp.clear();
+	}
+
+
+	@Override
+	public void onPressureChange(int i, double pressureTons) {
+		long time = System.currentTimeMillis()-startTime;
+		measuredPressure.add(time, pressureTons*100);
+	}
+
+
+	@Override
+	public void onTempretureChange(int i, double degreesFarenhight) {
+		long time = System.currentTimeMillis()-startTime;
+		measuredTemp.add(time, degreesFarenhight);
 	}
 
 }

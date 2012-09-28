@@ -19,43 +19,42 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 		this.hw = hw;
 		
 		setBorder(BorderFactory.createLoweredBevelBorder());
-		JPanel controlsPanel = new JPanel(new MigLayout());
+		JPanel graphPanel = new JPanel(new MigLayout());
 		graphs[0]=new PressGraph("Press #0 data");
 		graphs[1]=new PressGraph("Press #1 data");
 		
-		controlsPanel.add(new JLabel("General Press Controls"),"wrap");
-		controlsPanel.add(graphs[0],"wrap");
-		controlsPanel.add(graphs[1],"wrap");
+		graphPanel.add(new JLabel("General Press Controls"),"wrap");
+		graphPanel.add(graphs[0],"wrap");
+		graphPanel.add(graphs[1],"wrap");
+		
+		JPanel controlPanel = new JPanel(new MigLayout());
 		
 		
 		
-		add(controlsPanel);
+		add(graphPanel);
+		add(controlPanel);
 		
 		hw.addPressHardwareListener(this);
 	}
 
 	@Override
 	public void onCycleStart(int i, CycleConfig config) {
-		// TODO Auto-generated method stub
-		
+		graphs[i].onCycleStart(i, config);
 	}
 
 	@Override
 	public void onAbortCycle(int i) {
-		// TODO Auto-generated method stub
-		
+		graphs[i].onAbortCycle(i);
 	}
 
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
-		// TODO Auto-generated method stub
-		
+		graphs[i].onPressureChange(i, pressureTons);
 	}
 
 	@Override
 	public void onTempretureChange(int i, double degreesFarenhight) {
-		// TODO Auto-generated method stub
-		
+		graphs[i].onTempretureChange(i, degreesFarenhight);
 	}
 
 }

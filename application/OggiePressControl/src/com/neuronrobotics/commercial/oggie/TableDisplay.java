@@ -41,12 +41,12 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
 	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
-	private RoundButton ready = new RoundButton("Ready",new Dimension(50, 50));
+	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
 	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
 	
 	private IPressControler press;
 	
-	private static final int width = 17;
+	private static final int width = CycleConfig.dataSize;
 	private static final int hight = 2;
 	
 	private static final double bound = .1;
@@ -104,6 +104,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		});
 		
 		ready.setVisible(false);
+		ready.setEnabled(false);
 		
 		JPanel tablePanel = new JPanel(new MigLayout());
 		JPanel controlsPanel = new JPanel(new MigLayout());
