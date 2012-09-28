@@ -12,14 +12,19 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 	 * 
 	 */
 	private static final long serialVersionUID = -4955802212820308687L;
+	private final PressHardware hw;
 	
 	public PressConfigurationController(PressHardware hw){
+		this.hw = hw;
+		
 		setBorder(BorderFactory.createLoweredBevelBorder());
 		JPanel controlsPanel = new JPanel(new MigLayout());
 		
 		controlsPanel.add(new JLabel("General Press Controls"));
 		
 		add(controlsPanel);
+		
+		hw.addPressHardwareListener(this);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class SinglePressControl extends JPanel implements IPressControler {
 		this.pressIndex = pressIndex;
 		setLayout(new MigLayout());
 		add(enabledDisplay,"wrap");
-		table = new TableDisplay("Press #"+pressIndex, this);
+		table = new TableDisplay(pressIndex==0?true:false,pressIndex==1?true:false, this);
 		add(table,"wrap");
 		setPressControlEnabled(true);
 	}
@@ -34,8 +34,10 @@ public class SinglePressControl extends JPanel implements IPressControler {
 		table.setEnabled(b);
 		if(b){
 			enabledDisplay.setText("Press #"+pressIndex+ " Enabled");
+			hw.addPressHardwareListener(table);
 		}else{
 			enabledDisplay.setText("Press #"+pressIndex+ " Disabled");
+			hw.removePressHardwareListener(table);
 		}
 	}
 

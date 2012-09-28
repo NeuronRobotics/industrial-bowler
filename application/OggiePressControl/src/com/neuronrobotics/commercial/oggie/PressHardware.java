@@ -2,10 +2,7 @@ package com.neuronrobotics.commercial.oggie;
 
 import java.util.ArrayList;
 
-import Jama.Matrix;
-
 import com.neuronrobotics.sdk.dyio.DyIO;
-import com.neuronrobotics.sdk.dyio.IDyIOEvent;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class PressHardware {
@@ -14,6 +11,7 @@ public class PressHardware {
 	private ArrayList< IPressHardwareListener> listeners = new ArrayList< IPressHardwareListener> ();
 	
 	private double [] pressure = new double[]{0,0};
+	private double [] temp = new double[]{0,0};
 	private CycleConfig [] targetcycle = new CycleConfig[2];
 	
 	private boolean [] abort = new boolean[]{false,false};
@@ -23,15 +21,26 @@ public class PressHardware {
 		
 	}
 	
-	private void setPressure(int index, double p){
-		pressure[index]=p;
+	private void setTempreture(int index, double t){
+		temp[index]=t;
+		fireTempretureChange(index, t);
+	}	
+	public double getTempreture(int pressIndex) {
+		return temp[pressIndex];
 	}
 	
+	private void setPressure(int index, double p){
+		pressure[index]=p;
+		firePressureChange(index, p);
+	}	
 	public double getPressure(int pressIndex) {
 		return pressure[pressIndex];
 	}
+	
+	
 	public void abortCycle(int i) {
 		abort[i]=true;
+		fireAbort(i);
 		setPressure(i, 0);
 	}
 	public void onCycleStart(int i, CycleConfig config) {
@@ -41,6 +50,7 @@ public class PressHardware {
 		}
 		abort[i]=false;
 		targetcycle[i]=config;
+		fireCycleStart(i, config);
 	}
 	
 	/**
@@ -79,28 +89,29 @@ public class PressHardware {
 		listeners.clear();
 	}
 	
-	/**
-	 * Contact all of the listeners with the given event.
-	 * 
-	 * @param e
-	 *            - the event to fire to all listeners
-	 */
+	
 	public void fireCycleStart(int i, CycleConfig config) {
 		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
-			
+			l.onCycleStart(i, config);
 		}
 	}
 	public void fireAbort(int i) {
 		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
-			
+			l.onAbortCycle(i);
 		}
 	}
-	public void firePressureChange(int i) {
+	public void firePressureChange(int i, double pressure) {
 		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
-			
+			l.onPressureChange(i, pressure);
+		}
+	}
+	public void fireTempretureChange(int i, double temp) {
+		//System.out.println("DyIO Event: "+e);
+		for(IPressHardwareListener l : listeners) {
+			l.onTempretureChange(i, temp);
 		}
 	}
 	

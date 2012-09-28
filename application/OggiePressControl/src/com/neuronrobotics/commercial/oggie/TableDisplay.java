@@ -28,7 +28,7 @@ import Jama.Matrix;
 import net.miginfocom.swing.MigLayout;
 
 
-public class TableDisplay extends JPanel {
+public class TableDisplay extends JPanel implements IPressHardwareListener {
 	/**
 	 * 
 	 */
@@ -50,8 +50,12 @@ public class TableDisplay extends JPanel {
 	private static final int hight = 2;
 	
 	private static final double bound = .1;
+	private final boolean usePress0;
+	private final boolean usePress1;
 	
-	public TableDisplay(String name,IPressControler p){
+	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
+		this.usePress0 = usePress0;
+		this.usePress1 = usePress1;
 		setLayout(new MigLayout());
 		press=p;		
 		getTable().setBorder(BorderFactory.createLoweredBevelBorder());		
@@ -75,17 +79,6 @@ public class TableDisplay extends JPanel {
 					System.out.println("Starting...");
 					double t = Double.parseDouble(tons.getText());
 					press.onCycleStart(new CycleConfig(getTableDataMatrix(),t ));
-					new Thread(){
-						public void run(){
-							ButtonModel aModel = start.getModel();
-							while(aModel.isArmed() && aModel.isPressed()){
-								ThreadUtil.wait(100);
-								if(	isPressReady()){
-									ready.setVisible(true);
-								}
-							}
-						}
-					}.start();
 				}
 			}
 		});
@@ -98,7 +91,7 @@ public class TableDisplay extends JPanel {
 					abort.setEnabled(true);
 					start.setEnabled(false);
 				}else{
-					abort();
+					press.abortCycle();
 				}
 			}
 		});
@@ -106,7 +99,7 @@ public class TableDisplay extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				abort();
+				press.abortCycle();
 			}
 		});
 		
@@ -146,7 +139,6 @@ public class TableDisplay extends JPanel {
 	
 	private void abort(){
 		System.out.println("Press Aborted");
-		press.abortCycle();
 		abort.setEnabled(false);
 		start.setEnabled(true);
 		ready.setVisible(false);
@@ -160,6 +152,7 @@ public class TableDisplay extends JPanel {
 		save.setEnabled(b);
 		cycleName.setEnabled(b);
 		abort.setEnabled(false);
+		ready.setVisible(false);
 	}
 
 	public void setTransform(Matrix m){
@@ -260,5 +253,41 @@ public class TableDisplay extends JPanel {
 //        	}        		
             fireTableCellUpdated(row, col);
         }
+	}
+
+	@Override
+	public void onCycleStart(int i, CycleConfig config) {
+		// TODO Auto-generated method stub
+		if(i==0 && usePress0||i==1 && usePress1){
+			new Thread(){
+				public void run(){
+					ButtonModel aModel = start.getModel();
+					while(aModel.isArmed() && aModel.isPressed()){
+						ThreadUtil.wait(100);
+						if(	isPressReady()){
+							ready.setVisible(true);
+						}
+					}
+				}
+			}.start();
+		}
+	}
+
+	@Override
+	public void onAbortCycle(int i) {
+		if(i==0 && usePress0||i==1 && usePress1)
+			abort();
+	}
+
+	@Override
+	public void onPressureChange(int i, double pressureTons) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTempretureChange(int i, double degreesFarenhight) {
+		// TODO Auto-generated method stub
+		
 	} 
 }

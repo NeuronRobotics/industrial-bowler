@@ -28,7 +28,7 @@ public class DualPressControl extends JPanel implements IPressControler {
 		this.press2 = press2;
 		setLayout(new MigLayout());
 		add(useDualPress,"wrap");
-		table = new TableDisplay("Dual Press", this);
+		table = new TableDisplay(true,true, this);
 		add(table,"wrap");
 		useDualPress.addActionListener(new ActionListener() {
 			
@@ -37,6 +37,10 @@ public class DualPressControl extends JPanel implements IPressControler {
 				getPress1().setPressControlEnabled(!useDualPress.isSelected());
 				getPress2().setPressControlEnabled(!useDualPress.isSelected());
 				table.setEnabled(useDualPress.isSelected());
+				if(useDualPress.isSelected())
+					getHw().addPressHardwareListener(table);
+				else
+					getHw().removePressHardwareListener(table);
 			}
 		});
 		table.setEnabled(false);
@@ -50,16 +54,19 @@ public class DualPressControl extends JPanel implements IPressControler {
 	@Override
 	public void onCycleStart(CycleConfig config) {
 		abortCycle();
-		hw.onCycleStart(0, config); 
-		hw.onCycleStart(1, config); 
+		getHw().onCycleStart(0, config); 
+		getHw().onCycleStart(1, config); 
 	}
 	@Override
 	public void abortCycle() {
-		hw.abortCycle(0);
-		hw.abortCycle(1);
+		getHw().abortCycle(0);
+		getHw().abortCycle(1);
 	}
 	@Override
 	public 	double  getCurrentPressure() {
-		return (hw.getPressure(0) + hw.getPressure(1))/2;
+		return (getHw().getPressure(0) + getHw().getPressure(1))/2;
+	}
+	public PressHardware getHw() {
+		return hw;
 	}
 }
