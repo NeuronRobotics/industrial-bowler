@@ -25,6 +25,7 @@ public class PressHardware {
 		temp[index]=t;
 		fireTempretureChange(index, t);
 	}	
+	
 	public double getTempreture(int pressIndex) {
 		return temp[pressIndex];
 	}
