@@ -44,6 +44,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
 	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
+	private PressGraph  graph = new PressGraph("Data");
 	
 	private IPressControler press;
 	
@@ -130,8 +131,13 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		abort.setColor(Color.red);
 		abort.setEnabled(false);
 		
-		add(tablePanel);
-		add(controlsPanel);
+		JPanel interfacePanel = new JPanel(new MigLayout());
+		
+		interfacePanel.add(tablePanel);
+		interfacePanel.add(controlsPanel);
+		
+		add(interfacePanel,"wrap");
+		add(graph,"wrap");
 	}
 	
 	private boolean isPressReady(){
@@ -287,23 +293,29 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				}
 			}.start();
 		}
+		if(i==0 && usePress0||i==1 && usePress1)
+			graph.onCycleStart(i, config);
+		
 	}
 
 	@Override
 	public void onAbortCycle(int i) {
-		if(i==0 && usePress0||i==1 && usePress1)
+		if(i==0 && usePress0||i==1 && usePress1){
 			abort();
+			graph.onAbortCycle(i);
+		}
+		
 	}
 
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
-		// TODO Auto-generated method stub
-		
+		if(i==0 && usePress0||i==1 && usePress1)
+			graph.onPressureChange(i, pressureTons);
 	}
 
 	@Override
 	public void onTempretureChange(int i, double degreesFarenhight) {
-		// TODO Auto-generated method stub
-		
+		if(i==0 && usePress0||i==1 && usePress1)
+			graph.onTempretureChange(i, degreesFarenhight);
 	} 
 }
