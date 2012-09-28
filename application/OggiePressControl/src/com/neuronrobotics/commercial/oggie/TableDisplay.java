@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -52,6 +53,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private static final double bound = .1;
 	private final boolean usePress0;
 	private final boolean usePress1;
+	
+	private double lowestTemp =200;
 	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
 		this.usePress0 = usePress0;
@@ -152,8 +155,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		start.setEnabled(b);
 		save.setEnabled(b);
 		cycleName.setEnabled(b);
+		load.setEnabled(b);
 		abort.setEnabled(false);
 		ready.setVisible(false);
+		
 	}
 
 	public void setTransform(Matrix m){
@@ -243,15 +248,25 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
-        	data[row][col] = new DecimalFormat( "000.000" ).format(Double.parseDouble(value.toString()));
-//        	if(col == 3 && row < 3){
-//        		data[row][col] = new DecimalFormat( "000.000" ).format(Double.parseDouble(value.toString()));	
-//        	} else if(row == 3){
-//        		data[row][col] = new DecimalFormat( "0" ).format(Double.parseDouble(value.toString()));	
-//        	}        		
-//        	else{
-//        		data[row][col] = new DecimalFormat( "0.000" ).format(Double.parseDouble(value.toString()));
-//        	}        		
+        	double newVal=Double.parseDouble(value.toString());
+        	
+        	if(col==1&&newVal<lowestTemp){
+				Object[] options = {"Yes, use value",
+                "No, that is a mistake"};
+				int n = JOptionPane.showOptionDialog(null,
+				    "Value entered, " +newVal+"(F), is less then "+lowestTemp+"(F)",
+				    "Verify entry",
+				    JOptionPane.YES_NO_CANCEL_OPTION,
+				    JOptionPane.QUESTION_MESSAGE,
+				    null,
+				    options,
+				    options[1]);
+				if(n==1){
+					return;
+				}
+        	}
+        	
+        	data[row][col] = new DecimalFormat( "000.000" ).format(newVal);
             fireTableCellUpdated(row, col);
         }
 	}
