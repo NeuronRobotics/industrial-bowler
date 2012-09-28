@@ -13,14 +13,21 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 	 */
 	private static final long serialVersionUID = -4955802212820308687L;
 	private final PressHardware hw;
+	private PressGraph [] graphs = new PressGraph[2];
 	
 	public PressConfigurationController(PressHardware hw){
 		this.hw = hw;
 		
 		setBorder(BorderFactory.createLoweredBevelBorder());
 		JPanel controlsPanel = new JPanel(new MigLayout());
+		graphs[0]=new PressGraph("Press #0 data");
+		graphs[1]=new PressGraph("Press #1 data");
 		
-		controlsPanel.add(new JLabel("General Press Controls"));
+		controlsPanel.add(new JLabel("General Press Controls"),"wrap");
+		controlsPanel.add(graphs[0],"wrap");
+		controlsPanel.add(graphs[1],"wrap");
+		
+		
 		
 		add(controlsPanel);
 		
