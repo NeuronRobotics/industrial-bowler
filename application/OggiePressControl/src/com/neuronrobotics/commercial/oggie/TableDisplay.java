@@ -2,6 +2,7 @@ package com.neuronrobotics.commercial.oggie;
 
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -21,6 +22,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.neuronrobotics.sdk.util.ThreadUtil;
+
 import Jama.Matrix;
 import net.miginfocom.swing.MigLayout;
 
@@ -34,15 +37,18 @@ public class TableDisplay extends JPanel {
 	private JTable table = new JTable(model);
 	private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
 	private JComboBox< String> cycleName = new JComboBox<String>();
-	private JTextField tons = new JTextField("0.0");
+	private JTextField tons = new JTextField(" 003.700 ");
 	private JButton save = new JButton("Save As...");
-	private RoundButton start = new RoundButton("Start");
-	private RoundButton abort = new RoundButton("Abort");
+	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
+	private RoundButton ready = new RoundButton("Ready",new Dimension(50, 50));
+	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
 	
 	private IPressControler press;
 	
 	private static final int width = 17;
 	private static final int hight = 2;
+	
+	private static final double bound = .1;
 	
 	public TableDisplay(String name,IPressControler p){
 		setLayout(new MigLayout());
@@ -68,6 +74,17 @@ public class TableDisplay extends JPanel {
 					System.out.println("Starting...");
 					double t = Double.parseDouble(tons.getText());
 					press.onCycleStart(getTableDataMatrix(),t );
+					new Thread(){
+						public void run(){
+							ButtonModel aModel = start.getModel();
+							while(aModel.isArmed() && aModel.isPressed()){
+								ThreadUtil.wait(100);
+								if(	isPressReady()){
+									ready.setVisible(true);
+								}
+							}
+						}
+					}.start();
 				}
 			}
 		});
@@ -75,14 +92,24 @@ public class TableDisplay extends JPanel {
 		start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				double t = Double.parseDouble(tons.getText());
-				double bound = .1;
-				if(		press.getCurrentPressure()>=t-bound && 
-						press.getCurrentPressure()<=t+bound){
-					
+				if(	isPressReady()){
+					System.out.println("Press Running");
+					abort.setEnabled(true);
+					start.setEnabled(false);
+				}else{
+					abort();
 				}
 			}
 		});
+		abort.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				abort();
+			}
+		});
+		
+		ready.setVisible(false);
 		
 		JPanel tablePanel = new JPanel(new MigLayout());
 		JPanel controlsPanel = new JPanel(new MigLayout());
@@ -96,14 +123,31 @@ public class TableDisplay extends JPanel {
 		controlsPanel.add(tons);
 		controlsPanel.add(new JLabel("Tons"),"wrap");
 		controlsPanel.add(save,"wrap");
-		controlsPanel.add(start,"wrap");
-		start.setColor(Color.green);
+		controlsPanel.add(start);
+		controlsPanel.add(ready,"wrap");
+		ready.setColor(Color.green);
+		start.setColor(Color.yellow);
 		controlsPanel.add(abort,"wrap");
 		abort.setColor(Color.red);
 		abort.setEnabled(false);
 		
 		add(tablePanel);
 		add(controlsPanel);
+	}
+	
+	private boolean isPressReady(){
+		double t = Double.parseDouble(tons.getText());
+		double c = press.getCurrentPressure();
+		return (		c>=t-bound && 
+						c<=t+bound);
+	}
+	
+	private void abort(){
+		System.out.println("Press Aborted");
+		press.abortCycle();
+		abort.setEnabled(false);
+		start.setEnabled(true);
+		ready.setVisible(false);
 	}
 	
 	@Override

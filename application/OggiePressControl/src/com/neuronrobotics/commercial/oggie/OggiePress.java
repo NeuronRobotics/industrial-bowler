@@ -28,6 +28,7 @@ public class OggiePress {
 		dyio.enableDebug();
 		if (!ConnectionDialog.getBowlerDevice(dyio)){
 			System.out.println("Using virtual hardware");
+			dyio=null;
 		}
 		hw = new PressHardware(dyio);
 		
@@ -55,8 +56,8 @@ public class OggiePress {
 					
 					return;
 				}
-				
-				dyio.disconnect();
+				if(dyio !=null)
+					dyio.disconnect();
 				Log.debug("Closing clean");
 			    System.exit(0);
 			}

@@ -10,12 +10,11 @@ public class RoundButton extends JButton {
 	 */
 	private static final long serialVersionUID = -5236632037590342098L;
 	private Color color = Color.green;
-	public RoundButton(String label) {
+	public RoundButton(String label,Dimension size) {
 	    super(label);
 		
 		// These statements enlarge the button so that it 
-		// becomes a circle rather than an oval.
-		    Dimension size = new Dimension(100, 100);
+		// becomes a circle rather than an oval
 		    size.width = size.height = Math.max(size.width, 
 		      size.height);
 		    setPreferredSize(size);
