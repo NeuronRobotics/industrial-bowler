@@ -39,6 +39,7 @@ public class TableDisplay extends JPanel {
 	private JComboBox< String> cycleName = new JComboBox<String>();
 	private JTextField tons = new JTextField(" 003.700 ");
 	private JButton save = new JButton("Save As...");
+	private JButton load = new JButton("Load file...");
 	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Ready",new Dimension(50, 50));
 	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
@@ -73,7 +74,7 @@ public class TableDisplay extends JPanel {
 				if(aModel.isArmed() && aModel.isPressed()){
 					System.out.println("Starting...");
 					double t = Double.parseDouble(tons.getText());
-					press.onCycleStart(getTableDataMatrix(),t );
+					press.onCycleStart(new CycleConfig(getTableDataMatrix(),t ));
 					new Thread(){
 						public void run(){
 							ButtonModel aModel = start.getModel();
@@ -117,6 +118,7 @@ public class TableDisplay extends JPanel {
 		tablePanel.add(new JLabel("Time(min)  Temp(F)"),"wrap");
 		tablePanel.add(getTable(),"wrap");
 		
+		controlsPanel.add(load,"wrap");
 		controlsPanel.add(new JLabel("Cycle Name"));
 		controlsPanel.add(cycleName,"wrap");
 		controlsPanel.add(new JLabel("Pressure"));

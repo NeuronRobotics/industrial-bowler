@@ -40,9 +40,9 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	}
 
 	@Override
-	public void onCycleStart(Matrix m, double pressure) {
+	public void onCycleStart(CycleConfig config) {
 		abortCycle();
-		hw.onCycleStart(pressIndex, m, pressure); 
+		hw.onCycleStart(pressIndex,config); 
 	}
 
 	@Override

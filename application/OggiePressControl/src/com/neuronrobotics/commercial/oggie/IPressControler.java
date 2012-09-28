@@ -9,7 +9,7 @@ public interface IPressControler {
 	 * @param m Matrix of time/tempreture data
 	 * @param pressure the static pressure setpoint
 	 */
-	void onCycleStart(Matrix m, double pressure);
+	void onCycleStart(CycleConfig config);
 	
 	/**
 	 * This method is called to abort a running cycle. 

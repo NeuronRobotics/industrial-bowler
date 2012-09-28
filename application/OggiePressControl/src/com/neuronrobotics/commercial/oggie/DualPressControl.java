@@ -48,10 +48,10 @@ public class DualPressControl extends JPanel implements IPressControler {
 		return press2;
 	}
 	@Override
-	public void onCycleStart(Matrix m, double pressure) {
+	public void onCycleStart(CycleConfig config) {
 		abortCycle();
-		hw.onCycleStart(0, m, pressure); 
-		hw.onCycleStart(1, m, pressure); 
+		hw.onCycleStart(0, config); 
+		hw.onCycleStart(1, config); 
 	}
 	@Override
 	public void abortCycle() {
