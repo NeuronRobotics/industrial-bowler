@@ -34,14 +34,13 @@ public class DualPressControl extends JPanel implements IPressControler {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				getHw().abortCycle(0);
+				getHw().abortCycle(1);
 				getPress1().setPressControlEnabled(!useDualPress.isSelected());
 				getPress2().setPressControlEnabled(!useDualPress.isSelected());
 				table.setEnabled(useDualPress.isSelected());
-				
 				if(useDualPress.isSelected()){
 					getHw().addPressHardwareListener(table);
-					getHw().abortCycle(0);
-					getHw().abortCycle(1);
 				}else
 					getHw().removePressHardwareListener(table);
 			}
