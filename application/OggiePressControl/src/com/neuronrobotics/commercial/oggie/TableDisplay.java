@@ -55,7 +55,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private final boolean usePress0;
 	private final boolean usePress1;
 	
-	private double lowestTemp =200;
+	private double lowestTemp = 200;
+	private double highestTemp = 500;
 	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
 		this.usePress0 = usePress0;
@@ -81,8 +82,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				ButtonModel aModel = start.getModel();
 				if(aModel.isArmed() && aModel.isPressed()){
 					System.out.println("Starting...");
-					double t = Double.parseDouble(tons.getText());
-					press.onCycleStart(new CycleConfig(getTableDataMatrix(),t ));
+					press.onCycleStart(new CycleConfig(getTableDataMatrix(),getPressureSetpoint() ));
 				}
 			}
 		});
@@ -138,6 +138,18 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		
 		add(interfacePanel,"wrap");
 		add(graph,"wrap");
+		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
+	}
+	
+	private double getPressureSetpoint(){
+		double t = 3.7;
+		try{
+			t = Double.parseDouble(tons.getText());
+		}catch (NumberFormatException ex){
+			tons.setText(" 003.700 ");
+			t = Double.parseDouble(tons.getText());
+		}
+		return t;
 	}
 	
 	private boolean isPressReady(){
@@ -256,11 +268,11 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
         public void setValueAt(Object value, int row, int col) {
         	double newVal=Double.parseDouble(value.toString());
         	
-        	if(col==1&&newVal<lowestTemp){
+        	if(col==1&&(newVal<lowestTemp || newVal>highestTemp)){
 				Object[] options = {"Yes, use value",
                 "No, that is a mistake"};
 				int n = JOptionPane.showOptionDialog(null,
-				    "Value entered, " +newVal+"(F), is less then "+lowestTemp+"(F)",
+				    "Value entered, " +newVal+"(F), is not between "+lowestTemp+"(F) and "+highestTemp+"(F)",
 				    "Verify entry",
 				    JOptionPane.YES_NO_CANCEL_OPTION,
 				    JOptionPane.QUESTION_MESSAGE,
@@ -274,6 +286,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
         	
         	data[row][col] = new DecimalFormat( "000.000" ).format(newVal);
             fireTableCellUpdated(row, col);
+            graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
         }
 	}
 
@@ -302,7 +315,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	public void onAbortCycle(int i) {
 		if(i==0 && usePress0||i==1 && usePress1){
 			abort();
-			graph.onAbortCycle(i);
+			//graph.onAbortCycle(i);
 		}
 		
 	}
