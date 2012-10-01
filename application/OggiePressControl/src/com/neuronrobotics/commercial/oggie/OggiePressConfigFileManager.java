@@ -57,15 +57,15 @@ public class OggiePressConfigFileManager {
 		System.out.println("Saving values: #1 = \n\n"+press1.getTable().getXml());
 		System.out.println("Saving values: #2 = \n\n"+press2.getTable().getXml());
 		System.out.println("Saving values: #dual = \n\n"+dual.getTable().getXml());
-		try{
-			  // Create file 
-			  FileWriter fstream = new FileWriter(config.getAbsolutePath());
-			  BufferedWriter out = new BufferedWriter(fstream);
-			  out.write(getFileContents());
-			  out.close();
-		}catch (Exception e){//Catch exception if any
-			  System.err.println("Error: " + e.getMessage());
-		}
+//		try{
+//			  // Create file 
+//			  FileWriter fstream = new FileWriter(config.getAbsolutePath());
+//			  BufferedWriter out = new BufferedWriter(fstream);
+//			  out.write(getFileContents());
+//			  out.close();
+//		}catch (Exception e){//Catch exception if any
+//			  System.err.println("Error: " + e.getMessage());
+//		}
 		  
 	}
 	

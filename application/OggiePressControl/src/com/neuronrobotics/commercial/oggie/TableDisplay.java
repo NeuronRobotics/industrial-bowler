@@ -69,8 +69,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private final boolean usePress0;
 	private final boolean usePress1;
 	
-	private double lowestTemp = 200;
-	private double highestTemp = 500;
+	private double lowestTemp = 180;
+	private double highestTemp = 350;
 	
 	private ArrayList<File> availibleFiles = new ArrayList<File>();
 	
@@ -325,9 +325,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	@Override
 	public void setEnabled(boolean b){
-		if(b){
-			setDataTebleLockState(true);
-		}else{
+		setDataTebleLockState(true);
+		if(!b){
 			unlock.setEnabled(false);
 			lock.setEnabled(false);
 		}
@@ -375,7 +374,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	}
 
 	private void setTransform(Matrix m){
-		getTable().setEnabled(false);
+		//getTable().setEnabled(false);
 		for(TableModelListener l:listeners){
 			getTable().getModel().removeTableModelListener(l);
 		}
@@ -387,7 +386,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		for(TableModelListener l:listeners){
 			getTable().getModel().addTableModelListener(l);
 		}
-		getTable().setEnabled(true);
+		//getTable().setEnabled(true);
 		//System.out.println("Matrix display setting data "+m);
 	}
 	public double[][] getTableData() {
@@ -532,11 +531,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	public String getXml() {
 		String s ="";
-		s+="\t<files>\n";
 		for(int i=0;i<availibleFiles.size();i++){
-			s+="\t\t<file>"+availibleFiles.get(i).getAbsolutePath()+"<file>\n";
+			s+="\t<file>"+availibleFiles.get(i).getAbsolutePath()+"</file>\n";
 		}
-		s+="\t</files>\n";
 		s+="\t<selected>";
 		s+=getSelectedFile();
 		s+="</selected>\n";
@@ -545,28 +542,27 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	public void setConfigNode(NodeList p) {
 		String sel="Default";
-		for (int i = 0; i < p.getLength(); i++) {			
+		System.out.println("Config has "+p.getLength());
+		for(int i=0;i<p.getLength();i++){
 		    Node nNode = p.item(i);
 		    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-		    	Element eElement = (Element)nNode;
-		    	System.out.println("Elelment = "+eElement);
-		    	sel = XmlFactory.getTagValue("pressure",eElement);
-		    }else if(nNode.getNodeType() == Node.DOCUMENT_NODE){
-		    	System.out.println("Files found");
-		    	NodeList f = (NodeList)nNode;
-		    	for (int j = 0; j < f.getLength(); j++){
-		    		Node nNode1 = f.item(j);
-				    if (nNode1.getNodeType() == Node.ELEMENT_NODE){
-				    	Element eElement = (Element)nNode;	    		    
-				    	String fileFound = XmlFactory.getTagValue("file",eElement);
-				    	System.out.println("Adding file from config "+fileFound);
-				    	addAvailibleFile(new File(fileFound));
-				    }
+		    	Element eElement = (Element)nNode;	
+		    	System.out.println("Element = "+eElement);
+		    	try{
+		    		sel=XmlFactory.getTagValue("selected",eElement);
+		    	}catch(Exception ex){
+		    		//ex.printStackTrace();
+		    	}
+		    	try{
+		    		addAvailibleFile(new File(XmlFactory.getTagValue("file",eElement)));
+		    	}catch(Exception ex){
+		    		//ex.printStackTrace();
 		    	}
 		    }else{
-		    	Log.info("Not Element Node");
+		    	System.out.println("Not Element Node");
 		    }
 		}
+		
 		setSelectedFile(sel);
 	} 
 }
