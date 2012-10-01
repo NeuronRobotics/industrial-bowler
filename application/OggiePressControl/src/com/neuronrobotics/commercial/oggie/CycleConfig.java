@@ -51,8 +51,8 @@ public class CycleConfig {
 	}
 	
 	public CycleConfig(File currentConfig) throws FileNotFoundException{
-		config=currentConfig;
-		Document doc =XmlFactory.getAllNodesDocument(new FileInputStream(config));
+		setConfigFile(currentConfig);
+		Document doc =XmlFactory.getAllNodesDocument(new FileInputStream(getConfigFile()));
 		NodeList press = doc.getElementsByTagName("OggiePress");
 
 		for (int i = 0; i < press.getLength(); i++) {			
@@ -141,7 +141,7 @@ public class CycleConfig {
 	public void saveToFile(File currentSave) {
 		if(currentSave == null)
 			return;
-		config = currentSave;
+		setConfigFile(currentSave);
 		String s = getTag();
 		try{
 			  // Create file 
@@ -179,6 +179,14 @@ public class CycleConfig {
 			s+="</temp>\n";
 		s+="</OggiePress>\n";
 		return s;
+	}
+
+	public File getConfigFile() {
+		return config;
+	}
+
+	public void setConfigFile(File config) {
+		this.config = config;
 	}
 
 }

@@ -61,9 +61,15 @@ public class RoundButton extends JButton {
 	    }
 	    return shape.contains(x, y);
 	  }
-	
+//	@Override
+//	public void setEnabled(boolean b){
+//		super.setEnabled(b);
+//		
+//	}
 	public Color getColor() {
-		return color;
+		if(isEnabled())
+			return color;
+		return Color.lightGray;
 	}
 	
 	public void setColor(Color color) {

@@ -66,7 +66,8 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 		double [] times = config.getTimes();
 		double [] temps = config.getTempretures();
 		double pressure = config.getPressure();
-		
+		targetPressure.clear();
+		targetTemp.clear();
 		for(int i=0;i<CycleConfig.dataSize;i++){
 			targetPressure.add(times[i], pressure*100);
 			targetTemp.add(times[i], temps[i]);

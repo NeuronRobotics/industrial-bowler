@@ -18,6 +18,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
@@ -45,6 +46,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private JTextField tons = new JTextField(" 003.700 ");
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
+	private JPasswordField passwd = new JPasswordField(15);
+	private JButton unlock = new JButton("Unlock");
+	private JButton lock = new JButton("Lock");
 	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
 	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
@@ -62,6 +66,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private double lowestTemp = 200;
 	private double highestTemp = 500;
 	
+	private ArrayList<File> availibleFiles = new ArrayList<File>();
+	
+	private String defaultFileString = "Default";
+	private final String adminPassword = "wumpus3742";
 	private File currentSave=null;
 	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
@@ -124,6 +132,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				try {
 					//validation step
 					conf = new CycleConfig(currentSave);
+					setCycleConfig(conf);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -131,8 +140,78 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			}
 		});
 		
+		load.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				File nFile = FileSelectionFactory.GetFile(currentSave, new XmlFilter());
+				if(nFile!=null){
+					CycleConfig conf;
+					try {
+						conf= new CycleConfig(nFile);
+						setCycleConfig(conf);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return;
+					}
+					currentSave = nFile;
+				}
+			}
+		});
+		
+		cycleName.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String selected = cycleName.getSelectedItem().toString();
+				if(selected.equalsIgnoreCase(defaultFileString)){
+					System.out.println("Using default values");
+					setCycleConfig(new CycleConfig());
+					return;
+				}
+				for(int i=0;i<availibleFiles.size();i++){
+					if(selected.equalsIgnoreCase(availibleFiles.get(i).getName())){
+						System.out.println("Using file: "+availibleFiles.get(i).getAbsolutePath());
+						try {
+							setCycleConfig(new CycleConfig(availibleFiles.get(i)));
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						return;
+					}
+				}
+			}
+		});
+		
+		lock.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setDataTebleLockState(true);
+			}
+		});
+		
+		unlock.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				fireUnlockEvent();
+			}
+		});
+		passwd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				fireUnlockEvent();
+			}
+		});
+		
+		
 		ready.setVisible(false);
-		ready.setEnabled(false);
+		//ready.setEnabled(false);
+		abort.setColor(Color.red);
+		abort.setEnabled(false);
+		ready.setColor(Color.green);
+		start.setColor(Color.yellow);
 		
 		JPanel tablePanel = new JPanel(new MigLayout());
 		JPanel controlsPanel = new JPanel(new MigLayout());
@@ -143,17 +222,18 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(load,"wrap");
 		controlsPanel.add(new JLabel("Cycle Name"));
 		controlsPanel.add(cycleName,"wrap");
-		controlsPanel.add(new JLabel("Pressure"));
-		controlsPanel.add(tons);
-		controlsPanel.add(new JLabel("Tons"),"wrap");
+		controlsPanel.add(new JLabel("Pressure (Tons)"));
+		controlsPanel.add(tons,"wrap");
 		controlsPanel.add(save,"wrap");
 		controlsPanel.add(start);
 		controlsPanel.add(ready,"wrap");
-		ready.setColor(Color.green);
-		start.setColor(Color.yellow);
 		controlsPanel.add(abort,"wrap");
-		abort.setColor(Color.red);
-		abort.setEnabled(false);
+		
+		controlsPanel.add(new JLabel("Administrator Mode"));
+		controlsPanel.add(passwd,"wrap");
+		controlsPanel.add(unlock);
+		controlsPanel.add(lock,"wrap");
+		
 		
 		JPanel interfacePanel = new JPanel(new MigLayout());
 		
@@ -165,6 +245,32 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
 		//Load in default values on startup
 		setCycleConfig(new CycleConfig());
+		cycleName.addItem(defaultFileString);
+		setDataTebleLockState(true);
+	}
+	
+	private void fireUnlockEvent(){
+		String p = new String(passwd.getPassword());
+		if(p.equals(adminPassword)){
+			setDataTebleLockState(false);
+		}else{
+			setDataTebleLockState(true);
+			JOptionPane.showMessageDialog(null,   "Administration password invalid", "Administration Mode", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void setDataTebleLockState(boolean b){
+		passwd.setText("");
+		unlock.setEnabled(b);
+		lock.setEnabled(!b);
+		if(b){
+			table.setEnabled(false);
+			table.setBackground(Color.white);
+		}else{
+			table.setEnabled(true);
+			table.setBackground(Color.yellow);
+			JOptionPane.showMessageDialog(null,   "Administration Mode Unlocked", "Administration Mode", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 	
 	private CycleConfig getCurrentCycleConfig(){
@@ -198,7 +304,13 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	@Override
 	public void setEnabled(boolean b){
-		table.setEnabled(b);
+		if(b){
+			setDataTebleLockState(true);
+		}else{
+			unlock.setEnabled(false);
+			lock.setEnabled(false);
+		}
+		passwd.setEnabled(b);
 		tons.setEnabled(b);
 		start.setEnabled(b);
 		save.setEnabled(b);
@@ -210,8 +322,34 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	}
 	
 	public void setCycleConfig(CycleConfig conf){
+		graph.onAbortCycle(0);
 		tons.setText(new DecimalFormat( " 000.000 " ).format(conf.getPressure()));
 		setTransform(conf.getTimeTemp());
+		if(conf.getConfigFile() == null){
+			// do nothing with the files
+		}else{
+			 addAvailibleFile(conf.getConfigFile());
+		}
+	}
+	
+	public ArrayList<File> getAvailibleFiles(){
+		return availibleFiles;
+	}
+	
+	public boolean addAvailibleFile(File file){
+		boolean add = true;
+		for(File f : availibleFiles){
+			if(f.getAbsolutePath().equalsIgnoreCase(file.getAbsolutePath())){
+				add=false;
+			}
+		}
+		if(add){
+			availibleFiles.add(file);
+			String name = file.getName();
+			cycleName.addItem(name);
+			cycleName.setSelectedItem(name);
+		}
+		return add;
 	}
 
 	private void setTransform(Matrix m){
@@ -327,7 +465,6 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	@Override
 	public void onCycleStart(int i, CycleConfig config) {
-		// TODO Auto-generated method stub
 		if(i==0 && usePress0||i==1 && usePress1){
 			new Thread(){
 				public void run(){
