@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -120,6 +121,13 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				currentSave = FileSelectionFactory.GetFile(currentSave, new XmlFilter());
 				System.out.println("Using file: "+currentSave);
 				conf.saveToFile(currentSave);
+				try {
+					//validation step
+					conf = new CycleConfig(currentSave);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -155,6 +163,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		add(interfacePanel,"wrap");
 		add(graph,"wrap");
 		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
+		//Load in default values on startup
+		setCycleConfig(new CycleConfig());
 	}
 	
 	private CycleConfig getCurrentCycleConfig(){
@@ -198,8 +208,13 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		ready.setVisible(false);
 		
 	}
+	
+	public void setCycleConfig(CycleConfig conf){
+		tons.setText(new DecimalFormat( " 000.000 " ).format(conf.getPressure()));
+		setTransform(conf.getTimeTemp());
+	}
 
-	public void setTransform(Matrix m){
+	private void setTransform(Matrix m){
 		getTable().setEnabled(false);
 		for(TableModelListener l:listeners){
 			getTable().getModel().removeTableModelListener(l);
@@ -250,23 +265,23 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		private static final long serialVersionUID = 7096254212840475488L;
 		private boolean edit=false;
 		private Object[][] data = {
-				{0,210},
-				{10,240},
-				{20,270},
-				{30,290},
-				{40,290},
-				{60,290},
-				{70,290},
-				{80,290},
-				{90,290},
-				{100,290},
-				{110,270},
-				{120,250},
-				{130,230},
-				{140,210},
-				{150,200},
-				{160,200},
-				{170,200},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
+				{0,0},
 		};
 		 public MyDefaultTableModel() {  
 		   super(width,hight);  
