@@ -88,11 +88,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		setBorder(BorderFactory.createLoweredBevelBorder());		
 		// Disable auto resizing
 		getTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		// Set the first visible column to 100 pixels wide
-//		int vColIndex = 0;
-//		TableColumn col = getTable().getColumnModel().getColumn(vColIndex);
-//		int width = 40;
-//		col.setPreferredWidth(width);		
+	
 		getTable().getColumnModel().getColumn(0).setPreferredWidth(70);
 		getTable().getColumnModel().getColumn(1).setPreferredWidth(70);
 		setEditable(true);
@@ -554,7 +550,16 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		    		//ex.printStackTrace();
 		    	}
 		    	try{
-		    		addAvailibleFile(new File(XmlFactory.getTagValue("file",eElement)));
+		    	    NodeList nlList= eElement.getElementsByTagName("file");
+		    	    System.out.println("Have files # "+nlList.getLength());
+		    	    for(int j=0;j<nlList.getLength();j++)
+		    	    {
+		    	    	Node nValue = ((NodeList) nlList.item(j)).item(0); 
+		    	    	System.out.println("Value = "+nValue.getNodeValue());
+			    		addAvailibleFile(new File(nValue.getNodeValue()));
+		    	    }
+		    	   // System.out.println("\t\t"+sTag+" = "+nValue.getNodeValue());
+		    	    
 		    	}catch(Exception ex){
 		    		//ex.printStackTrace();
 		    	}

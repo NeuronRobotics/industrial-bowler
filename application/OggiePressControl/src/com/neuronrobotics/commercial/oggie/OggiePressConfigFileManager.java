@@ -22,12 +22,14 @@ public class OggiePressConfigFileManager {
 	private String configFileLocation = System.getProperty("user.home")+"/OggiePressSystem.xml";
 	
 	private File config =null;
+	
+	private boolean loading = false;
 
 	public OggiePressConfigFileManager(SinglePressControl press1,SinglePressControl press2, DualPressControl dual) throws IOException{
 		this.press1 = press1;
 		this.press2 = press2;
 		this.dual = dual;
-		
+		loading = true;
 		press1.getTable().setConfigFileManager(this);
 		press2.getTable().setConfigFileManager(this);
 		dual.getTable().setConfigFileManager(this);
@@ -49,23 +51,27 @@ public class OggiePressConfigFileManager {
 			dual.getTable().setConfigNode(pd);
 			
 		}
-		
+		loading = false;
 		
 	}
 	
 	public void save(){
-		System.out.println("Saving values: #1 = \n\n"+press1.getTable().getXml());
-		System.out.println("Saving values: #2 = \n\n"+press2.getTable().getXml());
-		System.out.println("Saving values: #dual = \n\n"+dual.getTable().getXml());
-//		try{
-//			  // Create file 
-//			  FileWriter fstream = new FileWriter(config.getAbsolutePath());
-//			  BufferedWriter out = new BufferedWriter(fstream);
-//			  out.write(getFileContents());
-//			  out.close();
-//		}catch (Exception e){//Catch exception if any
-//			  System.err.println("Error: " + e.getMessage());
-//		}
+		if(loading)
+			return;
+//		System.out.println("Saving values: #1 = \n\n"+press1.getTable().getXml());
+//		System.out.println("Saving values: #2 = \n\n"+press2.getTable().getXml());
+//		System.out.println("Saving values: #dual = \n\n"+dual.getTable().getXml());
+		
+		
+		try{
+			  // Create file 
+			  FileWriter fstream = new FileWriter(config.getAbsolutePath());
+			  BufferedWriter out = new BufferedWriter(fstream);
+			  out.write(getFileContents());
+			  out.close();
+		}catch (Exception e){//Catch exception if any
+			  System.err.println("Error: " + e.getMessage());
+		}
 		  
 	}
 	
