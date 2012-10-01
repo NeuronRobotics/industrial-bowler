@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -23,6 +24,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.neuronrobotics.commercial.oggie.fileio.FileSelectionFactory;
+import com.neuronrobotics.commercial.oggie.fileio.XmlFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
 import Jama.Matrix;
@@ -58,6 +61,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private double lowestTemp = 200;
 	private double highestTemp = 500;
 	
+	private File currentSave=null;
+	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
 		this.usePress0 = usePress0;
 		this.usePress1 = usePress1;
@@ -82,7 +87,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				ButtonModel aModel = start.getModel();
 				if(aModel.isArmed() && aModel.isPressed()){
 					System.out.println("Starting...");
-					press.onCycleStart(new CycleConfig(getTableDataMatrix(),getPressureSetpoint() ));
+					press.onCycleStart(getCurrentCycleConfig());
 				}
 			}
 		});
@@ -104,6 +109,17 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				press.abortCycle();
+			}
+		});
+		
+		save.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				CycleConfig conf = getCurrentCycleConfig();
+				currentSave = FileSelectionFactory.GetFile(currentSave, new XmlFilter());
+				System.out.println("Using file: "+currentSave);
+				conf.saveToFile(currentSave);
 			}
 		});
 		
@@ -139,6 +155,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		add(interfacePanel,"wrap");
 		add(graph,"wrap");
 		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
+	}
+	
+	private CycleConfig getCurrentCycleConfig(){
+		return new CycleConfig(getTableDataMatrix(),getPressureSetpoint() );
 	}
 	
 	private double getPressureSetpoint(){
@@ -286,7 +306,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
         	
         	data[row][col] = new DecimalFormat( "000.000" ).format(newVal);
             fireTableCellUpdated(row, col);
-            graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
+            graph.onCycleStart(0,getCurrentCycleConfig());
         }
 	}
 

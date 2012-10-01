@@ -1,5 +1,9 @@
 package com.neuronrobotics.commercial.oggie;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
 import Jama.Matrix;
 
 public class CycleConfig {
@@ -46,6 +50,27 @@ public class CycleConfig {
 			tmp[i]=array[i][1];
 		}
 		return tmp;
+	}
+
+	public void saveToFile(File currentSave) {
+		if(currentSave == null)
+			return;
+		String s = getTag();
+		try{
+			  // Create file 
+			  FileWriter fstream = new FileWriter(currentSave.getAbsolutePath());
+			  BufferedWriter out = new BufferedWriter(fstream);
+			  out.write(s);
+			  out.close();
+		}catch (Exception e){//Catch exception if any
+			  System.err.println("Error: " + e.getMessage());
+		}
+		  
+	}
+
+	private String getTag() {
+		// TODO Auto-generated method stub
+		return " ";
 	}
 
 }
