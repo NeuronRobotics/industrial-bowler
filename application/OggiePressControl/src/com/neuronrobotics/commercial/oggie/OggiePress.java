@@ -2,6 +2,7 @@ package com.neuronrobotics.commercial.oggie;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -22,7 +23,8 @@ public class OggiePress {
 	private SinglePressControl press2;
 	private DualPressControl   both;
 	private PressConfigurationController config;
-	public OggiePress(){	
+	private OggiePressConfigFileManager fm;
+	public OggiePress() throws IOException{	
 		DyIO.disableFWCheck();
 		dyio=new DyIO();
 		dyio.enableDebug();
@@ -58,13 +60,16 @@ public class OggiePress {
 				}
 				if(dyio !=null)
 					dyio.disconnect();
+				fm.save();
 				Log.debug("Closing clean");
 			    System.exit(0);
 			}
 		});
-		press1 = new SinglePressControl(hw, 0,both);
-		press2= new SinglePressControl(hw, 1,both);
+		press1 = new SinglePressControl(hw, 0);
+		press2= new SinglePressControl(hw, 1);
 		both= new DualPressControl(hw,press1,press2);
+		fm = new OggiePressConfigFileManager(press1, press2, both);
+		
 		config=new PressConfigurationController(hw);
 		tabs.addTab("Home", config);
 		tabs.addTab("Press #1", press1);

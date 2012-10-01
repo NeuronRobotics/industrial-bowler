@@ -26,8 +26,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.neuronrobotics.commercial.oggie.fileio.FileSelectionFactory;
 import com.neuronrobotics.commercial.oggie.fileio.XmlFilter;
+import com.neuronrobotics.sdk.addons.kinematics.xml.XmlFactory;
+import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
 import Jama.Matrix;
@@ -71,6 +77,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private String defaultFileString = "Default";
 	private final String adminPassword = "wumpus3742";
 	private File currentSave=null;
+	private OggiePressConfigFileManager fm;
 	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
 		this.usePress0 = usePress0;
@@ -133,6 +140,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 					//validation step
 					conf = new CycleConfig(currentSave);
 					setCycleConfig(conf);
+					
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -163,7 +171,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		cycleName.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String selected = cycleName.getSelectedItem().toString();
+				String selected = getSelectedFile();
 				if(selected.equalsIgnoreCase(defaultFileString)){
 					System.out.println("Using default values");
 					setCycleConfig(new CycleConfig());
@@ -178,6 +186,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
+						fm.save();
 						return;
 					}
 				}
@@ -247,6 +256,18 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		setCycleConfig(new CycleConfig());
 		cycleName.addItem(defaultFileString);
 		setDataTebleLockState(true);
+	}
+	
+	public void setSelectedFile(String name){
+		for(int i=0;i<cycleName.getItemCount();i++){
+			if(cycleName.getItemAt(i).toString().equalsIgnoreCase(name)){
+				cycleName.setSelectedIndex(i);
+			}
+		}
+	}
+	
+	public String getSelectedFile(){
+		return cycleName.getSelectedItem().toString();
 	}
 	
 	private void fireUnlockEvent(){
@@ -348,6 +369,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			String name = file.getName();
 			cycleName.addItem(name);
 			cycleName.setSelectedItem(name);
+			fm.save();
 		}
 		return add;
 	}
@@ -502,5 +524,49 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	public void onTempretureChange(int i, double degreesFarenhight) {
 		if(i==0 && usePress0||i==1 && usePress1)
 			graph.onTempretureChange(i, degreesFarenhight);
+	}
+
+	public void setConfigFileManager(OggiePressConfigFileManager fm) {
+		this.fm = fm;	
+	}
+
+	public String getXml() {
+		String s ="";
+		s+="\t<files>\n";
+		for(int i=0;i<availibleFiles.size();i++){
+			s+="\t\t<file>"+availibleFiles.get(i).getAbsolutePath()+"<file>\n";
+		}
+		s+="\t</files>\n";
+		s+="\t<selected>";
+		s+=getSelectedFile();
+		s+="</selected>\n";
+		return s;
+	}
+
+	public void setConfigNode(NodeList p) {
+		String sel="Default";
+		for (int i = 0; i < p.getLength(); i++) {			
+		    Node nNode = p.item(i);
+		    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+		    	Element eElement = (Element)nNode;
+		    	System.out.println("Elelment = "+eElement);
+		    	sel = XmlFactory.getTagValue("pressure",eElement);
+		    }else if(nNode.getNodeType() == Node.DOCUMENT_NODE){
+		    	System.out.println("Files found");
+		    	NodeList f = (NodeList)nNode;
+		    	for (int j = 0; j < f.getLength(); j++){
+		    		Node nNode1 = f.item(j);
+				    if (nNode1.getNodeType() == Node.ELEMENT_NODE){
+				    	Element eElement = (Element)nNode;	    		    
+				    	String fileFound = XmlFactory.getTagValue("file",eElement);
+				    	System.out.println("Adding file from config "+fileFound);
+				    	addAvailibleFile(new File(fileFound));
+				    }
+		    	}
+		    }else{
+		    	Log.info("Not Element Node");
+		    }
+		}
+		setSelectedFile(sel);
 	} 
 }

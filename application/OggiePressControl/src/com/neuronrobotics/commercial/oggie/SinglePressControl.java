@@ -1,5 +1,8 @@
 package com.neuronrobotics.commercial.oggie;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -20,27 +23,29 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	private final int pressIndex;
 
 	private final PressHardware hw;
-	public SinglePressControl(PressHardware hw,int pressIndex, DualPressControl both){
+	public SinglePressControl(PressHardware hw,int pressIndex){
 		this.hw = hw;
 		this.pressIndex = pressIndex;
 		setLayout(new MigLayout());
 		add(enabledDisplay,"wrap");
-		table = new TableDisplay(pressIndex==0?true:false,pressIndex==1?true:false, this);
-		add(table,"wrap");
+		setTable(new TableDisplay(pressIndex==0?true:false,pressIndex==1?true:false, this));
+		add(getTable(),"wrap");
 		setPressControlEnabled(true);
 	}
 	
 	public void setPressControlEnabled(boolean b){
-		table.setEnabled(b);
+		getTable().setEnabled(b);
 		if(b){
 			enabledDisplay.setText("Press #"+pressIndex+ " Enabled");
-			hw.addPressHardwareListener(table);
+			hw.addPressHardwareListener(getTable());
 		}else{
 			enabledDisplay.setText("Press #"+pressIndex+ " Disabled");
-			hw.removePressHardwareListener(table);
+			hw.removePressHardwareListener(getTable());
 		}
 	}
-
+	
+	
+	
 	@Override
 	public void onCycleStart(CycleConfig config) {
 		abortCycle();
@@ -55,5 +60,13 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	@Override
 	public 	double getCurrentPressure() {
 		return hw.getPressure(pressIndex);
+	}
+
+	public TableDisplay getTable() {
+		return table;
+	}
+
+	public void setTable(TableDisplay table) {
+		this.table = table;
 	}
 }

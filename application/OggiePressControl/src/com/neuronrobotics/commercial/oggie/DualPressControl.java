@@ -2,6 +2,8 @@ package com.neuronrobotics.commercial.oggie;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -28,8 +30,8 @@ public class DualPressControl extends JPanel implements IPressControler {
 		this.press2 = press2;
 		setLayout(new MigLayout());
 		add(useDualPress,"wrap");
-		table = new TableDisplay(true,true, this);
-		add(table,"wrap");
+		setTable(new TableDisplay(true,true, this));
+		add(getTable(),"wrap");
 		useDualPress.addActionListener(new ActionListener() {
 			
 			@Override
@@ -38,14 +40,14 @@ public class DualPressControl extends JPanel implements IPressControler {
 				getHw().abortCycle(1);
 				getPress1().setPressControlEnabled(!useDualPress.isSelected());
 				getPress2().setPressControlEnabled(!useDualPress.isSelected());
-				table.setEnabled(useDualPress.isSelected());
+				getTable().setEnabled(useDualPress.isSelected());
 				if(useDualPress.isSelected()){
-					getHw().addPressHardwareListener(table);
+					getHw().addPressHardwareListener(getTable());
 				}else
-					getHw().removePressHardwareListener(table);
+					getHw().removePressHardwareListener(getTable());
 			}
 		});
-		table.setEnabled(false);
+		getTable().setEnabled(false);
 	}
 	public SinglePressControl getPress1() {
 		return press1;
@@ -53,6 +55,8 @@ public class DualPressControl extends JPanel implements IPressControler {
 	public SinglePressControl getPress2() {
 		return press2;
 	}
+
+	
 	@Override
 	public void onCycleStart(CycleConfig config) {
 		abortCycle();
@@ -70,5 +74,11 @@ public class DualPressControl extends JPanel implements IPressControler {
 	}
 	public PressHardware getHw() {
 		return hw;
+	}
+	public TableDisplay getTable() {
+		return table;
+	}
+	public void setTable(TableDisplay table) {
+		this.table = table;
 	}
 }
