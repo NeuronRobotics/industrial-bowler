@@ -48,7 +48,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private MyDefaultTableModel model = new MyDefaultTableModel();
 	private JTable table = new JTable(model);
 	private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
-	private JComboBox< String> cycleName = new JComboBox<String>();
+	private JComboBox cycleName = new JComboBox();
 	private JTextField tons = new JTextField(" 003.700 ");
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
