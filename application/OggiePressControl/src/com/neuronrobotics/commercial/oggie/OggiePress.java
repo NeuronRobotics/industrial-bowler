@@ -31,6 +31,7 @@ public class OggiePress {
 		if (!ConnectionDialog.getBowlerDevice(dyio)){
 			//System.exit(1);
 			System.out.println("Running in virtual mode");
+			dyio=null;
 		}
 		hw = new PressHardware(dyio);
 		

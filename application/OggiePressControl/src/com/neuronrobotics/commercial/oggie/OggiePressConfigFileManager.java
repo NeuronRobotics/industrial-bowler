@@ -39,16 +39,21 @@ public class OggiePressConfigFileManager {
 			config.createNewFile();
 			save();
 		}else{
-			//load config from file
-			System.out.println("Loading file: "+config.getAbsolutePath());
-			Document doc =XmlFactory.getAllNodesDocument(new FileInputStream(config));
-			NodeList p1 = doc.getElementsByTagName("press1");
-			NodeList p2 = doc.getElementsByTagName("press2");
-			NodeList pd = doc.getElementsByTagName("dual");
-			
-			press1.getTable().setConfigNode(p1);
-			press2.getTable().setConfigNode(p2);
-			dual.getTable().setConfigNode(pd);
+			try{
+				System.out.println("Loading file: "+config.getAbsolutePath());
+				Document doc =XmlFactory.getAllNodesDocument(new FileInputStream(config));
+				NodeList p1 = doc.getElementsByTagName("press1");
+				NodeList p2 = doc.getElementsByTagName("press2");
+				NodeList pd = doc.getElementsByTagName("dual");
+				
+				press1.getTable().setConfigNode(p1);
+				press2.getTable().setConfigNode(p2);
+				dual.getTable().setConfigNode(pd);
+				
+			}catch(Exception e){
+				config.createNewFile();
+				save();
+			}
 			
 		}
 		loading = false;

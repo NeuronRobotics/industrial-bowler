@@ -59,7 +59,7 @@ public class DualPressControl extends JPanel implements IPressControler {
 	
 	@Override
 	public void onCycleStart(CycleConfig config) {
-		abortCycle();
+		//abortCycle();
 		getHw().onCycleStart(0, config); 
 		getHw().onCycleStart(1, config); 
 	}

@@ -45,7 +45,7 @@ public class PressHardware {
 		setPressure(i, 0);
 	}
 	public void onCycleStart(int i, CycleConfig config) {
-		
+		System.out.println("Starting Press Cycle from HW index = "+i);
 		if(dyio==null){
 			new VirtualPress(i).start();
 		}

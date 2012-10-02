@@ -308,6 +308,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private boolean isPressReady(){
 		double t = Double.parseDouble(tons.getText());
 		double c = press.getCurrentPressure();
+		//System.out.println("Target Pressure = "+t+" current = "+c);
 		return (		c>=t-bound && 
 						c<=t+bound);
 	}
@@ -485,6 +486,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		if(i==0 && usePress0||i==1 && usePress1){
 			new Thread(){
 				public void run(){
+					System.out.println("Starting press and hold thread");
 					ButtonModel aModel = start.getModel();
 					while(aModel.isArmed() && aModel.isPressed()){
 						ThreadUtil.wait(100);
@@ -492,6 +494,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 							ready.setVisible(true);
 						}
 					}
+					System.out.println("End press and hold thread");
 				}
 			}.start();
 		}
