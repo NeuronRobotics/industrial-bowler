@@ -29,8 +29,8 @@ public class OggiePress {
 		dyio=new DyIO();
 		dyio.enableDebug();
 		if (!ConnectionDialog.getBowlerDevice(dyio)){
-			System.out.println("Using virtual hardware");
-			dyio=null;
+			//System.exit(1);
+			System.out.println("Running in virtual mode");
 		}
 		hw = new PressHardware(dyio);
 		
@@ -76,8 +76,7 @@ public class OggiePress {
 		tabs.addTab("Press #2", press2);
 		tabs.addTab("Dual Press", both);
 		frame.setContentPane(tabs);
-		frame.setSize(900, 675);
-		frame.setLocationRelativeTo(null);
+		frame.setSize(800, 600);
 		frame.setVisible(true);
 	}
 	
