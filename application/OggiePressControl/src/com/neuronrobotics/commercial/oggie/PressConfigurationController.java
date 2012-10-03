@@ -4,6 +4,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.sun.org.apache.xerces.internal.xni.grammars.Grammar;
+
 import net.miginfocom.swing.MigLayout;
 
 public class PressConfigurationController extends JPanel implements IPressHardwareListener{
@@ -55,6 +57,11 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 	@Override
 	public void onTempretureChange(int i, double degreesFarenhight) {
 		graphs[i].onTempretureChange(i, degreesFarenhight);
+	}
+
+	@Override
+	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
+		graphs[press].onCycleIndexUpdate(index, press, newTargetTemp);
 	}
 
 }

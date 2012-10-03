@@ -24,4 +24,12 @@ public interface IPressHardwareListener {
 	 * @param degreesFarenhight
 	 */
 	void onTempretureChange(int i, double degreesFarenhight);
+	
+	/**
+	 * Called when the cycle index turns over
+	 * @param index the cycle index
+	 * @param press the press index
+	 * @param newTargetTemp the current target tempreture
+	 */
+	void onCycleIndexUpdate(int index, int press, double newTargetTemp);
 }

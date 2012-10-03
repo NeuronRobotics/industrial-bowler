@@ -24,9 +24,9 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 	private static final long serialVersionUID = -1342874101887400385L;
 	
 	private XYSeries targetPressure = new XYSeries("Target Pressure");
-	private XYSeries targetTemp = new XYSeries("Target Tempreture");
+	private XYSeries targetTemp = new XYSeries("Target Temperature");
 	private XYSeries measuredPressure = new XYSeries("Measured Pressure");
-	private XYSeries measuredTemp = new XYSeries("Measured Tempreture");
+	private XYSeries measuredTemp = new XYSeries("Measured Temperature");
 	private long startTime = System.currentTimeMillis();
 	
 	private XYSeriesCollection xyDataset;
@@ -99,6 +99,13 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 		double time = (double)(System.currentTimeMillis()-startTime)/1000.0/60.0;
 		System.out.println("Temp change at time: "+time);
 		measuredTemp.add(time, degreesFarenhight);
+	}
+
+
+	@Override
+	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

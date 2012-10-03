@@ -81,4 +81,10 @@ public class DualPressControl extends JPanel implements IPressControler {
 	public void setTable(TableDisplay table) {
 		this.table = table;
 	}
+	@Override
+	public void setTempreture(double t) {
+		// TODO Auto-generated method stub
+		getHw().setTargetTempreture(0, t);
+		getHw().setTargetTempreture(1, t);
+	}
 }

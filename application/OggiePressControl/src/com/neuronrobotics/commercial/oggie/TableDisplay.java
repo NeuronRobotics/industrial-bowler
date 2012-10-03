@@ -50,14 +50,17 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
 	private JComboBox cycleName = new JComboBox();
 	private JTextField tons = new JTextField(" 003.700 ");
+	private JTextField currentTemp = new JTextField(" 000.000 ");
+	private JTextField currentPressure = new JTextField(" 000.000 ");
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
 	private JPasswordField passwd = new JPasswordField(15);
 	private JButton unlock = new JButton("Unlock");
 	private JButton lock = new JButton("Lock");
-	private RoundButton start = new RoundButton("Start",new Dimension(100, 100));
+	private RoundButton start = new RoundButton("Start Cycle",new Dimension(100, 100));
+	private RoundButton setTemp = new RoundButton("Set Temp",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
-	private RoundButton abort = new RoundButton("Abort",new Dimension(100, 100));
+	private RoundButton abort = new RoundButton("Abort Cycle",new Dimension(100, 100));
 	private PressGraph  graph = new PressGraph("Data");
 	
 	private IPressControler press;
@@ -68,6 +71,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private static final double bound = .1;
 	private final boolean usePress0;
 	private final boolean usePress1;
+	
+	private boolean waitingForTemp = false;
 	
 	private double lowestTemp = 180;
 	private double highestTemp = 350;
@@ -83,7 +88,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		this.usePress0 = usePress0;
 		this.usePress1 = usePress1;
 		setLayout(new MigLayout());
-		press=p;		
+		press=p;
 		getTable().setBorder(BorderFactory.createLoweredBevelBorder());		
 		setBorder(BorderFactory.createLoweredBevelBorder());		
 		// Disable auto resizing
@@ -92,6 +97,15 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		getTable().getColumnModel().getColumn(0).setPreferredWidth(70);
 		getTable().getColumnModel().getColumn(1).setPreferredWidth(70);
 		setEditable(true);
+		
+		
+		setTemp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				press.setTempreture(getStartingTempreture());
+				waitingForTemp = true;
+			}
+		});
 		
 		start.addChangeListener(new ChangeListener() {
 			@Override
@@ -227,9 +241,20 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(load,"wrap");
 		controlsPanel.add(new JLabel("Cycle Name"));
 		controlsPanel.add(cycleName,"wrap");
-		controlsPanel.add(new JLabel("Pressure (Tons)"));
+		
+		controlsPanel.add(new JLabel("Target Pressure (Tons)"));
 		controlsPanel.add(tons,"wrap");
+		controlsPanel.add(new JLabel("Current Pressure (Tons)"));
+		controlsPanel.add(currentPressure,"wrap");
+		controlsPanel.add(new JLabel("Current Tempreture (F)"));
+		controlsPanel.add(currentTemp,"wrap");
+		
+		currentPressure.setEditable(false);
+		currentTemp.setEditable(false);		
+		
+		
 		controlsPanel.add(save,"wrap");
+		controlsPanel.add(setTemp,"wrap");
 		controlsPanel.add(start);
 		controlsPanel.add(ready,"wrap");
 		controlsPanel.add(abort,"wrap");
@@ -246,12 +271,16 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		interfacePanel.add(controlsPanel);
 		
 		add(interfacePanel,"wrap");
-		add(graph,"wrap");
+		//add(graph,"wrap");
 		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
 		//Load in default values on startup
 		setCycleConfig(new CycleConfig());
 		cycleName.addItem(defaultFileString);
-		setDataTebleLockState(true);
+		setEnabled(true);
+	}
+	
+	private double getStartingTempreture(){
+		return getTableData()[0][1];// first temp in the table
 	}
 	
 	public void setSelectedFile(String name){
@@ -316,8 +345,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private void abort(){
 		System.out.println("Press Aborted");
 		abort.setEnabled(false);
-		start.setEnabled(true);
+		start.setEnabled(false);
 		ready.setVisible(false);
+		setTemp.setEnabled(true);
 	}
 	
 	@Override
@@ -327,15 +357,18 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			unlock.setEnabled(false);
 			lock.setEnabled(false);
 		}
-		passwd.setEnabled(b);
-		tons.setEnabled(b);
-		start.setEnabled(b);
-		save.setEnabled(b);
-		cycleName.setEnabled(b);
-		load.setEnabled(b);
+		start.setEnabled(false);
 		abort.setEnabled(false);
 		ready.setVisible(false);
 		
+		passwd.setEnabled(b);
+		tons.setEnabled(b);
+		save.setEnabled(b);
+		cycleName.setEnabled(b);
+		load.setEnabled(b);
+		setTemp.setEnabled(b);
+
+		super.setEnabled(b);
 	}
 	
 	public void setCycleConfig(CycleConfig conf){
@@ -391,7 +424,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < hight; j++) {
-				String current = this.getTable().getValueAt(i, j).toString();
+				String current = getTable().getValueAt(i, j).toString();
 				data[i][j] = Double.parseDouble( current);
 			}
 		}
@@ -486,7 +519,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		if(i==0 && usePress0||i==1 && usePress1){
 			new Thread(){
 				public void run(){
-					System.out.println("Starting press and hold thread");
+					//System.out.println("Starting press and hold thread");
 					ButtonModel aModel = start.getModel();
 					while(aModel.isArmed() && aModel.isPressed()){
 						ThreadUtil.wait(100);
@@ -494,7 +527,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 							ready.setVisible(true);
 						}
 					}
-					System.out.println("End press and hold thread");
+					//System.out.println("End press and hold thread");
 				}
 			}.start();
 		}
@@ -514,14 +547,33 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
-		if(i==0 && usePress0||i==1 && usePress1)
+		if(i==0 && usePress0||i==1 && usePress1){
 			graph.onPressureChange(i, pressureTons);
+			currentPressure.setText(new DecimalFormat( " 000.000 " ).format(pressureTons));
+		}
 	}
 
 	@Override
-	public void onTempretureChange(int i, double degreesFarenhight) {
-		if(i==0 && usePress0||i==1 && usePress1)
+	public void onTempretureChange(int i, final double degreesFarenhight) {
+		if(i==0 && usePress0||i==1 && usePress1){
 			graph.onTempretureChange(i, degreesFarenhight);
+			currentTemp.setText(new DecimalFormat( " 000.000 " ).format(degreesFarenhight));
+			new Thread(){
+				public void run(){
+					ThreadUtil.wait(100);
+					if(waitingForTemp){
+						if(!(	degreesFarenhight > (getStartingTempreture()+1) || 
+								degreesFarenhight < (getStartingTempreture()-1))){
+							start.setEnabled(true);
+							setTemp.setEnabled(false);
+							waitingForTemp=false;
+						}
+						
+					}
+				}
+			}.start();
+			
+		}
 	}
 
 	public void setConfigFileManager(OggiePressConfigFileManager fm) {
@@ -572,5 +624,11 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		}
 		
 		setSelectedFile(sel);
+	}
+
+	@Override
+	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
+		// TODO Auto-generated method stub
+		
 	} 
 }

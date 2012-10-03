@@ -16,9 +16,25 @@ public class PressHardware {
 	
 	private boolean [] abort = new boolean[]{false,false};
 	
+	private VirtualPress [] vp = new VirtualPress[2];
+	
 	public PressHardware (DyIO d){
 		dyio=d;
-		
+		if(d==null){
+			vp[0]=new VirtualPress(0);
+			vp[1]=new VirtualPress(1);
+			vp[0].start();
+			vp[1].start();
+		}
+	}
+	
+	public void setTargetTempreture(int index, double t){
+		if(dyio==null){
+			vp[index].setTargetTemp(t);
+		}else{
+			//do hardware
+		}
+		setTempreture(index, getTempreture(index));
 	}
 	
 	private void setTempreture(int index, double t){
@@ -40,6 +56,11 @@ public class PressHardware {
 	
 	
 	public void abortCycle(int i) {
+		if(dyio==null){
+			vp[i].abort();
+		}else{
+			//do hardware
+		}
 		abort[i]=true;
 		fireAbort(i);
 		setPressure(i, 0);
@@ -47,7 +68,9 @@ public class PressHardware {
 	public void onCycleStart(int i, CycleConfig config) {
 		System.out.println("Starting Press Cycle from HW index = "+i);
 		if(dyio==null){
-			new VirtualPress(i).start();
+			vp[i].setRunClose(true);
+		}else{
+			//do hardware
 		}
 		abort[i]=false;
 		targetcycle[i]=config;
@@ -118,16 +141,70 @@ public class PressHardware {
 	
 	private class VirtualPress extends Thread{
 		private final int index;
+		
+		private boolean runClose = false;
+		private boolean runVirtual = true;
+		private double targetTemp = 0.0;
+		private double currentTemp = 0.0;
+		
+		private double closeIndex = 0;
+		
+		
+		
 		public VirtualPress(int index){
 			this.index = index;
+			abort();
 		}
+		
 		public void run(){
 			System.out.println("Press hardware starting..");
-			ThreadUtil.wait(2000);
-			if(!abort[index]){
-				setPressure(index, targetcycle[index].getPressure());
-				System.out.println("Press "+index+" is ready");
+			double size=100;
+			while(isRunVirtual()){
+				ThreadUtil.wait(50);
+				if(isRunClose()){
+					closeIndex+=1;
+					if(closeIndex<size){
+						setPressure(index, targetcycle[index].getPressure()*(closeIndex/size));
+					}else{
+						runClose = false;
+					}
+				}
+				if(		currentTemp > (getTargetTemp()+.5) || 
+						currentTemp < (getTargetTemp()-.5)){
+					if(currentTemp>getTargetTemp()){
+						currentTemp-=1;
+					}else{
+						currentTemp+=1;
+					}
+					setTempreture(index, currentTemp);
+				}
 			}
+			
+		}
+
+		public boolean isRunVirtual() {
+			return runVirtual;
+		}
+		
+		public boolean isRunClose() {
+			return runClose;
+		}
+
+		public void setRunClose(boolean runClose) {
+			this.runClose = runClose;
+		}
+
+		public double getTargetTemp() {
+			return targetTemp;
+		}
+
+		public void setTargetTemp(double targetTemp) {
+			this.targetTemp = targetTemp;
+		}
+		
+		public void abort(){
+			closeIndex = 0;
+			runClose = false;
 		}
 	}
 }

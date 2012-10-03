@@ -69,4 +69,9 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	public void setTable(TableDisplay table) {
 		this.table = table;
 	}
+
+	@Override
+	public void setTempreture(double t) {
+		hw.setTargetTempreture(pressIndex, t);
+	}
 }

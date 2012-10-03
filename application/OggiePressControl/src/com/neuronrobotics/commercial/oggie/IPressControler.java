@@ -1,7 +1,5 @@
 package com.neuronrobotics.commercial.oggie;
 
-import Jama.Matrix;
-
 public interface IPressControler {
 	
 	/**
@@ -21,5 +19,17 @@ public interface IPressControler {
 	 * @return the pressure in tons
 	 */
 	double getCurrentPressure();
+
+	/**
+	 * Tells the press to start up to the target tempreture
+	 * @param t
+	 */
+	void setTempreture(double t);
+	
+	/**
+	 * Checks to see if press is up to temperature
+	 * @return temp in (F)
+	 */
+	//boolean isAtTempreture();
 
 }
