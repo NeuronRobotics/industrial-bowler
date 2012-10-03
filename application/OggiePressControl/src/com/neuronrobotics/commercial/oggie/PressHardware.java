@@ -1,6 +1,7 @@
 package com.neuronrobotics.commercial.oggie;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.util.ThreadUtil;
@@ -75,6 +76,7 @@ public class PressHardware {
 		abort[i]=false;
 		targetcycle[i]=config;
 		fireCycleStart(i, config);
+		new CycleTimer(i).start();
 	}
 	
 	/**
@@ -112,30 +114,63 @@ public class PressHardware {
 	public void removeAllPressHardwareListener() {
 		listeners.clear();
 	}
-	
+	public void fireCycleIndexUpdate(int index, int press, double newTargetTemp) {
+		for(IPressHardwareListener l : listeners) {
+			l.onCycleIndexUpdate(index, press,  newTargetTemp);
+		}
+	}
 	
 	public void fireCycleStart(int i, CycleConfig config) {
-		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
 			l.onCycleStart(i, config);
 		}
 	}
 	public void fireAbort(int i) {
-		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
 			l.onAbortCycle(i);
 		}
 	}
 	public void firePressureChange(int i, double pressure) {
-		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
 			l.onPressureChange(i, pressure);
 		}
 	}
 	public void fireTempretureChange(int i, double temp) {
-		//System.out.println("DyIO Event: "+e);
 		for(IPressHardwareListener l : listeners) {
 			l.onTempretureChange(i, temp);
+		}
+	}
+	
+	private class CycleTimer extends Thread{
+		private int index;
+		private long startTime;
+		double time;
+		public CycleTimer(int index){
+			this.index = index;
+			
+		}
+		public void run(){
+			startTime=System.currentTimeMillis();
+			int cycleIndex=0;
+			while(!abort[index] && cycleIndex<CycleConfig.dataSize){
+				ThreadUtil.wait(100);
+				time = ((double)System.currentTimeMillis()-startTime)/1000.0/60.0;
+				if(time>getTime(cycleIndex)){
+					fire(cycleIndex++);
+				}
+			}
+			System.out.println("Cycle time bailing out!");
+		}
+		
+		private double getTime(int i){
+			return targetcycle[index].getTimes()[i];
+		}
+		
+		private void fire(int i){
+			double temp = targetcycle[index].getTempretures()[i];
+			setTargetTempreture(index, temp);
+			fireCycleIndexUpdate(i, index, temp);
+			System.out.println("Fireing cycle update from hardware = "+time+" time = "+ new Date(System.currentTimeMillis()));
 		}
 	}
 	

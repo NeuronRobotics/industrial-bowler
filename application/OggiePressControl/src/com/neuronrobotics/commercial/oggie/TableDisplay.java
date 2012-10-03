@@ -3,6 +3,7 @@ package com.neuronrobotics.commercial.oggie;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -50,8 +51,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
 	private JComboBox cycleName = new JComboBox();
 	private JTextField tons = new JTextField(" 003.700 ");
-	private JTextField currentTemp = new JTextField(" 000.000 ");
-	private JTextField currentPressure = new JTextField(" 000.000 ");
+	private JLabel currentTemp = new JLabel(" 000.000 ");
+	private JLabel currentPressure = new JLabel(" 000.000 ");
+	private JLabel timeRemaining   = new JLabel("000 min");
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
 	private JPasswordField passwd = new JPasswordField(15);
@@ -124,6 +126,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				if(	isPressReady()){
 					System.out.println("Press Running");
 					abort.setEnabled(true);
+					timeRemaining.setVisible(true);
 					start.setEnabled(false);
 				}else{
 					press.abortCycle();
@@ -231,6 +234,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		abort.setEnabled(false);
 		ready.setColor(Color.green);
 		start.setColor(Color.yellow);
+		timeRemaining.setFont(new Font("Dialog", Font.PLAIN, 24));
 		
 		JPanel tablePanel = new JPanel(new MigLayout());
 		JPanel controlsPanel = new JPanel(new MigLayout());
@@ -238,7 +242,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		tablePanel.add(new JLabel("Time(min)  Temp(F)"),"wrap");
 		tablePanel.add(getTable(),"wrap");
 		
-		controlsPanel.add(load,"wrap");
+		controlsPanel.add(load);
+		controlsPanel.add(save,"wrap");
 		controlsPanel.add(new JLabel("Cycle Name"));
 		controlsPanel.add(cycleName,"wrap");
 		
@@ -247,17 +252,14 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(new JLabel("Current Pressure (Tons)"));
 		controlsPanel.add(currentPressure,"wrap");
 		controlsPanel.add(new JLabel("Current Tempreture (F)"));
-		controlsPanel.add(currentTemp,"wrap");
-		
-		currentPressure.setEditable(false);
-		currentTemp.setEditable(false);		
+		controlsPanel.add(currentTemp,"wrap");	
 		
 		
-		controlsPanel.add(save,"wrap");
 		controlsPanel.add(setTemp,"wrap");
 		controlsPanel.add(start);
 		controlsPanel.add(ready,"wrap");
-		controlsPanel.add(abort,"wrap");
+		controlsPanel.add(abort);
+		controlsPanel.add(timeRemaining,"wrap");
 		
 		controlsPanel.add(new JLabel("Administrator Mode"));
 		controlsPanel.add(passwd,"wrap");
@@ -344,6 +346,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	private void abort(){
 		System.out.println("Press Aborted");
+		timeRemaining.setVisible(false);
 		abort.setEnabled(false);
 		start.setEnabled(false);
 		ready.setVisible(false);
@@ -359,6 +362,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		}
 		start.setEnabled(false);
 		abort.setEnabled(false);
+		timeRemaining.setVisible(false);
 		ready.setVisible(false);
 		
 		passwd.setEnabled(b);
@@ -628,7 +632,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	@Override
 	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
-		// TODO Auto-generated method stub
-		
+		double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[index][0];
+		timeRemaining.setText(new DecimalFormat( "000" ).format(minRemain)+" min");
 	} 
 }

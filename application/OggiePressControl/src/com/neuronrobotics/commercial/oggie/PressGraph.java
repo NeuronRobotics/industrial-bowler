@@ -89,7 +89,7 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
 		double time = (double)(System.currentTimeMillis()-startTime)/1000.0/60.0;
-		System.out.println("Pressure change at time: "+time);
+		//System.out.println("Pressure change at time: "+time);
 		measuredPressure.add(time, pressureTons*100);
 	}
 
@@ -97,7 +97,7 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 	@Override
 	public void onTempretureChange(int i, double degreesFarenhight) {
 		double time = (double)(System.currentTimeMillis()-startTime)/1000.0/60.0;
-		System.out.println("Temp change at time: "+time);
+		//System.out.println("Temp change at time: "+time);
 		measuredTemp.add(time, degreesFarenhight);
 	}
 
