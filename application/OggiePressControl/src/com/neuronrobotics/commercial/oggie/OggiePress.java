@@ -70,6 +70,7 @@ public class OggiePress {
 		press2= new SinglePressControl(hw, 1);
 		both= new DualPressControl(hw,press1,press2);
 		fm = new OggiePressConfigFileManager(press1, press2, both);
+		hw.addPressHardwareListener(fm);
 		
 		config=new PressConfigurationController(hw);
 		tabs.addTab("Home", config);

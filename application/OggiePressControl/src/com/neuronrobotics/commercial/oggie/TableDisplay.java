@@ -633,10 +633,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	}
 
 	@Override
-	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
-		double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[index][0];
-		timeRemaining.setText(new DecimalFormat( "000" ).format(minRemain)+" min");
-		if(index == CycleConfig.dataSize-1){
+	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
+		//double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[currentTableIndex][0];
+		this.timeRemaining.setText(new DecimalFormat( "000" ).format(timeRemaining)+" min");
+		if(currentTableIndex == CycleConfig.dataSize-1){
 			abort.setText("Open Press");
 			abort.setColor(Color.green);
 			ready.setVisible(false);

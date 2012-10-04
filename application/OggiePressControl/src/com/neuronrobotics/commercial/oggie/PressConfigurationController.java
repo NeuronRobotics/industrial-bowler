@@ -60,8 +60,8 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 	}
 
 	@Override
-	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
-		graphs[press].onCycleIndexUpdate(index, press, newTargetTemp);
+	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
+		graphs[press].onCycleIndexUpdate(currentTableIndex, currentTableTime, timeRemaining, press, newTargetTemp);
 	}
 
 }

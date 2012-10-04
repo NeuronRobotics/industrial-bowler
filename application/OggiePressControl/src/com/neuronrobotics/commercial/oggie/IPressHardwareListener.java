@@ -31,5 +31,5 @@ public interface IPressHardwareListener {
 	 * @param press the press index
 	 * @param newTargetTemp the current target tempreture
 	 */
-	void onCycleIndexUpdate(int index, int press, double newTargetTemp);
+	void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp);
 }

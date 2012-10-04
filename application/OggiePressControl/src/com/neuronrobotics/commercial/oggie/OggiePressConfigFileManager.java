@@ -14,7 +14,7 @@ import org.w3c.dom.NodeList;
 import com.neuronrobotics.sdk.addons.kinematics.xml.XmlFactory;
 import com.neuronrobotics.sdk.common.Log;
 
-public class OggiePressConfigFileManager {
+public class OggiePressConfigFileManager implements IPressHardwareListener{
 	
 	private SinglePressControl press1;
 	private SinglePressControl press2;
@@ -96,6 +96,36 @@ public class OggiePressConfigFileManager {
 		s+="</dual>\n";
 		s+="</root>\n";
 		return s;
+	}
+
+	@Override
+	public void onCycleStart(int i, CycleConfig config) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAbortCycle(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPressureChange(int i, double pressureTons) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTempretureChange(int i, double degreesFarenhight) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

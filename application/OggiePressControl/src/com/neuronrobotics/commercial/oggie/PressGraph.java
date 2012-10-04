@@ -103,7 +103,7 @@ public class PressGraph extends JPanel implements IPressHardwareListener{
 
 
 	@Override
-	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
+	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
 		// TODO Auto-generated method stub
 		
 	}

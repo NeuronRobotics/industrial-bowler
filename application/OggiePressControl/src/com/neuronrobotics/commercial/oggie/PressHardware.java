@@ -114,9 +114,9 @@ public class PressHardware {
 	public void removeAllPressHardwareListener() {
 		listeners.clear();
 	}
-	public void fireCycleIndexUpdate(int index, int press, double newTargetTemp) {
+	public void fireCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
 		for(IPressHardwareListener l : listeners) {
-			l.onCycleIndexUpdate(index, press,  newTargetTemp);
+			l.onCycleIndexUpdate(currentTableIndex, currentTableTime, timeRemaining, press, newTargetTemp);
 		}
 	}
 	
@@ -142,17 +142,17 @@ public class PressHardware {
 	}
 	
 	private class CycleTimer extends Thread{
-		private int index;
+		private int pressIndex;
 		private long startTime;
 		double time;
 		public CycleTimer(int index){
-			this.index = index;
+			this.pressIndex = index;
 			
 		}
 		public void run(){
 			startTime=System.currentTimeMillis();
 			int cycleIndex=0;
-			while(!abort[index] && cycleIndex<CycleConfig.dataSize){
+			while(!abort[pressIndex] && cycleIndex<CycleConfig.dataSize){
 				ThreadUtil.wait(100);
 				time = ((double)System.currentTimeMillis()-startTime)/1000.0/60.0;
 				if(time>getTime(cycleIndex)){
@@ -163,13 +163,15 @@ public class PressHardware {
 		}
 		
 		private double getTime(int i){
-			return targetcycle[index].getTimes()[i];
+			return targetcycle[pressIndex].getTimes()[i];
 		}
 		
 		private void fire(int i){
-			double temp = targetcycle[index].getTempretures()[i];
-			setTargetTempreture(index, temp);
-			fireCycleIndexUpdate(i, index, temp);
+			double temp = targetcycle[pressIndex].getTempretures()[i];
+			setTargetTempreture(pressIndex, temp);
+			double currentTableTime=targetcycle[pressIndex].getTimes()[i];
+			double timeRemaining=targetcycle[pressIndex].getTimes()[CycleConfig.dataSize-1]-currentTableTime;
+			fireCycleIndexUpdate(i, currentTableTime, timeRemaining, pressIndex, temp);
 			System.out.println("Fireing cycle update from hardware = "+time+" time = "+ new Date(System.currentTimeMillis()));
 		}
 	}
