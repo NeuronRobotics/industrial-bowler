@@ -351,6 +351,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		start.setEnabled(false);
 		ready.setVisible(false);
 		setTemp.setEnabled(true);
+		abort.setText("Abort Cycle");
+		abort.setColor(Color.red);
 	}
 	
 	@Override
@@ -634,5 +636,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	public void onCycleIndexUpdate(int index, int press, double newTargetTemp) {
 		double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[index][0];
 		timeRemaining.setText(new DecimalFormat( "000" ).format(minRemain)+" min");
+		if(index == CycleConfig.dataSize-1){
+			abort.setText("Open Press");
+			abort.setColor(Color.green);
+			ready.setVisible(false);
+		}
 	} 
 }
