@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,7 @@ import org.w3c.dom.NodeList;
 
 import com.neuronrobotics.sdk.addons.kinematics.xml.XmlFactory;
 import com.neuronrobotics.sdk.common.Log;
+import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class OggiePressConfigFileManager implements IPressHardwareListener{
 	
@@ -20,9 +22,10 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 	private SinglePressControl press2;
 	private DualPressControl dual;
 	private String configFileLocation = System.getProperty("user.home")+"/OggiePressSystem.xml";
+	private String logFileLocation = System.getProperty("user.home")+"/OggiePressSystemLog.csv";
 	
 	private File config =null;
-	
+	private File log =null;
 	private boolean loading = false;
 
 	public OggiePressConfigFileManager(SinglePressControl press1,SinglePressControl press2, DualPressControl dual) throws IOException{
@@ -35,6 +38,7 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 		dual.getTable().setConfigFileManager(this);
 		
 		config = new File(configFileLocation);
+		log    = new File(logFileLocation);
 		if(!config.exists()){
 			config.createNewFile();
 			save();
@@ -56,6 +60,11 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 			}
 			
 		}
+		
+		if(! log.exists()){
+			log.createNewFile();
+		}
+		writeLine("Open Press Application");
 		loading = false;
 		
 	}
@@ -100,32 +109,56 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 
 	@Override
 	public void onCycleStart(int i, CycleConfig config) {
-		// TODO Auto-generated method stub
-		
+		writeLine("onCycleStart,"+i+","+config.getPressure());
+		ThreadUtil.wait(200);
+		writeLine("onCycleStart temp,"+i+","+config.getTempString());
+		ThreadUtil.wait(200);
+		writeLine("onCycleStart times,"+i+","+config.getTimeString());
 	}
 
 	@Override
 	public void onAbortCycle(int i) {
-		// TODO Auto-generated method stub
-		
+		String s= "onAbortCycle,"+i;
+		writeLine(s);
 	}
 
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
-		// TODO Auto-generated method stub
-		
+		String s= "onPressureChange,"+i+","+pressureTons;
+		writeLine(s);
 	}
 
 	@Override
 	public void onTempretureChange(int i, double degreesFarenhight) {
 		// TODO Auto-generated method stub
-		
+		String s= "onTempretureChange,"+i+","+degreesFarenhight;
+		writeLine(s);
 	}
 
 	@Override
 	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
-		// TODO Auto-generated method stub
-		
+		String s= "onCycleIndexUpdate,"+press+","+currentTableIndex+","+currentTableTime+","+timeRemaining+","+newTargetTemp;
+		writeLine(s);
+	}
+	
+	private void writeLine(final String s){
+		new Thread(){
+			public void run(){
+				synchronized(log){
+					String line = System.currentTimeMillis()+","+new Date(System.currentTimeMillis())+","+s+"\r\n";
+					try{
+						  // Create file in append mode
+						  FileWriter fstream = new FileWriter(log.getAbsolutePath(),true);
+						  BufferedWriter out = new BufferedWriter(fstream);
+						  out.write(line);
+						  out.close();
+					}catch (Exception e){//Catch exception if any
+						  System.err.println("Error: " + e.getMessage());
+					}
+				}
+			}
+		}.start();
+
 	}
 
 }

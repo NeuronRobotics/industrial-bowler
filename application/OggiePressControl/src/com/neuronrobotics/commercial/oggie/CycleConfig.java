@@ -164,6 +164,12 @@ public class CycleConfig {
 		}
 		return s;
 	}
+	public String getTimeString(){
+		return arrayToString(getTimes());
+	}
+	public String getTempString(){
+		return arrayToString(getTempretures());
+	}
 
 	private String getTag() {
 		String s="";
@@ -172,10 +178,10 @@ public class CycleConfig {
 			s+=pressure;
 			s+="</pressure>\n";
 			s+="\t<time>";
-			s+=arrayToString(getTimes());
+			s+=getTimeString();
 			s+="</time>\n";
 			s+="\t<temp>";
-			s+=arrayToString(getTempretures());
+			s+=getTempString();
 			s+="</temp>\n";
 		s+="</OggiePress>\n";
 		return s;
