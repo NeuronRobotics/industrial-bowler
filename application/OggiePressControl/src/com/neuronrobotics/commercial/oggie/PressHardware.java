@@ -153,11 +153,12 @@ public class PressHardware {
 			startTime=System.currentTimeMillis();
 			int cycleIndex=0;
 			while(!abort[pressIndex] && cycleIndex<CycleConfig.dataSize){
-				ThreadUtil.wait(100);
+				ThreadUtil.wait(1000);
 				time = ((double)System.currentTimeMillis()-startTime)/1000.0/60.0;
 				if(time>getTime(cycleIndex)){
-					fire(cycleIndex++);
+					cycleIndex++;
 				}
+				fire(cycleIndex, time);
 			}
 			System.out.println("Cycle time bailing out!");
 		}
@@ -166,13 +167,13 @@ public class PressHardware {
 			return targetcycle[pressIndex].getTimes()[i];
 		}
 		
-		private void fire(int i){
+		private void fire(int i, double currentTime){
 			double temp = targetcycle[pressIndex].getTempretures()[i];
 			setTargetTempreture(pressIndex, temp);
 			double currentTableTime=targetcycle[pressIndex].getTimes()[i];
-			double timeRemaining=targetcycle[pressIndex].getTimes()[CycleConfig.dataSize-1]-currentTableTime;
-			fireCycleIndexUpdate(i, currentTableTime, timeRemaining, pressIndex, temp);
-			System.out.println("Fireing cycle update from hardware = "+time+" time = "+ new Date(System.currentTimeMillis()));
+			double timeRemaining=targetcycle[pressIndex].getTimes()[CycleConfig.dataSize-1]-currentTime;
+			fireCycleIndexUpdate(i, currentTime, timeRemaining, pressIndex, temp);
+			//System.out.println("Fireing cycle update from hardware = "+time+" time = "+ new Date(System.currentTimeMillis()));
 		}
 	}
 	

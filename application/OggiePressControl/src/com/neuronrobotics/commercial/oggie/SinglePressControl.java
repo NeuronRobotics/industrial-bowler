@@ -36,10 +36,10 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	public void setPressControlEnabled(boolean b){
 		getTable().setEnabled(b);
 		if(b){
-			enabledDisplay.setText("Press #"+pressIndex+ " Enabled");
+			enabledDisplay.setText("Press #"+(pressIndex+1)+ " Enabled");
 			hw.addPressHardwareListener(getTable());
 		}else{
-			enabledDisplay.setText("Press #"+pressIndex+ " Disabled");
+			enabledDisplay.setText("Press #"+(pressIndex+1)+ " Disabled");
 			hw.removePressHardwareListener(getTable());
 		}
 	}

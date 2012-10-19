@@ -63,7 +63,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private RoundButton setTemp = new RoundButton("Set Temp",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
 	private RoundButton abort = new RoundButton("Abort Cycle",new Dimension(100, 100));
-	private PressGraph  graph = new PressGraph("Data");
+	//private PressGraph  graph = new PressGraph("Data");
 	
 	private IPressControler press;
 	
@@ -274,7 +274,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		
 		add(interfacePanel,"wrap");
 		//add(graph,"wrap");
-		graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
+		//graph.onCycleStart(0,new CycleConfig(getTableDataMatrix(),getPressureSetpoint()));
 		//Load in default values on startup
 		setCycleConfig(new CycleConfig());
 		cycleName.addItem(defaultFileString);
@@ -378,7 +378,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	}
 	
 	public void setCycleConfig(CycleConfig conf){
-		graph.onAbortCycle(0);
+		//graph.onAbortCycle(0);
 		tons.setText(new DecimalFormat( " 000.000 " ).format(conf.getPressure()));
 		setTransform(conf.getTimeTemp());
 		if(conf.getConfigFile() == null){
@@ -514,9 +514,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				}
         	}
         	
-        	data[row][col] = new DecimalFormat( "000.000" ).format(newVal);
+        	data[row][col] = new DecimalFormat( "000.0" ).format(newVal);
             fireTableCellUpdated(row, col);
-            graph.onCycleStart(0,getCurrentCycleConfig());
+            //graph.onCycleStart(0,getCurrentCycleConfig());
         }
 	}
 
@@ -537,8 +537,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				}
 			}.start();
 		}
-		if(i==0 && usePress0||i==1 && usePress1)
-			graph.onCycleStart(i, config);
+		if(i==0 && usePress0||i==1 && usePress1){
+			//graph.onCycleStart(i, config);
+		}
 		
 	}
 
@@ -554,7 +555,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	@Override
 	public void onPressureChange(int i, double pressureTons) {
 		if(i==0 && usePress0||i==1 && usePress1){
-			graph.onPressureChange(i, pressureTons);
+			//graph.onPressureChange(i, pressureTons);
 			currentPressure.setText(new DecimalFormat( " 000.000 " ).format(pressureTons));
 		}
 	}
@@ -562,7 +563,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	@Override
 	public void onTempretureChange(int i, final double degreesFarenhight) {
 		if(i==0 && usePress0||i==1 && usePress1){
-			graph.onTempretureChange(i, degreesFarenhight);
+			//graph.onTempretureChange(i, degreesFarenhight);
 			currentTemp.setText(new DecimalFormat( " 000.000 " ).format(degreesFarenhight));
 			new Thread(){
 				public void run(){
@@ -635,7 +636,12 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	@Override
 	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
 		//double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[currentTableIndex][0];
-		this.timeRemaining.setText(new DecimalFormat( "000" ).format(timeRemaining)+" min");
+//		System.out.println(	"Index= "+currentTableIndex+
+//							" tableTime= " +currentTableTime +
+//							" Time remaining = " +timeRemaining);
+		double minFract =  (double)((int) timeRemaining);
+		double seconds = (timeRemaining - minFract )*59;
+		this.timeRemaining.setText(new DecimalFormat( "000" ).format(minFract)+" min "+new DecimalFormat( "00" ).format(seconds)+" sec");
 		if(currentTableIndex == CycleConfig.dataSize-1){
 			abort.setText("Open Press");
 			abort.setColor(Color.green);
