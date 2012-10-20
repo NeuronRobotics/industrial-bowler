@@ -26,6 +26,7 @@ public class DualPressControl extends JPanel implements IPressControler {
 	private final PressHardware hw;
 	public DualPressControl(PressHardware hw, SinglePressControl press1, SinglePressControl press2){
 		this.hw = hw;
+		hw.setDualMode(true);
 		this.press1 = press1;
 		this.press2 = press2;
 		setLayout(new MigLayout());

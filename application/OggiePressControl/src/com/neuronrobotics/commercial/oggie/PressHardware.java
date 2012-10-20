@@ -245,4 +245,13 @@ public class PressHardware {
 			runClose = false;
 		}
 	}
+	private boolean dualMode = false;
+	public boolean isDualMode() {
+		// TODO Auto-generated method stub
+		return dualMode;
+	}
+
+	public void setDualMode(boolean dualMode) {
+		this.dualMode = dualMode;
+	}
 }

@@ -33,9 +33,9 @@ public class AbortTimeWidget extends JPanel implements IPressHardwareListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(usePress0)
+				if(usePress0 || pressControler.isDualMode())
 					pressControler.abortCycle(0);
-				if(usePress1)
+				if(usePress1|| pressControler.isDualMode())
 					pressControler.abortCycle(1);
 			}
 		});
