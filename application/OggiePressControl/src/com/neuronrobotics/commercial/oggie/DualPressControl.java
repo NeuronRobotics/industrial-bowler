@@ -24,9 +24,9 @@ public class DualPressControl extends JPanel implements IPressControler {
 	private final SinglePressControl press2;
 	private TableDisplay table;
 	private final PressHardware hw;
-	public DualPressControl(PressHardware hw, SinglePressControl press1, SinglePressControl press2){
+	public DualPressControl(final PressHardware hw, SinglePressControl press1, SinglePressControl press2){
 		this.hw = hw;
-		hw.setDualMode(true);
+
 		this.press1 = press1;
 		this.press2 = press2;
 		setLayout(new MigLayout());
@@ -37,15 +37,19 @@ public class DualPressControl extends JPanel implements IPressControler {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
 				getHw().abortCycle(0);
 				getHw().abortCycle(1);
 				getPress1().setPressControlEnabled(!useDualPress.isSelected());
 				getPress2().setPressControlEnabled(!useDualPress.isSelected());
 				getTable().setEnabled(useDualPress.isSelected());
 				if(useDualPress.isSelected()){
+					hw.setDualMode(true);
 					getHw().addPressHardwareListener(getTable());
-				}else
+				}else{
 					getHw().removePressHardwareListener(getTable());
+					hw.setDualMode(false);
+				}
 			}
 		});
 		getTable().setEnabled(false);

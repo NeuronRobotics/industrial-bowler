@@ -47,13 +47,13 @@ public class AbortTimeWidget extends JPanel implements IPressHardwareListener{
 	
 	@Override
 	public void setEnabled(boolean b){
+		abort.setText("Abort Cycle");
 		if(b){
 			abort.setEnabled(true);
 //			timeRemaining.setVisible(true);
 		}else{
 //			timeRemaining.setVisible(false);
 			abort.setEnabled(false);
-			abort.setText("Abort Cycle");
 			abort.setColor(Color.red);
 			timeRemaining.setText("000 min 00 sec");
 		}
