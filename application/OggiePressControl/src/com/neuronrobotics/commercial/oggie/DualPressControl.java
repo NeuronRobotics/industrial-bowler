@@ -87,4 +87,8 @@ public class DualPressControl extends JPanel implements IPressControler {
 		getHw().setTargetTempreture(0, t);
 		getHw().setTargetTempreture(1, t);
 	}
+	@Override
+	public PressHardware getPressHardware() {
+		return hw;
+	}
 }

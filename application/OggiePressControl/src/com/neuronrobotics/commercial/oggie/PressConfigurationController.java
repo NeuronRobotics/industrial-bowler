@@ -22,18 +22,25 @@ public class PressConfigurationController extends JPanel implements IPressHardwa
 		
 		setBorder(BorderFactory.createLoweredBevelBorder());
 		JPanel graphPanel = new JPanel(new MigLayout());
-		graphs[0]=new PressGraph("Press #0 data");
-		graphs[1]=new PressGraph("Press #1 data");
+		
+		AbortTimeWidget abortTime0 = new AbortTimeWidget(true,false,hw);
+		AbortTimeWidget abortTime1 = new AbortTimeWidget(false,true,hw);
+		
+		graphs[0]=new PressGraph("Press #1 data");
+		graphs[1]=new PressGraph("Press #2 data");
 		
 		graphPanel.add(new JLabel("General Press Controls"),"wrap");
-		graphPanel.add(graphs[0],"wrap");
-		graphPanel.add(graphs[1],"wrap");
+		graphPanel.add(graphs[0]);
+		graphPanel.add(abortTime0,"wrap");
+		graphPanel.add(graphs[1]);
+		graphPanel.add(abortTime1,"wrap");
 		
 		JPanel controlPanel = new JPanel(new MigLayout());
 		
-		
+
 		
 		add(graphPanel);
+		
 		add(controlPanel);
 		
 		hw.addPressHardwareListener(this);

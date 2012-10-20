@@ -31,5 +31,9 @@ public interface IPressControler {
 	 * @return temp in (F)
 	 */
 	//boolean isAtTempreture();
+	/**
+	 * Returns the hardware object
+	 */
+	PressHardware getPressHardware();
 
 }

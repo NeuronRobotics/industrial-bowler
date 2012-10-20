@@ -74,4 +74,9 @@ public class SinglePressControl extends JPanel implements IPressControler {
 	public void setTempreture(double t) {
 		hw.setTargetTempreture(pressIndex, t);
 	}
+
+	@Override
+	public PressHardware getPressHardware() {
+		return hw;
+	}
 }

@@ -53,7 +53,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private JTextField tons = new JTextField(" 003.700 ");
 	private JLabel currentTemp = new JLabel(" 000.000 ");
 	private JLabel currentPressure = new JLabel(" 000.000 ");
-	private JLabel timeRemaining   = new JLabel("000 min");
+	
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
 	private JPasswordField passwd = new JPasswordField(15);
@@ -62,7 +62,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private RoundButton start = new RoundButton("Start Cycle",new Dimension(100, 100));
 	private RoundButton setTemp = new RoundButton("Set Temp",new Dimension(100, 100));
 	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
-	private RoundButton abort = new RoundButton("Abort Cycle",new Dimension(100, 100));
+	
+	private AbortTimeWidget abortTime;
+	
 	//private PressGraph  graph = new PressGraph("Data");
 	
 	private IPressControler press;
@@ -100,6 +102,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		getTable().getColumnModel().getColumn(1).setPreferredWidth(70);
 		setEditable(true);
 		
+		abortTime=new AbortTimeWidget(usePress0, usePress1,p.getPressHardware());
 		
 		setTemp.addActionListener(new ActionListener() {
 			@Override
@@ -125,21 +128,15 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			public void actionPerformed(ActionEvent arg0) {
 				if(	isPressReady()){
 					System.out.println("Press Running");
-					abort.setEnabled(true);
-					timeRemaining.setVisible(true);
+					abortTime.setEnabled(true);
+
 					start.setEnabled(false);
 				}else{
 					press.abortCycle();
 				}
 			}
 		});
-		abort.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				press.abortCycle();
-			}
-		});
+
 		
 		save.addActionListener(new ActionListener() {
 			
@@ -230,11 +227,10 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		
 		ready.setVisible(false);
 		//ready.setEnabled(false);
-		abort.setColor(Color.red);
-		abort.setEnabled(false);
+
 		ready.setColor(Color.green);
 		start.setColor(Color.yellow);
-		timeRemaining.setFont(new Font("Dialog", Font.PLAIN, 24));
+
 		
 		JPanel tablePanel = new JPanel(new MigLayout());
 		JPanel controlsPanel = new JPanel(new MigLayout());
@@ -258,8 +254,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(setTemp,"wrap");
 		controlsPanel.add(start);
 		controlsPanel.add(ready,"wrap");
-		controlsPanel.add(abort);
-		controlsPanel.add(timeRemaining,"wrap");
+		controlsPanel.add(abortTime,"wrap");
 		
 		controlsPanel.add(new JLabel("Administrator Mode"));
 		controlsPanel.add(passwd,"wrap");
@@ -346,13 +341,11 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	private void abort(){
 		System.out.println("Press Aborted");
-		timeRemaining.setVisible(false);
-		abort.setEnabled(false);
+
 		start.setEnabled(false);
 		ready.setVisible(false);
 		setTemp.setEnabled(true);
-		abort.setText("Abort Cycle");
-		abort.setColor(Color.red);
+		
 	}
 	
 	@Override
@@ -363,10 +356,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			lock.setEnabled(false);
 		}
 		start.setEnabled(false);
-		abort.setEnabled(false);
-		timeRemaining.setVisible(false);
+		abortTime.setEnabled(false);
 		ready.setVisible(false);
-		
 		passwd.setEnabled(b);
 		tons.setEnabled(b);
 		save.setEnabled(b);
@@ -635,16 +626,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 
 	@Override
 	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
-		//double minRemain = getTableData()[CycleConfig.dataSize-1][0] - getTableData()[currentTableIndex][0];
-//		System.out.println(	"Index= "+currentTableIndex+
-//							" tableTime= " +currentTableTime +
-//							" Time remaining = " +timeRemaining);
-		double minFract =  (double)((int) timeRemaining);
-		double seconds = (timeRemaining - minFract )*59;
-		this.timeRemaining.setText(new DecimalFormat( "000" ).format(minFract)+" min "+new DecimalFormat( "00" ).format(seconds)+" sec");
 		if(currentTableIndex == CycleConfig.dataSize-1){
-			abort.setText("Open Press");
-			abort.setColor(Color.green);
 			ready.setVisible(false);
 		}
 	} 

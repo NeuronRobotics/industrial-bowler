@@ -73,12 +73,12 @@ public class OggiePress {
 		hw.addPressHardwareListener(fm);
 		
 		config=new PressConfigurationController(hw);
-		tabs.addTab("Home", config);
+		tabs.addTab("Display", config);
 		tabs.addTab("Press #1", press1);
 		tabs.addTab("Press #2", press2);
 		tabs.addTab("Dual Press", both);
 		frame.setContentPane(tabs);
-		frame.setSize(800, 600);
+		frame.setSize(900, 700);
 		frame.setVisible(true);
 	}
 	
