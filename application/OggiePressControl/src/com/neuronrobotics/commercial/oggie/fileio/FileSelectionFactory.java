@@ -11,7 +11,12 @@ public class FileSelectionFactory {
 		JFileChooser fc =new JFileChooser();
     	File dir1 = new File (".");
     	if(start!=null){
-    		fc.setSelectedFile(start);
+    		if(start.isDirectory()){
+    			fc.setCurrentDirectory(start);
+    		}else{
+    			fc.setSelectedFile(start);
+    		}
+    		System.out.println("Selecting file from "+start.getAbsolutePath());
     	}else{
     		fc.setCurrentDirectory(dir1);
     	}

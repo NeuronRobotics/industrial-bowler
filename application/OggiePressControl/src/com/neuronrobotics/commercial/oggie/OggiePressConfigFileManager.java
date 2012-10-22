@@ -21,8 +21,8 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 	private SinglePressControl press1;
 	private SinglePressControl press2;
 	private DualPressControl dual;
-	private String configFileLocation = System.getProperty("user.home")+"/OggiePressSystem.xml";
-	private String logFileLocation = System.getProperty("user.home")+"/OggiePressSystemLog.csv";
+	private String configFileLocation = System.getProperty("user.home")+"/OggiePressSystem/System.xml";
+	private String logFileLocation = System.getProperty("user.home")+"/OggiePressSystem/Log/log";
 	
 	private File config =null;
 	private File log =null;
@@ -37,8 +37,13 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 		press2.getTable().setConfigFileManager(this);
 		dual.getTable().setConfigFileManager(this);
 		
+		File logDir = new File(System.getProperty("user.home")+"/OggiePressSystem/Log/");
+		if(!logDir.exists()){
+			logDir.mkdirs();
+		}
+		
 		config = new File(configFileLocation);
-		log    = new File(logFileLocation);
+		log    = new File(logFileLocation+new Date()+".csv");
 		if(!config.exists()){
 			config.createNewFile();
 			save();
@@ -109,6 +114,7 @@ public class OggiePressConfigFileManager implements IPressHardwareListener{
 
 	@Override
 	public void onCycleStart(int i, CycleConfig config) {
+		log    = new File(logFileLocation+new Date()+".csv");
 		writeLine("onCycleStart,"+i+","+config.getPressure());
 		ThreadUtil.wait(200);
 		writeLine("onCycleStart temp,"+i+","+config.getTempString());

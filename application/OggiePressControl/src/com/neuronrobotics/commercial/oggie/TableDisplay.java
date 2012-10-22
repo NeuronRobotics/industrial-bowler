@@ -87,7 +87,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	private String defaultFileString = "Default";
 	private final String adminPassword = "wumpus3742";
-	private File currentSave=null;
+	private File currentSave=new File(System.getProperty("user.home")+"/OggiePressSystem/");
+	private File confDir=new File(System.getProperty("user.home")+"/OggiePressSystem/");
 	private OggiePressConfigFileManager fm;
 	
 	public TableDisplay(boolean usePress0, boolean usePress1, IPressControler p){
@@ -147,17 +148,18 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				CycleConfig conf = getCurrentCycleConfig();
-				currentSave = FileSelectionFactory.GetFile(currentSave, new XmlFilter());
+				currentSave = FileSelectionFactory.GetFile(confDir, new XmlFilter());
 				System.out.println("Using file: "+currentSave);
 				conf.saveToFile(currentSave);
 				try {
 					//validation step
 					conf = new CycleConfig(currentSave);
-					setCycleConfig(conf);
+					if(conf!=null)
+						setCycleConfig(conf);
 					
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 		});
@@ -166,7 +168,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				File nFile = FileSelectionFactory.GetFile(currentSave, new XmlFilter());
+				File nFile = FileSelectionFactory.GetFile(confDir, new XmlFilter());
 				if(nFile!=null){
 					CycleConfig conf;
 					try {
