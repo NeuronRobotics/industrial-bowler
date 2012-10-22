@@ -168,6 +168,8 @@ public class PressHardware {
 		}
 		
 		private void fire(int i, double currentTime){
+			if(i>=CycleConfig.dataSize)
+				return;
 			double temp = targetcycle[pressIndex].getTempretures()[i];
 			setTargetTempreture(pressIndex, temp);
 			double currentTableTime=targetcycle[pressIndex].getTimes()[i];

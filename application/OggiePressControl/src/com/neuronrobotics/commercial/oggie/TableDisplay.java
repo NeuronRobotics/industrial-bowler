@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -54,6 +55,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private JLabel currentTemp = new JLabel(" 000.000 ");
 	private JLabel currentPressure = new JLabel(" 000.000 ");
 	
+	private JTextArea notes = new JTextArea(3, 15);
 	private JButton save = new JButton("Save As...");
 	private JButton load = new JButton("Load file...");
 	private JPasswordField passwd = new JPasswordField(15);
@@ -61,7 +63,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private JButton lock = new JButton("Lock");
 	private RoundButton start = new RoundButton("Start Cycle",new Dimension(100, 100));
 	private RoundButton setTemp = new RoundButton("Set Temp",new Dimension(100, 100));
-	private RoundButton ready = new RoundButton("Running..",new Dimension(50, 50));
+	private JLabel ready = new JLabel ("Running..");
 	
 	private AbortTimeWidget abortTime;
 	
@@ -109,6 +111,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			public void actionPerformed(ActionEvent arg0) {
 				press.setTempreture(getStartingTempreture());
 				waitingForTemp = true;
+				notes.setText("Waiting for press to \nreach to tempreture...");
 			}
 		});
 		
@@ -119,6 +122,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				if(aModel.isArmed() && aModel.isPressed()){
 					System.out.println("Starting...");
 					press.onCycleStart(getCurrentCycleConfig());
+					notes.setText("Waiting for press to \nreach desired pressure.\nDo not release button until it is safe.");
 				}
 			}
 		});
@@ -129,7 +133,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				if(	isPressReady()){
 					System.out.println("Press Running");
 					abortTime.setEnabled(true);
-
+					notes.setText("Press running.\nHit Abort to stop cycle.");
 					start.setEnabled(false);
 				}else{
 					press.abortCycle();
@@ -228,7 +232,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		ready.setVisible(false);
 		//ready.setEnabled(false);
 
-		ready.setColor(Color.green);
+		//ready.setColor(Color.green);
 		start.setColor(Color.yellow);
 
 		
@@ -250,8 +254,9 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(new JLabel("Current Tempreture (F)"));
 		controlsPanel.add(currentTemp,"wrap");	
 		
-		
-		controlsPanel.add(setTemp,"wrap");
+		notes.setText("Start up\nPress 'Set Temp' to begin.");
+		controlsPanel.add(setTemp);
+		controlsPanel.add(notes,"wrap");
 		controlsPanel.add(start);
 		controlsPanel.add(ready,"wrap");
 		controlsPanel.add(abortTime,"wrap");
@@ -341,7 +346,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	
 	private void abort(){
 		System.out.println("Press Aborted");
-
+		notes.setText("Start up\nPress 'Set Temp' to begin.");
 		start.setEnabled(false);
 		ready.setVisible(false);
 		setTemp.setEnabled(true);
@@ -364,7 +369,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		cycleName.setEnabled(b);
 		load.setEnabled(b);
 		setTemp.setEnabled(b);
-
+		notes.setText("Start up\nPress 'Set Temp' to begin.");
 		super.setEnabled(b);
 	}
 	
@@ -522,6 +527,8 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 						ThreadUtil.wait(100);
 						if(	isPressReady()){
 							ready.setVisible(true);
+							notes.setText("Press running.\nIt is now safe to release the \nstart cycle button.");
+							break;
 						}
 					}
 					//System.out.println("End press and hold thread");
@@ -565,6 +572,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 							start.setEnabled(true);
 							setTemp.setEnabled(false);
 							waitingForTemp=false;
+							notes.setText("Press Ready for Cycle.");
 						}
 						
 					}
@@ -628,6 +636,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	public void onCycleIndexUpdate(int currentTableIndex, double currentTableTime, double timeRemaining, int press, double newTargetTemp) {
 		if(currentTableIndex == CycleConfig.dataSize-1){
 			ready.setVisible(false);
+			notes.setText("Cycle Complete\nReady for new cycle.");
 		}
 	} 
 }

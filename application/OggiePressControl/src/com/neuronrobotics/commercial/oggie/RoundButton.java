@@ -2,6 +2,8 @@ package com.neuronrobotics.commercial.oggie;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+
 import javax.swing.*;
 
 public class RoundButton extends JButton {
@@ -12,17 +14,11 @@ public class RoundButton extends JButton {
 	private Color color = Color.green;
 	public RoundButton(String label,Dimension size) {
 	    super(label);
-		
-		// These statements enlarge the button so that it 
-		// becomes a circle rather than an oval
-		    size.width = size.height = Math.max(size.width, 
-		      size.height);
-		    setPreferredSize(size);
-		
-		// This call causes the JButton not to paint 
-		   // the background.
-		// This allows us to paint a round background.
-		    setContentAreaFilled(false);
+	    ImageIcon icon = new ImageIcon(RoundButton.class.getResource("red.png"));
+		setIcon(icon); 
+		setBorderPainted(false); 
+		setFocusPainted(false); 
+		setContentAreaFilled(false);  
 	  }
 	
 	// Paint the round background and label.
@@ -34,8 +30,7 @@ public class RoundButton extends JButton {
 	    } else {
 	      g.setColor(getColor());
 	    }
-	    g.fillOval(0, 0, getSize().width-1, 
-	      getSize().height-1);
+	    //g.fillOval(0, 0, getSize().width-1, getSize().height-1);
 	
 	// This call will paint the label and the 
 	   // focus rectangle.
@@ -45,8 +40,7 @@ public class RoundButton extends JButton {
 	// Paint the border of the button using a simple stroke.
 	  protected void paintBorder(Graphics g) {
 	    g.setColor(getForeground());
-	    g.drawOval(0, 0, getSize().width-1, 
-	      getSize().height-1);
+	    //g.drawOval(0, 0, getSize().width-1, getSize().height-1);
 	  }
 	
 	// Hit detection.
