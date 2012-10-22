@@ -14,10 +14,12 @@ public class RoundButton extends JButton {
 	private Color color = Color.green;
 	ImageIcon iconRed = new ImageIcon(RoundButton.class.getResource("red.png"));
 	ImageIcon iconRedPressed = new ImageIcon(RoundButton.class.getResource("red_pressed.png"));
+	
 	ImageIcon iconGreen = new ImageIcon(RoundButton.class.getResource("green.png"));
 	ImageIcon iconGreenPressed = new ImageIcon(RoundButton.class.getResource("green_pressed.png"));
-	ImageIcon iconYellow= new ImageIcon(RoundButton.class.getResource("green.png"));
-	ImageIcon iconYellowPressed = new ImageIcon(RoundButton.class.getResource("green_pressed.png"));
+	
+	ImageIcon iconYellow= new ImageIcon(RoundButton.class.getResource("yellow.png"));
+	ImageIcon iconYellowPressed = new ImageIcon(RoundButton.class.getResource("yellow_pressed.png"));
 	public RoundButton(String label,Dimension size) {
 	    super(label);
 		setIcon(iconRed); 
@@ -29,15 +31,15 @@ public class RoundButton extends JButton {
 	// Paint the round background and label.
 	  protected void paintComponent(Graphics g) {
 	    if (getModel().isArmed()) {	
-	    if(color.equals(Color.red)){
-			setIcon(iconRedPressed); 
-		}
-		if(color.equals(Color.green)){
-			setIcon(iconGreenPressed); 
-		}
-		if(color.equals(Color.yellow)){
-			setIcon(iconYellowPressed); 
-		} 
+		    if(color.equals(Color.red)){
+				setIcon(iconRedPressed); 
+			}
+			if(color.equals(Color.green)){
+				setIcon(iconGreenPressed); 
+			}
+			if(color.equals(Color.yellow)){
+				setIcon(iconYellowPressed); 
+			} 
 	    } else {
 			if(color.equals(Color.red)){
 				setIcon(iconRed); 
