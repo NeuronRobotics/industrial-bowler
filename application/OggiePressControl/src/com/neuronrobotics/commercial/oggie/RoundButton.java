@@ -12,9 +12,11 @@ public class RoundButton extends JButton {
 	 */
 	private static final long serialVersionUID = -5236632037590342098L;
 	private Color color = Color.green;
+	ImageIcon icon = new ImageIcon(RoundButton.class.getResource("red.png"));
+	ImageIcon iconPressed = new ImageIcon(RoundButton.class.getResource("red_pressed.png"));
 	public RoundButton(String label,Dimension size) {
 	    super(label);
-	    ImageIcon icon = new ImageIcon(RoundButton.class.getResource("red.png"));
+	    
 		setIcon(icon); 
 		setBorderPainted(false); 
 		setFocusPainted(false); 
@@ -24,13 +26,10 @@ public class RoundButton extends JButton {
 	// Paint the round background and label.
 	  protected void paintComponent(Graphics g) {
 	    if (getModel().isArmed()) {
-	// You might want to make the highlight color 
-	   // a property of the RoundButton class.
-	      g.setColor(Color.lightGray);
+	    	setIcon(iconPressed); 
 	    } else {
-	      g.setColor(getColor());
+	      setIcon(icon); 
 	    }
-	    //g.fillOval(0, 0, getSize().width-1, getSize().height-1);
 	
 	// This call will paint the label and the 
 	   // focus rectangle.
