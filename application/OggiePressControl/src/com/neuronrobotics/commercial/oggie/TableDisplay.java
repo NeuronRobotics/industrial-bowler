@@ -112,7 +112,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 			public void actionPerformed(ActionEvent arg0) {
 				press.setTempreture(getStartingTempreture());
 				waitingForTemp = true;
-				notes.setText("Waiting for press to \nreach to tempreture...");
+				notes.setText("Waiting for press to \nreach to temperature...");
 			}
 		});
 		
@@ -253,17 +253,31 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		controlsPanel.add(tons,"wrap");
 		controlsPanel.add(new JLabel("Current Pressure (Tons)"));
 		controlsPanel.add(currentPressure,"wrap");
-		controlsPanel.add(new JLabel("Current Tempreture (F)"));
+		controlsPanel.add(new JLabel("Current Temperature (F)"));
 		controlsPanel.add(currentTemp,"wrap");	
 		
 		notes.setText("Start up\nPress 'Set Temp' to begin.");
-		controlsPanel.add(setTemp);
+		
+		JPanel spacePanel= new JPanel(new MigLayout());
+		JLabel spaceText   = new JLabel(" ");
+		spaceText.setFont(new Font("Dialog", Font.PLAIN, 24));
+		spacePanel.add(setTemp,"wrap");
+		spacePanel.add(spaceText);
+		controlsPanel.add(spacePanel);
+
 		controlsPanel.add(notes,"wrap");
-		controlsPanel.add(start);
-		controlsPanel.add(ready,"wrap");
+		
+		JPanel spacePanel1= new JPanel(new MigLayout());
+		JLabel spaceText1   = new JLabel(" ");
+		spaceText1.setFont(new Font("Dialog", Font.PLAIN, 24));
+		spacePanel1.add(start,"wrap");
+		spacePanel1.add(spaceText1);
+		controlsPanel.add(spacePanel1);
+		
+		//controlsPanel.add(ready,"wrap");
 		controlsPanel.add(abortTime,"wrap");
 		
-		controlsPanel.add(new JLabel("Administrator Mode"));
+		controlsPanel.add(new JLabel("Administrator Mode Enter Password:"));
 		controlsPanel.add(passwd,"wrap");
 		controlsPanel.add(unlock);
 		controlsPanel.add(lock,"wrap");
@@ -495,7 +509,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
          */
         public void setValueAt(Object value, int row, int col) {
         	double newVal=Double.parseDouble(value.toString());
-        	
+        	newVal = newVal>0?newVal:0;
         	if(col==1&&(newVal<lowestTemp || newVal>highestTemp)){
 				Object[] options = {"Yes, use value",
                 "No, that is a mistake"};
@@ -512,7 +526,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 				}
         	}
         	
-        	data[row][col] = new DecimalFormat( "000.0" ).format(newVal);
+        	data[row][col] = new DecimalFormat( "000" ).format(newVal);
             fireTableCellUpdated(row, col);
             //graph.onCycleStart(0,getCurrentCycleConfig());
         }
@@ -574,7 +588,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 							start.setEnabled(true);
 							setTemp.setEnabled(false);
 							waitingForTemp=false;
-							notes.setText("Press Ready for Cycle.");
+							notes.setText("Press ready for cycle.\nHold Button until\npress is closed.");
 						}
 						
 					}
