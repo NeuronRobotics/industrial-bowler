@@ -12,12 +12,15 @@ public class RoundButton extends JButton {
 	 */
 	private static final long serialVersionUID = -5236632037590342098L;
 	private Color color = Color.green;
-	ImageIcon icon = new ImageIcon(RoundButton.class.getResource("red.png"));
-	ImageIcon iconPressed = new ImageIcon(RoundButton.class.getResource("red_pressed.png"));
+	ImageIcon iconRed = new ImageIcon(RoundButton.class.getResource("red.png"));
+	ImageIcon iconRedPressed = new ImageIcon(RoundButton.class.getResource("red_pressed.png"));
+	ImageIcon iconGreen = new ImageIcon(RoundButton.class.getResource("green.png"));
+	ImageIcon iconGreenPressed = new ImageIcon(RoundButton.class.getResource("green_pressed.png"));
+	ImageIcon iconYellow= new ImageIcon(RoundButton.class.getResource("green.png"));
+	ImageIcon iconYellowPressed = new ImageIcon(RoundButton.class.getResource("green_pressed.png"));
 	public RoundButton(String label,Dimension size) {
 	    super(label);
-	    
-		setIcon(icon); 
+		setIcon(iconRed); 
 		setBorderPainted(false); 
 		setFocusPainted(false); 
 		setContentAreaFilled(false);  
@@ -25,10 +28,26 @@ public class RoundButton extends JButton {
 	
 	// Paint the round background and label.
 	  protected void paintComponent(Graphics g) {
-	    if (getModel().isArmed()) {
-	    	setIcon(iconPressed); 
+	    if (getModel().isArmed()) {	
+	    if(color.equals(Color.red)){
+			setIcon(iconRedPressed); 
+		}
+		if(color.equals(Color.green)){
+			setIcon(iconGreenPressed); 
+		}
+		if(color.equals(Color.yellow)){
+			setIcon(iconYellowPressed); 
+		} 
 	    } else {
-	      setIcon(icon); 
+			if(color.equals(Color.red)){
+				setIcon(iconRed); 
+			}
+			if(color.equals(Color.green)){
+				setIcon(iconGreen); 
+			}
+			if(color.equals(Color.yellow)){
+				setIcon(iconYellow); 
+			}
 	    }
 	
 	// This call will paint the label and the 
@@ -66,6 +85,16 @@ public class RoundButton extends JButton {
 	}
 	
 	public void setColor(Color color) {
+		if(color.equals(Color.red)){
+			setIcon(iconRed); 
+		}
+		if(color.equals(Color.green)){
+			setIcon(iconGreen); 
+		}
+		if(color.equals(Color.yellow)){
+			setIcon(iconYellow); 
+		}
+		
 		this.color = color;
 	}
 
