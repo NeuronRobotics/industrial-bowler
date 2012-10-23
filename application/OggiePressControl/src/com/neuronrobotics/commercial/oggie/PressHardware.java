@@ -155,7 +155,7 @@ public class PressHardware {
 			while(!abort[pressIndex] && cycleIndex<CycleConfig.dataSize){
 				ThreadUtil.wait(1000);
 				time = ((double)System.currentTimeMillis()-startTime)/1000.0/60.0;
-				if(time>getTime(cycleIndex)){
+				if(time>getTime(cycleIndex+1)){
 					cycleIndex++;
 				}
 				fire(cycleIndex, time);
@@ -164,6 +164,8 @@ public class PressHardware {
 		}
 		
 		private double getTime(int i){
+			if(i>=CycleConfig.dataSize)
+				return targetcycle[pressIndex].getTimes()[CycleConfig.dataSize-1];
 			return targetcycle[pressIndex].getTimes()[i];
 		}
 		
