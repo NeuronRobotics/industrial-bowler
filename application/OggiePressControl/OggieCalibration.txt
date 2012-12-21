@@ -1,0 +1,13 @@
+analog value = 202, 25 PSI, value 110
+
+analog value = 224, 40 PSI, value 100
+
+analog value = 258, 53 PSI, value 90
+
+analog value = 302, 67 PSI, value 80
+
+analog value = 357, 95 PSI, value 0//Pegged
+
+
+
+
