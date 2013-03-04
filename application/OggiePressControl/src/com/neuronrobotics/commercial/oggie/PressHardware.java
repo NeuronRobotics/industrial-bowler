@@ -3,11 +3,34 @@ package com.neuronrobotics.commercial.oggie;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.neuronrobotics.sdk.common.BowlerMethod;
 import com.neuronrobotics.sdk.dyio.DyIO;
+import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
+import com.neuronrobotics.sdk.dyio.dypid.DyPIDConfiguration;
+import com.neuronrobotics.sdk.pid.IPIDEventListener;
+import com.neuronrobotics.sdk.pid.PIDChannel;
+import com.neuronrobotics.sdk.pid.PIDConfiguration;
+import com.neuronrobotics.sdk.pid.PIDEvent;
+import com.neuronrobotics.sdk.pid.PIDLimitEvent;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
-public class PressHardware {
+public class PressHardware implements IPIDEventListener {
 	private DyIO dyio;
+	
+	private PIDChannel tempPID[] = new PIDChannel [2]; 
+	private PIDConfiguration pidConf1 = new PIDConfiguration(0, true, true, true, 
+															.12, 0, 0, 
+															0, false, false);
+	private DyPIDConfiguration dypidConf1 = new DyPIDConfiguration(	0, 
+																	10, DyIOChannelMode.ANALOG_IN, 
+																	2, 	DyIOChannelMode.DIGITAL_OUT);
+	private PIDConfiguration pidConf2 = new PIDConfiguration(0, true, true, true, 
+			.12, 0, 0, 
+			0, false, false);
+	private DyPIDConfiguration dypidConf2 = new DyPIDConfiguration(	0, 
+						10, DyIOChannelMode.ANALOG_IN, 
+						2, 	DyIOChannelMode.DIGITAL_OUT);
+	private final double adcToTempreture = 228.5; 
 	
 	private ArrayList< IPressHardwareListener> listeners = new ArrayList< IPressHardwareListener> ();
 	
@@ -26,6 +49,16 @@ public class PressHardware {
 			vp[1]=new VirtualPress(1);
 			vp[0].start();
 			vp[1].start();
+		}else{
+			dyio.ConfigureDynamicPIDChannels(dypidConf1);
+			tempPID[0] = dyio.getPIDChannel(0);
+			tempPID[0].ConfigurePIDController(pidConf1);
+			tempPID[0].addPIDEventListener(this);
+			
+			dyio.ConfigureDynamicPIDChannels(dypidConf2);
+			tempPID[1] = dyio.getPIDChannel(1);
+			tempPID[1].ConfigurePIDController(pidConf2);
+			tempPID[1].addPIDEventListener(this);
 		}
 	}
 	
@@ -33,7 +66,7 @@ public class PressHardware {
 		if(dyio==null){
 			vp[index].setTargetTemp(t);
 		}else{
-			//do hardware
+			tempPID[index].SetPIDSetPoint(tempretureToAdc(t), 0);
 		}
 		setTempreture(index, getTempreture(index));
 	}
@@ -61,6 +94,7 @@ public class PressHardware {
 			vp[i].abort();
 		}else{
 			//do hardware
+			tempPID[i].SetPIDSetPoint(0, 0);
 		}
 		abort[i]=true;
 		fireAbort(i);
@@ -257,5 +291,44 @@ public class PressHardware {
 
 	public void setDualMode(boolean dualMode) {
 		this.dualMode = dualMode;
+	}
+
+	@Override
+	public void onPIDEvent(PIDEvent e) {
+		if(e.getGroup() == pidConf1.getGroup()){
+			setTempreture(0, adcToTempreture(e.getValue()));
+		}
+		if(e.getGroup() == pidConf2.getGroup()){
+			setTempreture(1, adcToTempreture(e.getValue()));
+		}
+	}
+
+	@Override
+	public void onPIDLimitEvent(PIDLimitEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPIDReset(int group, int currentValue) {
+		// TODO Auto-generated method stub8
+		
+	}
+	
+	double celciusToFerinheight(double celcius){
+		return celcius * (9.0/5.0) + 32.0;
+	}
+	
+	double ferinheightTocelcius(double ferinheight){
+		return (ferinheight -  32.0)  *  (5.0/9.0);
+	}
+	
+	private final double referenceVoltage = 4.9;
+	
+	double adcToTempreture(int adc){	
+		return celciusToFerinheight(((((double)adc*(referenceVoltage/1024.0))-1.246090909)*150.56118259));
+	}
+	int tempretureToAdc(double tempreture){
+		return (int)(((ferinheightTocelcius(tempreture)/150.56118259)+1.246090909)/(referenceVoltage/1024.0));
 	}
 }
