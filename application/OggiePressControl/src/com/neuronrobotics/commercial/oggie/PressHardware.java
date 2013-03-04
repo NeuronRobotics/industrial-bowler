@@ -323,7 +323,7 @@ public class PressHardware implements IPIDEventListener {
 		return (ferinheight -  32.0)  *  (5.0/9.0);
 	}
 	
-	private final double referenceVoltage = 4.9;
+	private final double referenceVoltage = 4.6;
 	
 	double adcToTempreture(int adc){	
 		return celciusToFerinheight(((((double)adc*(referenceVoltage/1024.0))-1.246090909)*150.56118259));
