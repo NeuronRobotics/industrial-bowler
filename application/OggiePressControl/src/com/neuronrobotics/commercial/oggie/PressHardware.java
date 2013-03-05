@@ -24,7 +24,7 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 	
 	private RollingAverageFilter filter[]= new RollingAverageFilter[2];
 	private PIDChannel tempPID[] = new PIDChannel [2]; 
-	private double pGain = .05;
+	private double pGain = .1;
 	private PIDConfiguration pidConf1 = new PIDConfiguration(		0, true, true, true, 
 			 														pGain, 0, 0, 
 																	0, false, false);
@@ -80,7 +80,7 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 			pressAnalog[0] = new DCMotorOutputChannel(dyio.getChannel(5)); 
 			//pressAnalog[1] = new DCMotorOutputChannel(dyio.getChannel(4)); 
 			
-			pressureSense[0] = new AnalogInputChannel(dyio.getChannel(8));
+			pressureSense[0] = new AnalogInputChannel(dyio.getChannel(11));
 			pressureSense[0].addAnalogInputListener(this);
 			pressureSense[1] = new AnalogInputChannel(dyio.getChannel(12));
 			pressureSense[1].addAnalogInputListener(this);
@@ -123,9 +123,9 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 			vp[i].abort();
 		}else{
 			//do hardware
-			enablePin.setHigh(false);
+			//enablePin.setHigh(false);
 			tempPID[i].SetPIDSetPoint(0, 0);//zero tempreture
-			pressAnalog[i].setValue(128);// zero pressure
+			pressAnalog[i].setValue(120);// zero pressure
 		}
 		abort[i]=true;
 		fireAbort(i);
@@ -370,7 +370,7 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 		return (int)(((ferinheightTocelcius(tempreture)/150.56118259)+1.246090909)/(referenceVoltage/1024.0));
 	}
 	
-	private double scaleAdcToPressure= (258/1024)*2.43;
+	private double scaleAdcToPressure = 0.0078125;
 	
 	private double adcToPressure(double adc){
 		return adc * scaleAdcToPressure;
@@ -383,7 +383,9 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 	
 	@Override
 	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+	
 		if(chan == pressureSense[0]){
+			//System.out.println("ADC value = "+value+" pressure = "+adcToPressure(value));
 			setPressure(0,adcToPressure(value) );
 		}
 		if(chan == pressureSense[1]){
