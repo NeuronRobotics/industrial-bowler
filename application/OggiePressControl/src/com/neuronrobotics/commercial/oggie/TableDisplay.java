@@ -74,7 +74,7 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 	private static final int width = CycleConfig.dataSize;
 	private static final int hight = 2;
 	
-	private static final double bound = .1;
+	private static final double bound = 4;
 	private final boolean usePress0;
 	private final boolean usePress1;
 	
@@ -579,21 +579,39 @@ public class TableDisplay extends JPanel implements IPressHardwareListener {
 		if(i==0 && usePress0||i==1 && usePress1){
 			//graph.onTempretureChange(i, degreesFarenhight);
 			currentTemp.setText(new DecimalFormat( " 000.000 " ).format(degreesFarenhight));
-			new Thread(){
-				public void run(){
-					ThreadUtil.wait(100);
-					if(waitingForTemp){
-						if(!(	degreesFarenhight > (getStartingTempreture()+1) || 
-								degreesFarenhight < (getStartingTempreture()-1))){
-							start.setEnabled(true);
-							setTemp.setEnabled(false);
-							waitingForTemp=false;
-							notes.setText("Press ready for cycle.\nHold Button until\npress is closed.");
+//			Log.enableDebugPrint(true);
+//			Log.debug("Current Temp is "+degreesFarenhight+"\nTarget is "+getStartingTempreture());
+//		   
+//			Log.enableDebugPrint(false);
+//			 final Exception ex;
+//			 try
+//		      {
+//		         throw new Exception("Who called me?");
+//		      }
+//		      catch( Exception e )
+//		      {
+//		    	  ex = e;
+//		      }
+			if(waitingForTemp){
+				new Thread(){
+					public void run(){
+						ThreadUtil.wait(100);
+						if(waitingForTemp){
+							if(!(	degreesFarenhight > (getStartingTempreture()+1) || 
+									degreesFarenhight < (getStartingTempreture()-1))){
+								System.out.println("Current Temp is "+degreesFarenhight+"\nTarget is "+getStartingTempreture());
+								start.setEnabled(true);
+								setTemp.setEnabled(false);
+								waitingForTemp=false;
+								notes.setText("Press ready for cycle.\nHold Button until\npress is closed.");
+								//ex.printStackTrace();  
+								//while(true);
+							}
+							
 						}
-						
 					}
-				}
-			}.start();
+				}.start();
+			}
 			
 		}
 	}

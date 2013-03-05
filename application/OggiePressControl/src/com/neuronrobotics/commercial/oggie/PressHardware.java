@@ -12,24 +12,26 @@ import com.neuronrobotics.sdk.pid.PIDChannel;
 import com.neuronrobotics.sdk.pid.PIDConfiguration;
 import com.neuronrobotics.sdk.pid.PIDEvent;
 import com.neuronrobotics.sdk.pid.PIDLimitEvent;
+import com.neuronrobotics.sdk.util.RollingAverageFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class PressHardware implements IPIDEventListener {
 	private DyIO dyio;
 	
+	private RollingAverageFilter filter[]= new RollingAverageFilter[2];
 	private PIDChannel tempPID[] = new PIDChannel [2]; 
-	private PIDConfiguration pidConf1 = new PIDConfiguration(0, true, true, true, 
-															.12, 0, 0, 
-															0, false, false);
+	private PIDConfiguration pidConf1 = new PIDConfiguration(		0, true, true, true, 
+																	.12, 0, 0, 
+																	0, false, false);
 	private DyPIDConfiguration dypidConf1 = new DyPIDConfiguration(	0, 
 																	10, DyIOChannelMode.ANALOG_IN, 
 																	2, 	DyIOChannelMode.DIGITAL_OUT);
-	private PIDConfiguration pidConf2 = new PIDConfiguration(0, true, true, true, 
-			.12, 0, 0, 
-			0, false, false);
-	private DyPIDConfiguration dypidConf2 = new DyPIDConfiguration(	0, 
-						10, DyIOChannelMode.ANALOG_IN, 
-						2, 	DyIOChannelMode.DIGITAL_OUT);
+	private PIDConfiguration pidConf2 = new PIDConfiguration(		1, true, true, true, 
+																	.12, 0, 0, 
+																	0, false, false);
+	private DyPIDConfiguration dypidConf2 = new DyPIDConfiguration(	1, 
+																	12, DyIOChannelMode.ANALOG_IN, 
+																	13, 	DyIOChannelMode.DIGITAL_OUT);
 	private final double adcToTempreture = 228.5; 
 	
 	private ArrayList< IPressHardwareListener> listeners = new ArrayList< IPressHardwareListener> ();
@@ -53,11 +55,16 @@ public class PressHardware implements IPIDEventListener {
 			dyio.ConfigureDynamicPIDChannels(dypidConf1);
 			tempPID[0] = dyio.getPIDChannel(0);
 			tempPID[0].ConfigurePIDController(pidConf1);
-			tempPID[0].addPIDEventListener(this);
+			tempPID[0].SetPIDSetPoint(0, 0);
+			filter[0] = new RollingAverageFilter(10,tempPID[0].GetPIDPosition() );
 			
 			dyio.ConfigureDynamicPIDChannels(dypidConf2);
 			tempPID[1] = dyio.getPIDChannel(1);
 			tempPID[1].ConfigurePIDController(pidConf2);
+			tempPID[1].SetPIDSetPoint(0, 0);
+			filter[1] = new RollingAverageFilter(10,tempPID[1].GetPIDPosition() );
+			
+			tempPID[0].addPIDEventListener(this);
 			tempPID[1].addPIDEventListener(this);
 		}
 	}
@@ -68,7 +75,7 @@ public class PressHardware implements IPIDEventListener {
 		}else{
 			tempPID[index].SetPIDSetPoint(tempretureToAdc(t), 0);
 		}
-		setTempreture(index, getTempreture(index));
+		//setTempreture(index, getTempreture(index));
 	}
 	
 	private void setTempreture(int index, double t){
@@ -169,9 +176,11 @@ public class PressHardware implements IPIDEventListener {
 			l.onPressureChange(i, pressure);
 		}
 	}
-	public void fireTempretureChange(int i, double temp) {
-		for(IPressHardwareListener l : listeners) {
-			l.onTempretureChange(i, temp);
+	public void fireTempretureChange(int index, double temp) {
+		synchronized (listeners){
+			for(int i=0;i< listeners.size();i++) {
+				listeners.get(i).onTempretureChange(index, temp);
+			}
 		}
 	}
 	
@@ -296,10 +305,11 @@ public class PressHardware implements IPIDEventListener {
 	@Override
 	public void onPIDEvent(PIDEvent e) {
 		if(e.getGroup() == pidConf1.getGroup()){
-			setTempreture(0, adcToTempreture(e.getValue()));
+
+			setTempreture(0,filter[0].add( adcToTempreture(e.getValue())));
 		}
 		if(e.getGroup() == pidConf2.getGroup()){
-			setTempreture(1, adcToTempreture(e.getValue()));
+			setTempreture(1, filter[1].add( adcToTempreture(e.getValue())));
 		}
 	}
 

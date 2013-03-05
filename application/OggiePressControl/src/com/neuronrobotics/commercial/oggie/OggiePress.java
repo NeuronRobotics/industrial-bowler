@@ -27,7 +27,7 @@ public class OggiePress {
 	public OggiePress() throws IOException{	
 		DyIO.disableFWCheck();
 		dyio=new DyIO();
-		dyio.enableDebug();
+		//dyio.enableDebug();
 		if (!ConnectionDialog.getBowlerDevice(dyio)){
 			//System.exit(1);
 			System.out.println("Running in virtual mode");
