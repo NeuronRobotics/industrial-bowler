@@ -7,6 +7,8 @@ import com.neuronrobotics.sdk.common.BowlerMethod;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
 import com.neuronrobotics.sdk.dyio.dypid.DyPIDConfiguration;
+import com.neuronrobotics.sdk.dyio.peripherals.DCMotorOutputChannel;
+import com.neuronrobotics.sdk.dyio.peripherals.DigitalOutputChannel;
 import com.neuronrobotics.sdk.pid.IPIDEventListener;
 import com.neuronrobotics.sdk.pid.PIDChannel;
 import com.neuronrobotics.sdk.pid.PIDConfiguration;
@@ -20,19 +22,19 @@ public class PressHardware implements IPIDEventListener {
 	
 	private RollingAverageFilter filter[]= new RollingAverageFilter[2];
 	private PIDChannel tempPID[] = new PIDChannel [2]; 
+	private double pGain = .05;
 	private PIDConfiguration pidConf1 = new PIDConfiguration(		0, true, true, true, 
-																	.12, 0, 0, 
+			 														pGain, 0, 0, 
 																	0, false, false);
 	private DyPIDConfiguration dypidConf1 = new DyPIDConfiguration(	0, 
 																	10, DyIOChannelMode.ANALOG_IN, 
 																	2, 	DyIOChannelMode.DIGITAL_OUT);
 	private PIDConfiguration pidConf2 = new PIDConfiguration(		1, true, true, true, 
-																	.12, 0, 0, 
+			 														pGain, 0, 0, 
 																	0, false, false);
 	private DyPIDConfiguration dypidConf2 = new DyPIDConfiguration(	1, 
 																	12, DyIOChannelMode.ANALOG_IN, 
 																	13, 	DyIOChannelMode.DIGITAL_OUT);
-	private final double adcToTempreture = 228.5; 
 	
 	private ArrayList< IPressHardwareListener> listeners = new ArrayList< IPressHardwareListener> ();
 	
@@ -43,6 +45,10 @@ public class PressHardware implements IPIDEventListener {
 	private boolean [] abort = new boolean[]{false,false};
 	
 	private VirtualPress [] vp = new VirtualPress[2];
+	
+	private DigitalOutputChannel enablePin;
+	
+	private DCMotorOutputChannel pressAnalog[] = new  DCMotorOutputChannel [2];
 	
 	public PressHardware (DyIO d){
 		dyio=d;
@@ -66,6 +72,14 @@ public class PressHardware implements IPIDEventListener {
 			
 			tempPID[0].addPIDEventListener(this);
 			tempPID[1].addPIDEventListener(this);
+			
+			enablePin = new DigitalOutputChannel(dyio.getChannel(1));
+			pressAnalog[0] = new DCMotorOutputChannel(dyio.getChannel(5)); 
+			pressAnalog[1] = new DCMotorOutputChannel(dyio.getChannel(4)); 
+			
+			enablePin.setHigh(true);
+			pressAnalog[0].setValue(128);
+			pressAnalog[1].setValue(128);
 		}
 	}
 	
@@ -102,6 +116,7 @@ public class PressHardware implements IPIDEventListener {
 		}else{
 			//do hardware
 			tempPID[i].SetPIDSetPoint(0, 0);
+			pressAnalog[i].setValue(128);
 		}
 		abort[i]=true;
 		fireAbort(i);
