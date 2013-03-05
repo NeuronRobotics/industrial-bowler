@@ -7,8 +7,10 @@ import com.neuronrobotics.sdk.common.BowlerMethod;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
 import com.neuronrobotics.sdk.dyio.dypid.DyPIDConfiguration;
+import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.DCMotorOutputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.DigitalOutputChannel;
+import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
 import com.neuronrobotics.sdk.pid.IPIDEventListener;
 import com.neuronrobotics.sdk.pid.PIDChannel;
 import com.neuronrobotics.sdk.pid.PIDConfiguration;
@@ -17,7 +19,7 @@ import com.neuronrobotics.sdk.pid.PIDLimitEvent;
 import com.neuronrobotics.sdk.util.RollingAverageFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
-public class PressHardware implements IPIDEventListener {
+public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 	private DyIO dyio;
 	
 	private RollingAverageFilter filter[]= new RollingAverageFilter[2];
@@ -49,6 +51,7 @@ public class PressHardware implements IPIDEventListener {
 	private DigitalOutputChannel enablePin;
 	
 	private DCMotorOutputChannel pressAnalog[] = new  DCMotorOutputChannel [2];
+	private AnalogInputChannel   pressureSense[] = new AnalogInputChannel[2];
 	
 	public PressHardware (DyIO d){
 		dyio=d;
@@ -75,11 +78,16 @@ public class PressHardware implements IPIDEventListener {
 			
 			enablePin = new DigitalOutputChannel(dyio.getChannel(1));
 			pressAnalog[0] = new DCMotorOutputChannel(dyio.getChannel(5)); 
-			pressAnalog[1] = new DCMotorOutputChannel(dyio.getChannel(4)); 
+			//pressAnalog[1] = new DCMotorOutputChannel(dyio.getChannel(4)); 
 			
-			enablePin.setHigh(true);
-			pressAnalog[0].setValue(128);
-			pressAnalog[1].setValue(128);
+			pressureSense[0] = new AnalogInputChannel(dyio.getChannel(8));
+			pressureSense[0].addAnalogInputListener(this);
+			pressureSense[1] = new AnalogInputChannel(dyio.getChannel(12));
+			pressureSense[1].addAnalogInputListener(this);
+			
+			enablePin.setHigh(false);
+			pressAnalog[0].setValue(129);
+			//pressAnalog[1].setValue(129);
 		}
 	}
 	
@@ -115,8 +123,9 @@ public class PressHardware implements IPIDEventListener {
 			vp[i].abort();
 		}else{
 			//do hardware
-			tempPID[i].SetPIDSetPoint(0, 0);
-			pressAnalog[i].setValue(128);
+			enablePin.setHigh(false);
+			tempPID[i].SetPIDSetPoint(0, 0);//zero tempreture
+			pressAnalog[i].setValue(128);// zero pressure
 		}
 		abort[i]=true;
 		fireAbort(i);
@@ -128,6 +137,10 @@ public class PressHardware implements IPIDEventListener {
 			vp[i].setRunClose(true);
 		}else{
 			//do hardware
+			enablePin.setHigh(true);
+			int pressure= pressureToDcMotorValue(config.getPressure());
+			System.out.println("Starting cycle with pressure "+config.getPressure()+" PWM = "+pressure);
+			pressAnalog[i].setValue(pressure);
 		}
 		abort[i]=false;
 		targetcycle[i]=config;
@@ -356,4 +369,27 @@ public class PressHardware implements IPIDEventListener {
 	int tempretureToAdc(double tempreture){
 		return (int)(((ferinheightTocelcius(tempreture)/150.56118259)+1.246090909)/(referenceVoltage/1024.0));
 	}
+	
+	private double scaleAdcToPressure= (258/1024)*2.43;
+	
+	private double adcToPressure(double adc){
+		return adc * scaleAdcToPressure;
+	}
+	
+	private int pressureToDcMotorValue(double pressure){
+
+		return (int) ((pressure/8)*128)+129;
+	}
+	
+	@Override
+	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+		if(chan == pressureSense[0]){
+			setPressure(0,adcToPressure(value) );
+		}
+		if(chan == pressureSense[1]){
+			setPressure(1,adcToPressure(value) );
+		}
+		
+	}
+
 }
