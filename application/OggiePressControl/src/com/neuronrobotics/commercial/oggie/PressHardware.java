@@ -125,7 +125,7 @@ public class PressHardware implements IPIDEventListener, IAnalogInputListener {
 			//do hardware
 			//enablePin.setHigh(false);
 			tempPID[i].SetPIDSetPoint(0, 0);//zero tempreture
-			pressAnalog[i].setValue(120);// zero pressure
+			pressAnalog[i].setValue(0);// zero pressure
 		}
 		abort[i]=true;
 		fireAbort(i);
