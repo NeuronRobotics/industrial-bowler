@@ -1,6 +1,7 @@
 package com.neuronrobotics.industrial;
 
 import javax.swing.JPanel;
+import javax.swing.BoxLayout;
 
 public class DashBoard extends JPanel {
 
@@ -11,6 +12,9 @@ public class DashBoard extends JPanel {
 
 	public DashBoard(){
 		setName("Dash Board");
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		
+		
 	}
 
 }
