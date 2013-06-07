@@ -74,12 +74,6 @@ public class MainWindow {
 		}
 		dashBoard = new DashBoard(list);
 		alarm = new AlarmAccount();
-
-		updateTabData();
-	}
-	
-	public void updateTabData(){
-		System.out.println("Setting the tab data");
 		tabbedPane.removeAll();
 		tabbedPane.addTab("Dash Board",dashBoard);
 		for(BathMoniter b:list){
@@ -87,6 +81,17 @@ public class MainWindow {
 			b.setMainWindow(this);
 		}
 		tabbedPane.addTab("Allarm Notifications",alarm );
+		dashBoard.updateTableData();
+		updateTabData();
+	}
+	
+	public void updateTabData(){
+		int totalTabs = tabbedPane.getTabCount();
+		for(int i = 1; i < totalTabs-1; i++)
+		{
+		   tabbedPane.setTitleAt(i, list.get(i-1).getName());
+				   
+		}
 		dashBoard.updateTableData();
 	}
 
