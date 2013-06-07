@@ -17,6 +17,10 @@ import javax.swing.BoxLayout;
 public class MainWindow {
 
 	private JFrame frame;
+	private ArrayList<BathMoniter> list;
+	private DashBoard dashBoard;
+	private AlarmAccount alarm;
+	private JTabbedPane tabbedPane;
 
 	/**
 	 * Launch the application.
@@ -46,11 +50,11 @@ public class MainWindow {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 590, 418);
+		frame.setBounds(100, 100, 640, 480);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		loadTabs(tabbedPane);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		loadTabs();
 		frame.getContentPane().add(tabbedPane);
 		
 		
@@ -59,24 +63,31 @@ public class MainWindow {
 		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane, frame.getContentPane()}));
 	}
 	
-	private void loadTabs(JTabbedPane tabbedPane){
-		DashBoard dashBoard = new DashBoard();
-		AlarmAccount alarm = new AlarmAccount();
+	private void loadTabs(){
 		
-		ArrayList<BathMoniter> list = BathMoniterFactory.getBathMoniterList();
+		
+		list = BathMoniterFactory.getBathMoniterList();
 		
 		if(list.size()==0){
 			list.add(new BathMoniter());
 			list.add(new BathMoniter());
 		}
-		
+		dashBoard = new DashBoard(list);
+		alarm = new AlarmAccount();
+
+		updateTabData();
+	}
+	
+	public void updateTabData(){
+		System.out.println("Setting the tab data");
+		tabbedPane.removeAll();
 		tabbedPane.addTab("Dash Board",dashBoard);
 		for(BathMoniter b:list){
 			tabbedPane.addTab(b.getName(), null, b, null);
+			b.setMainWindow(this);
 		}
 		tabbedPane.addTab("Allarm Notifications",alarm );
-		dashBoard.setLayout(new BoxLayout(dashBoard, BoxLayout.X_AXIS));
-		
+		dashBoard.updateTableData();
 	}
 
 }
