@@ -3,6 +3,15 @@ package com.neuronrobotics.industrial;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import java.awt.BorderLayout;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+import java.awt.Component;
+import java.util.ArrayList;
+
+import net.miginfocom.swing.MigLayout;
+import javax.swing.BoxLayout;
 
 public class MainWindow {
 
@@ -36,8 +45,35 @@ public class MainWindow {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 590, 418);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		loadTabs(tabbedPane);
+		frame.getContentPane().add(tabbedPane);
+		
+		
+
+		frame.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane}));
+		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane, frame.getContentPane()}));
+	}
+	
+	private void loadTabs(JTabbedPane tabbedPane){
+		DashBoard dashBoard = new DashBoard();
+		
+		ArrayList<BathMoniter> list = BathMoniterFactory.getBathMoniterList();
+		
+		if(list.size()==0){
+			list.add(new BathMoniter());
+			list.add(new BathMoniter());
+		}
+		
+		tabbedPane.addTab("Dash Board",dashBoard);
+		for(BathMoniter b:list){
+			tabbedPane.addTab(b.getName(), null, b, null);
+		}
+		dashBoard.setLayout(new BoxLayout(dashBoard, BoxLayout.X_AXIS));
+		
 	}
 
 }
