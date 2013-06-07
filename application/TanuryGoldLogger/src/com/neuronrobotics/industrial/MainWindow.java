@@ -8,6 +8,7 @@ import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
+import java.security.AllPermission;
 import java.util.ArrayList;
 
 import net.miginfocom.swing.MigLayout;
@@ -60,6 +61,7 @@ public class MainWindow {
 	
 	private void loadTabs(JTabbedPane tabbedPane){
 		DashBoard dashBoard = new DashBoard();
+		AlarmAccount alarm = new AlarmAccount();
 		
 		ArrayList<BathMoniter> list = BathMoniterFactory.getBathMoniterList();
 		
@@ -72,6 +74,7 @@ public class MainWindow {
 		for(BathMoniter b:list){
 			tabbedPane.addTab(b.getName(), null, b, null);
 		}
+		tabbedPane.addTab("Allarm Notifications",alarm );
 		dashBoard.setLayout(new BoxLayout(dashBoard, BoxLayout.X_AXIS));
 		
 	}
