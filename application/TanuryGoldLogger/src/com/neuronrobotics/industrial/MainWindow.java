@@ -64,14 +64,9 @@ public class MainWindow {
 	}
 	
 	private void loadTabs(){
-		
-		
+				
 		list = BathMoniterFactory.getBathMoniterList();
-		
-		if(list.size()==0){
-			list.add(new BathMoniter());
-			list.add(new BathMoniter());
-		}
+
 		dashBoard = new DashBoard(list);
 		alarm = new AlarmAccount();
 		tabbedPane.removeAll();
@@ -87,10 +82,8 @@ public class MainWindow {
 	
 	public void updateTabData(){
 		int totalTabs = tabbedPane.getTabCount();
-		for(int i = 1; i < totalTabs-1; i++)
-		{
+		for(int i = 1; i < totalTabs-1; i++){
 		   tabbedPane.setTitleAt(i, list.get(i-1).getName());
-				   
 		}
 		dashBoard.updateTableData();
 	}

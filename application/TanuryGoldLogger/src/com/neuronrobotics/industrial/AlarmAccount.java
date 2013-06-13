@@ -2,6 +2,8 @@ package com.neuronrobotics.industrial;
 
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+
 public class AlarmAccount extends JPanel {
 
 	/**
@@ -11,6 +13,8 @@ public class AlarmAccount extends JPanel {
 
 	public AlarmAccount(){
 		setName("Alarm Accounts");
+		setLayout(new MigLayout("", "[grow][]", "[grow][]"));
+		
 	}
 
 }

@@ -8,7 +8,11 @@ public class BathMoniterFactory {
 			
 		ArrayList<BathMoniter> list = new ArrayList<BathMoniter>();
 		
-		
+		if(list.size()==0){
+			for(int i=0;i<5;i++){
+				list.add(new BathMoniter());
+			}
+		}
 		
 		return list;
 		
