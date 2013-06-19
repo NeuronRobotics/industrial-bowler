@@ -27,7 +27,7 @@ public class DashBoard extends JPanel {
 		setName("Dash Board");
 		setLayout(new MigLayout("", "[grow][grow]", "[grow][][]"));
 		
-		table = new JTable(2,list.size());
+		table = new JTable(list.size(),2);
 		int i=0;
 		for (BathMoniter b:list){
 			table.setValueAt("<value>", i++, 1);			
