@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 
 public class BathMoniter extends JPanel {
-	private XYSeries ozHour = new XYSeries("Oz/Hour");
+	private XYSeries ozHour = new XYSeries("Oz/Minutes");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
 	/**
@@ -118,7 +118,7 @@ public class BathMoniter extends JPanel {
 		chart = ChartFactory.createXYLineChart(
 				"", 
 				"Minutes", 
-				"Press(1/100th tons)/Temp(F)",
+				"Oz Gold",
 				xyDataset, 
 				PlotOrientation.VERTICAL, 
 				true, 

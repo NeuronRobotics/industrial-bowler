@@ -33,8 +33,8 @@ public class BathMoniterDevice extends DyIO implements IAnalogInputListener{
 		if(super.connect()){
 			referenceVoltage = 	new AnalogInputChannel(this, 10);
 			signalVoltage = 	new AnalogInputChannel(this, 11);
-			referenceVoltage.configAdvancedAsyncAutoSample(500);
-			signalVoltage.configAdvancedAsyncAutoSample(500);
+			referenceVoltage.configAdvancedAsyncAutoSample(5000);
+			signalVoltage.configAdvancedAsyncAutoSample(5000);
 			referenceVoltage.addAnalogInputListener(this);
 			signalVoltage.addAnalogInputListener(this);
 			return true;
