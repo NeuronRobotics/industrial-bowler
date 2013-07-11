@@ -18,12 +18,17 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import com.neuronrobotics.sdk.dyio.DyIO;
+import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
+import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
+
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
-public class BathMoniter extends JPanel {
+public class BathMoniter extends JPanel implements IAnalogInputListener {
 	private XYSeries ozHour = new XYSeries("Oz/Hour");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
@@ -37,7 +42,7 @@ public class BathMoniter extends JPanel {
 	private JFreeChart chart;
 	private JLabel lblName;
 	private JLabel lblAmphourcurrent;
-	private JTextField textField;
+	private JTextField recentCurrentRating;
 	private JLabel lblAmphourToOz;
 	private JTextField textField_1;
 	private JLabel lblTotalOzdaily;
@@ -47,6 +52,18 @@ public class BathMoniter extends JPanel {
 	private JLabel lblClearDataFor;
 	private JButton btnClear;
 	private MainWindow mainWindow;
+	private DyIO dyio;
+	private AnalogInputChannel referenceVoltage;
+	private AnalogInputChannel signalVoltage;
+	
+	private double reference;
+	private double signal;
+	
+	public BathMoniter(DyIO dyio){
+		this();
+		this.setDyio(dyio);
+		updateName(getDyio().getInfo());
+	}
 	
 	public BathMoniter(){
 		String tmpmyName = "Bath Moniter "+ index++;
@@ -74,10 +91,10 @@ public class BathMoniter extends JPanel {
 		lblAmphourcurrent = new JLabel("Amp-Hour (Current)");
 		Controls.add(lblAmphourcurrent, "cell 0 1,alignx trailing");
 		
-		textField = new JTextField();
-		textField.setText("<value>");
-		Controls.add(textField, "cell 1 1,growx");
-		textField.setColumns(10);
+		recentCurrentRating = new JTextField();
+		recentCurrentRating.setText("<value>");
+		Controls.add(recentCurrentRating, "cell 1 1,growx");
+		recentCurrentRating.setColumns(10);
 		
 		lblAmphourToOz = new JLabel("Amp-Hour to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 2,alignx trailing");
@@ -135,6 +152,8 @@ public class BathMoniter extends JPanel {
 	
 	private void updateName(String newName){
 		 myName=newName;
+		 if(getDyio()!=null)
+			 getDyio().setInfo(newName);
 		 chart.setTitle(newName);
 		 setName(newName);
 		 txtbathName.setText(newName);
@@ -145,6 +164,40 @@ public class BathMoniter extends JPanel {
 	public void setMainWindow(MainWindow mainWindow) {
 		if(mainWindow != this.mainWindow)
 			this.mainWindow = mainWindow;		
+	}
+
+	public DyIO getDyio() {
+		return dyio;
+	}
+
+	public void setDyio(DyIO dyio) {
+		this.dyio = dyio;
+		referenceVoltage = 	new AnalogInputChannel(dyio, 10);
+		signalVoltage = 	new AnalogInputChannel(dyio, 11);
+		referenceVoltage.configAdvancedAsyncAutoSample(500);
+		signalVoltage.configAdvancedAsyncAutoSample(500);
+		referenceVoltage.addAnalogInputListener(this);
+		signalVoltage.addAnalogInputListener(this);
+	}
+	
+	public double getCurrent(){
+		
+		double scale = (4096.0//Reference voltage actual volts
+				*1024.0)
+				/reference;
+		double i=100.0;//Ohms of shunt
+		
+		return (signal*scale)/i;
+	}
+
+	@Override
+	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+		if(chan == referenceVoltage){
+			reference =  value;
+		}if(chan == signalVoltage){
+			signal =  value;
+		}
+		recentCurrentRating.setText(new Double(getCurrent()).toString());
 	}
 
 }
