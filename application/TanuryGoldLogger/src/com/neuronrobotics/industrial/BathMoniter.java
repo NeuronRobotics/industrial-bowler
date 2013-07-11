@@ -8,7 +8,9 @@ import net.miginfocom.swing.MigLayout;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -17,7 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
-public class BathMoniter extends JPanel {
+public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private XYSeries ozHour = new XYSeries("Oz/Minutes");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
@@ -42,6 +44,7 @@ public class BathMoniter extends JPanel {
 	private JButton btnClear;
 	private MainWindow mainWindow;
 	private BathMoniterDevice dyio;
+	private long startTimestamp;
 
 
 	
@@ -131,10 +134,12 @@ public class BathMoniter extends JPanel {
 		xyDataset.addSeries(ozHour);
 		
 		add(chartPanel, "cell 0 1,grow");
+		XYPlot plot = (XYPlot) chart.getPlot();
+		ValueAxis axis = plot.getDomainAxis();
+		axis.setFixedAutoRange((60*24)/5);
+		startTimestamp =System.currentTimeMillis();
 		
-		
-		
-		 updateName(tmpmyName);
+		updateName(tmpmyName);
 	}
 	
 	private void updateName(String newName){
@@ -168,6 +173,24 @@ public class BathMoniter extends JPanel {
 
 	public void setRecentCurrentRating(JTextField recentCurrentRating) {
 		this.recentCurrentRating = recentCurrentRating;
+	}
+
+	@Override
+	public void onNameChange(String newName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onValueChange(String bathName, long timestamp,double currentOzHrRate) {
+		getRecentCurrentRating().setText(new Double(currentOzHrRate).toString());
+		ozHour.add(((timestamp-startTimestamp)/1000), currentOzHrRate);
+
+	}
+
+	@Override
+	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
+		
 	}
 	
 
