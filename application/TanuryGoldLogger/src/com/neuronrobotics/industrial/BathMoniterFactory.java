@@ -5,8 +5,7 @@ import java.util.ArrayList;
 
 import org.jfree.util.Log;
 
-import com.neuronrobotics.sdk.dyio.DyIO;
-import com.neuronrobotics.sdk.dyio.DyIORegestry;
+import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.sdk.network.BowlerUDPClient;
 import com.neuronrobotics.sdk.ui.ConnectionDialog;
 
@@ -15,7 +14,7 @@ public class BathMoniterFactory {
 	static BowlerUDPClient clnt;
 	
 	public static ArrayList<BathMoniter> getBathMoniterList(){
-		DyIO.disableFWCheck();
+		
 		ArrayList<BathMoniter> list = new ArrayList<BathMoniter>();
 		
 		if(clnt == null)
@@ -24,13 +23,16 @@ public class BathMoniterFactory {
 		if(addrs.size()>0){
 			for (InetAddress i:addrs) {
 				Log.info("Adding "+i);
+				BathMoniterDevice d = new BathMoniterDevice(new BowlerUDPClient(i));
+				d.connect();
+				list.add(new BathMoniter(d));
 			}
 		}else{
-			DyIORegestry.setConnection(ConnectionDialog.promptConnection());
-		}
-		if(list.size()==0){
+			BathMoniterDevice d =new BathMoniterDevice();
+			d.setConnection(ConnectionDialog.promptConnection());
+			d.connect();
 			for(int i=0;i<5;i++){
-				list.add(new BathMoniter(DyIORegestry.get()));
+				list.add(new BathMoniter(d));
 			}
 		}
 		

@@ -1,34 +1,23 @@
 package com.neuronrobotics.industrial;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-
 import net.miginfocom.swing.MigLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import com.neuronrobotics.sdk.dyio.DyIO;
-import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
-import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
-
-import javax.swing.JTextPane;
+import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
-public class BathMoniter extends JPanel implements IAnalogInputListener {
+public class BathMoniter extends JPanel {
 	private XYSeries ozHour = new XYSeries("Oz/Hour");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
@@ -52,17 +41,15 @@ public class BathMoniter extends JPanel implements IAnalogInputListener {
 	private JLabel lblClearDataFor;
 	private JButton btnClear;
 	private MainWindow mainWindow;
-	private DyIO dyio;
-	private AnalogInputChannel referenceVoltage;
-	private AnalogInputChannel signalVoltage;
+	private BathMoniterDevice dyio;
+
+
 	
-	private double reference;
-	private double signal;
-	
-	public BathMoniter(DyIO dyio){
+	public BathMoniter(BathMoniterDevice dyio){
 		this();
 		this.setDyio(dyio);
 		updateName(getDyio().getInfo());
+		dyio.addBathUi(this);
 	}
 	
 	public BathMoniter(){
@@ -91,10 +78,10 @@ public class BathMoniter extends JPanel implements IAnalogInputListener {
 		lblAmphourcurrent = new JLabel("Amp-Hour (Current)");
 		Controls.add(lblAmphourcurrent, "cell 0 1,alignx trailing");
 		
-		recentCurrentRating = new JTextField();
-		recentCurrentRating.setText("<value>");
-		Controls.add(recentCurrentRating, "cell 1 1,growx");
-		recentCurrentRating.setColumns(10);
+		setRecentCurrentRating(new JTextField());
+		getRecentCurrentRating().setText("<value>");
+		Controls.add(getRecentCurrentRating(), "cell 1 1,growx");
+		getRecentCurrentRating().setColumns(10);
 		
 		lblAmphourToOz = new JLabel("Amp-Hour to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 2,alignx trailing");
@@ -166,38 +153,25 @@ public class BathMoniter extends JPanel implements IAnalogInputListener {
 			this.mainWindow = mainWindow;		
 	}
 
-	public DyIO getDyio() {
+	public BathMoniterDevice getDyio() {
 		return dyio;
 	}
 
-	public void setDyio(DyIO dyio) {
+	public void setDyio(BathMoniterDevice dyio) {
 		this.dyio = dyio;
-		referenceVoltage = 	new AnalogInputChannel(dyio, 10);
-		signalVoltage = 	new AnalogInputChannel(dyio, 11);
-		referenceVoltage.configAdvancedAsyncAutoSample(500);
-		signalVoltage.configAdvancedAsyncAutoSample(500);
-		referenceVoltage.addAnalogInputListener(this);
-		signalVoltage.addAnalogInputListener(this);
-	}
-	
-	public double getCurrent(){
-		
-		double scale = (4096.0//Reference voltage actual volts
-				*1024.0)
-				/reference;
-		double i=100.0;//Ohms of shunt
-		
-		return (signal*scale)/i;
+
 	}
 
-	@Override
-	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
-		if(chan == referenceVoltage){
-			reference =  value;
-		}if(chan == signalVoltage){
-			signal =  value;
-		}
-		recentCurrentRating.setText(new Double(getCurrent()).toString());
+	public JTextField getRecentCurrentRating() {
+		return recentCurrentRating;
 	}
+
+	public void setRecentCurrentRating(JTextField recentCurrentRating) {
+		this.recentCurrentRating = recentCurrentRating;
+	}
+	
+
+
+
 
 }

@@ -6,11 +6,11 @@ import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.network.AbstractUdpDeviceServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 
-public class BathMonitorDevice extends AbstractUdpDeviceServer{
+public class BathMonitorDeviceServer extends AbstractUdpDeviceServer{
 	
 
 
-	public BathMonitorDevice(BowlerAbstractConnection device) {
+	public BathMonitorDeviceServer(BowlerAbstractConnection device) {
 		super(device);
 		
 	}
@@ -34,6 +34,6 @@ public class BathMonitorDevice extends AbstractUdpDeviceServer{
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(new SerialConnection(args[0]));
 		dyio.connect();
-		new BathMonitorDevice(dyio.getConnection());
+		new BathMonitorDeviceServer(dyio.getConnection());
 	}
 }
