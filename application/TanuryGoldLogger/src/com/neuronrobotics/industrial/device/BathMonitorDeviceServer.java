@@ -12,7 +12,7 @@ public class BathMonitorDeviceServer extends AbstractUdpDeviceServer{
 
 
 	public BathMonitorDeviceServer(BowlerAbstractConnection device) {
-		super(device,true);
+		super(device,false);
 		
 	}
 
