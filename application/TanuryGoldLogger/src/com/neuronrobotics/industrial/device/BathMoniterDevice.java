@@ -5,7 +5,9 @@ import com.neuronrobotics.industrial.IBathMoniterUpdateListener;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
+import com.neuronrobotics.sdk.dyio.sequencer.ISchedulerListener;
 import com.neuronrobotics.sdk.network.BowlerUDPClient;
+import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class BathMoniterDevice extends DyIO implements IAnalogInputListener{
 	
@@ -33,11 +35,19 @@ public class BathMoniterDevice extends DyIO implements IAnalogInputListener{
 	public boolean connect(){
 		if(super.connect()){
 			referenceVoltage = 	new AnalogInputChannel(this,15);
-			signalVoltage = 	new AnalogInputChannel(this, 14);
+			signalVoltage = 	new AnalogInputChannel(this, 13);
 			reference = referenceVoltage.getValue();
-			signalVoltage.configAdvancedAsyncAutoSample(5000);
+			signalVoltage.configAdvancedAsyncAutoSample(500);
 			referenceVoltage.addAnalogInputListener(this);
 			signalVoltage.addAnalogInputListener(this);
+			new Thread(){
+				public void run(){
+					while(isAvailable()){
+						ThreadUtil.wait(1000);
+						onAnalogValueChange(signalVoltage, signalVoltage.getValue());
+					}
+				}
+			}.start();
 			return true;
 		}
 		return false;
@@ -48,9 +58,11 @@ public class BathMoniterDevice extends DyIO implements IAnalogInputListener{
 		double scale = (2.5//Reference voltage actual volts
 				*1024.0)
 				/reference;
-		double i=0.001;//Ohms of shunt
+		double i=150;//Ohms of shunt
 		
-		return (signal*scale)/i;
+		double ampScale = .046/1.494;
+		
+		return (((signal/1024)*scale)*ampScale);
 	}
 	
 	@Override
