@@ -3,17 +3,27 @@ package com.neuronrobotics.industrial.device;
 import java.util.List;
 
 import com.neuronrobotics.sdk.common.BowlerAbstractConnection;
+import com.neuronrobotics.sdk.common.BowlerDatagram;
+import com.neuronrobotics.sdk.common.device.server.BowlerAbstractDeviceServerNamespace;
 import com.neuronrobotics.sdk.dyio.DyIO;
-import com.neuronrobotics.sdk.network.AbstractUdpDeviceServer;
+import com.neuronrobotics.sdk.network.AbstractNetworkDeviceServer;
+import com.neuronrobotics.sdk.network.BowlerUDPServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 
-public class BathMonitorDeviceServer extends AbstractUdpDeviceServer{
+public class BathMonitorDeviceServer extends AbstractNetworkDeviceServer{
 	
 
 
 	public BathMonitorDeviceServer(BowlerAbstractConnection device) {
-		super(device,false);
-		
+		super(device,false,new BowlerUDPServer(1865));
+		addBowlerDeviceServerNamespace(new BowlerAbstractDeviceServerNamespace() {
+			
+			@Override
+			public BowlerDatagram process(BowlerDatagram data) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
 	}
 
 
