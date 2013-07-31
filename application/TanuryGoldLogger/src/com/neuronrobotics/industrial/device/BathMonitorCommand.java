@@ -9,8 +9,10 @@ public class BathMonitorCommand extends BowlerAbstractCommand{
 		 setOpCode("bath");
 		 setMethod(BowlerMethod.ASYNCHRONOUS);
 		 getCallingDataStorage().add(ev.getBathName());
+		 getCallingDataStorage().add(0);
 		 getCallingDataStorage().addAs32((int) ev.getTimestamp());
 		 getCallingDataStorage().addAs32((int)(ev.getCurrentOzHrRate()*1000));
+		 getCallingDataStorage().addAs32((int)(ev.getTotalUsedToday()*1000));
 	 }
 
 }

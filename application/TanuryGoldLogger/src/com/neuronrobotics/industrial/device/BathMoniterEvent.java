@@ -10,8 +10,10 @@ public class BathMoniterEvent {
 	private String bathName;
 	private long timestamp;
 	private double currentOzHrRate;
+	private double totalUsedToday;
 	
-	public BathMoniterEvent(String bathName, long timestamp, double currentOzHrRate){
+	public BathMoniterEvent(String bathName, long timestamp, double currentOzHrRate, double totalUsedToday){
+		this.setTotalUsedToday(totalUsedToday);
 		this.setBathName(bathName);
 		this.setTimestamp(timestamp);
 		this.setCurrentOzHrRate(currentOzHrRate);
@@ -24,12 +26,10 @@ public class BathMoniterEvent {
 		String s = data.asString();
 		data.popList(s.length()+1);
 		this.setBathName(s );
-		
-		
 		this.setTimestamp( new Integer(ByteList.convertToInt(data.popList(4),true)));
-		
-		
 		this.setCurrentOzHrRate(new Double(ByteList.convertToInt(data.popList(4)))/1000.0);
+		this.setTotalUsedToday(new Double(ByteList.convertToInt(data.popList(4)))/1000.0);
+		
 	}
 
 	public BowlerDatagram getPacket(MACAddress mac) {
@@ -61,6 +61,23 @@ public class BathMoniterEvent {
 	}
 	
 	
-	
+	@Override
+	public String toString(){
+		
+		String s="";
+		s+=getBathName()+" ";
+		s+=timestamp+"ms ";
+		s+=currentOzHrRate+"Oz/Hr ";
+		s+= totalUsedToday+"Oz ";
+		return s;
+	}
+
+	public double getTotalUsedToday() {
+		return totalUsedToday;
+	}
+
+	public void setTotalUsedToday(double totalUsedToday) {
+		this.totalUsedToday = totalUsedToday;
+	}
 
 }

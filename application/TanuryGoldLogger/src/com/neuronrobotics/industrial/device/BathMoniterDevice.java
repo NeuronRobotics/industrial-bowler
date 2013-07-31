@@ -45,33 +45,77 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 
 	@Override
 	public void onAsyncResponse(BowlerDatagram data) {
+		
 		if(data.getRPC().contains("bath")){
 			BathMoniterEvent be = new BathMoniterEvent(data);
 			
-			if(getBathMoniter() !=null)
-				getBathMoniter().onValueChange(be.getBathName(), be.getTimestamp(), be.getCurrentOzHrRate());
+			if(getBathMoniter() !=null){
+				System.out.println("ASYNC << "+be+"\n"+data);
+				
+				getBathMoniter().onValueChange(be);
+			}
 		}
 	}
 
 	public String getName() {
-		Object [] args = send("tanury.bath.*", BowlerMethod.GET,
-				"name",
-				new Object[]{});
+		Object [] args = send(	"tanury.bath.*", 
+								BowlerMethod.GET,
+								"name",
+								new Object[]{});
 		return (String)args[0];
 	}
 
 	public void setName(String newName) {
 		Object[] args = new Object[]{newName};
-		send("tanury.bath.*",BowlerMethod.POST,
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
 				"name",
 				args);
 	}
-	
+	/**
+	 * Sets the internal variable for the polling rate
+	 * @param pollingRate The polling rate in seconds
+	 */
 	public void setPollingRate(int seconds){
 		Object[] args = new Object[]{seconds};
-		send("tanury.bath.*",BowlerMethod.POST,
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
 				"rate",
 				args);
+	}
+	/**
+	 * Gets the internal variable for the polling rate
+	 * @return The polling rate in seconds
+	 */
+	public int getPollingRate(){
+		Object[] args = send(	"tanury.bath.*",
+				BowlerMethod.GET,
+				"rate",
+				new Object[]{});
+		return (Integer)args[0];
+	}
+	
+	public void setScale(double scale) {
+		Object[] args = new Object[]{scale};
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
+				"scal",
+				args);
+	}
+
+	public double getScale() {
+		Object[] args = send(	"tanury.bath.*",
+				BowlerMethod.GET,
+				"scal",
+				new Object[]{});
+		return (Double)args[0];
+	}
+
+	public void clearData() {
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
+				"cler",
+				new Object[]{});
 	}
 
 }

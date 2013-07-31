@@ -11,7 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 
-public class DashBoard extends JPanel {
+import com.neuronrobotics.industrial.device.BathMoniterEvent;
+
+public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
 	/**
 	 * 
@@ -37,11 +39,11 @@ public class DashBoard extends JPanel {
 		add(table, "flowy,cell 0 0,grow");
 		
 		JLabel lblNewLabel = new JLabel("Summary");
-		add(lblNewLabel, "cell 0 1,alignx trailing");
+		//add(lblNewLabel, "cell 0 1,alignx trailing");
 		
 		textField = new JTextField();
 		textField.setText("<value>");
-		add(textField, "cell 1 1,growx");
+		//add(textField, "cell 1 1,growx");
 		textField.setColumns(10);
 		
 		JLabel lblTroyOzRate = new JLabel("Troy Oz. Rate");
@@ -61,5 +63,28 @@ public class DashBoard extends JPanel {
 		for (BathMoniter b:list){
 			table.setValueAt(b.getName(), i++, 0);
 		}
+	}
+
+	@Override
+	public void onNameChange(String newName) {
+		
+	}
+
+	@Override
+	public void onValueChange(BathMoniterEvent event) {
+		double total=0;
+		for(int i=0;i<list.size();i++){
+			if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
+				table.setValueAt(new Double(event.getTotalUsedToday()).toString(), i, 1);
+			}
+			total+=new Double(table.getValueAt( i, 1).toString());
+		}
+		textField_1.setText(new Double(total).toString());
+	}
+
+	@Override
+	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
+		// TODO Auto-generated method stub
+		
 	}
 }

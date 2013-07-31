@@ -1,5 +1,7 @@
 package com.neuronrobotics.industrial;
 
+import com.neuronrobotics.industrial.device.BathMoniterEvent;
+
 public interface IBathMoniterUpdateListener {
 
 	/**
@@ -14,7 +16,7 @@ public interface IBathMoniterUpdateListener {
 	 * @param timestamp
 	 * @param currentOzHrRate
 	 */
-	public void onValueChange(String bathName, long timestamp, double currentOzHrRate);
+	public void onValueChange(BathMoniterEvent event);
 	
 	/**
 	 * THis fires when a value change crosses an alarm threshhold

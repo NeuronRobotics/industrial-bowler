@@ -15,9 +15,13 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
+import com.neuronrobotics.industrial.device.BathMoniterEvent;
+
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private XYSeries ozHour = new XYSeries("Oz/Minutes");
@@ -51,8 +55,37 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	public BathMoniter(BathMoniterDevice dyio){
 		this();
 		this.setDyio(dyio);
-		updateName(getDyio().getName());
+		
+		updateName(dyio.getName());
 		dyio.addBathUi(this);
+		textField_3.setText(new Integer(dyio.getPollingRate()).toString());
+		textField_3.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getDyio().setPollingRate(Integer.parseInt(textField_3.getText()));
+			}
+		});
+		
+		textField_1.setText(new Double(dyio.getScale()).toString());
+		textField_1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getDyio().setScale(getScaleValue());
+			}
+		});
+		
+		btnClear.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getDyio().clearData();
+			}
+		});
+		
+	}
+	
+	private double getScaleValue(){
+		return Double.parseDouble(textField_1.getText());
 	}
 	
 	public BathMoniter(){
@@ -164,7 +197,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 
 	public void setDyio(BathMoniterDevice dyio) {
 		this.dyio = dyio;
-
 	}
 
 	public JTextField getRecentCurrentRating() {
@@ -177,20 +209,23 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onNameChange(String newName) {
-		// TODO Auto-generated method stub
-		
+		if(mainWindow!=null)
+			mainWindow.onNameChange(newName);
 	}
 
 	@Override
-	public void onValueChange(String bathName, long timestamp,double currentOzHrRate) {
-		getRecentCurrentRating().setText(new Double(currentOzHrRate).toString());
-		ozHour.add(((timestamp-startTimestamp)/1000), currentOzHrRate);
-
+	public void onValueChange(BathMoniterEvent event) {
+		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
+		ozHour.add(((event.getTimestamp()-startTimestamp)/1000), event.getCurrentOzHrRate());
+		textField_2.setText(new Double(event.getTotalUsedToday() ).toString());
+		if(mainWindow!=null)
+			mainWindow.onValueChange(event);
 	}
 
 	@Override
 	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
-		
+		if(mainWindow!=null)
+			mainWindow.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
 	}
 	
 

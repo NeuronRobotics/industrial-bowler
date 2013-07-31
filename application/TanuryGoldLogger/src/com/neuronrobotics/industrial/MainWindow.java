@@ -7,6 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
+
+import com.neuronrobotics.industrial.device.BathMoniterEvent;
+
 import java.awt.Component;
 import java.security.AllPermission;
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import java.util.ArrayList;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.BoxLayout;
 
-public class MainWindow {
+public class MainWindow implements IBathMoniterUpdateListener{
 
 	private JFrame frame;
 	private ArrayList<BathMoniter> list;
@@ -87,6 +90,22 @@ public class MainWindow {
 		   tabbedPane.setTitleAt(i, list.get(i-1).getName());
 		}
 		dashBoard.updateTableData();
+	}
+
+	@Override
+	public void onNameChange(String newName) {
+		updateTabData();
+	}
+
+	@Override
+	public void onValueChange(BathMoniterEvent event) {
+		dashBoard.onValueChange(event);
+	}
+
+	@Override
+	public void onAlarmEvenFire(String bathName, long timestamp,
+			double currentOzHrRate, double alarmThreshhold) {
+		dashBoard.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
 	}
 
 }

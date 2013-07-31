@@ -2,13 +2,13 @@ package com.neuronrobotics.industrial.device;
 
 import java.util.List;
 
-import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
 import com.neuronrobotics.sdk.network.BowlerUDPServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
+import com.neuronrobotics.sdk.util.RollingAverageFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAnalogInputListener{
@@ -17,8 +17,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private AnalogInputChannel signalVoltage;
 	private double reference;
 	private double signal;
-	
-	private int pollingRate = 1000*60*2;
+	private RollingAverageFilter integral; 
+	private int pollingRate = 1000*2;
+	private double totalUsedToday =0;
+	private double scaleValue=37.37;
 	
 	private DyIO dyio;
 	private String name = null;
@@ -35,6 +37,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
 		signalVoltage = 	new AnalogInputChannel(dyio, 13);
 		reference = referenceVoltage.getValue();
+		signal    = signalVoltage.getValue();
+		integral = new RollingAverageFilter(20, getCurrent());
 		//signalVoltage.configAdvancedAsyncAutoSample(5000);
 		referenceVoltage.addAnalogInputListener(this);
 		signalVoltage.addAnalogInputListener(this);
@@ -48,8 +52,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		new Thread(){
 			public void run(){
+				ThreadUtil.wait(getPollingRate());
 				while(dyio.isAvailable()){
-					BathMoniterEvent be = new BathMoniterEvent(getName(), System.currentTimeMillis(), getCurrent());
+					totalUsedToday +=getCurrent();
+					BathMoniterEvent be = new BathMoniterEvent(getDeviceName(), System.currentTimeMillis(), getCurrent(),totalUsedToday*getScale());
 					pushAsyncPacket(be.getPacket(dyio.getAddress()));
 					ThreadUtil.wait(getPollingRate());
 				}
@@ -67,8 +73,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		double i=150;//Ohms of shunt
 		
 		double ampScale = .046/1.494;
-		
-		return (((signal/1024)*scale)*ampScale);
+		double val = 0;
+		if(integral== null)
+			val = signal;
+		else
+			val = integral.getValue();
+		return (((val/1024)*scale)*ampScale);
 	}
 	
 	@Override
@@ -76,7 +86,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		if(chan == referenceVoltage){
 			reference =  value;
 		}if(chan == signalVoltage){
-			signal =  value;
+			signal = value;
+			integral.add( value);
 		}
 		
 	}
@@ -110,7 +121,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		new BathMonitorDeviceServer(dyio);
 	}
 
-	public String getName() {
+	public String getDeviceName() {
 		if(name == null)
 			name=dyio.getInfo();
 		return name;
@@ -128,6 +139,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	 * @param pollingRate The polling rate in seconds
 	 */
 	public void setPollingRate(int pollingRate) {
-		this.pollingRate = 1000*60*pollingRate;
+		this.pollingRate = 1000*pollingRate;
+	}
+
+	public void setScale(double integer) {
+		scaleValue = integer;
+	}
+
+	public double getScale() {
+		return scaleValue;
+	}
+
+	public void clearData() {
+		totalUsedToday = 0;
 	}
 }

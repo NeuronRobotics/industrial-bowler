@@ -22,7 +22,7 @@ public class BathMoniterFactory {
 		ArrayList<InetAddress>  addrs = clnt.getAllAddresses();
 		if(addrs.size()>0){
 			for (InetAddress i:addrs) {
-				Log.info("Adding "+i);
+				System.out.println("Adding "+i);
 				BathMoniterDevice d = new BathMoniterDevice(new BowlerUDPClient(i));
 				d.connect();
 				list.add(new BathMoniter(d));
