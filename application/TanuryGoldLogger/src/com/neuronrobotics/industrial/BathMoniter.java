@@ -112,7 +112,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			}
 		});
 		
-		lblAmphourcurrent = new JLabel("Amp-Hour (Current)");
+		lblAmphourcurrent = new JLabel("Mili-Amps (Recent)");
 		Controls.add(lblAmphourcurrent, "cell 0 1,alignx trailing");
 		
 		setRecentCurrentRating(new JTextField());
@@ -216,8 +216,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
-		ozHour.add(((event.getTimestamp())/60000), event.getCurrentOzHrRate());
-		textField_2.setText(new Double(event.getTotalUsedToday() ).toString());
+		ozHour.add(((	event.getTimestamp())), 
+						event.getCurrentOzHrRate()); 
+		textField_2.setText(new Double(	event.getTotalUsedToday() 
+										).toString());
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
 	}

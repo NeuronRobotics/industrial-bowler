@@ -85,7 +85,7 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 			bathMonitorDeviceServer.setPollingRate((Integer)data[0]);
 			return back;
 		}if(rpc.contains("rate") && method == BowlerMethod.GET){
-			Object[] back = new Object[]{new Integer(bathMonitorDeviceServer.getPollingRate()/1000)};
+			Object[] back = new Object[]{new Integer((int) (bathMonitorDeviceServer.getPollingRate()/1000))};
 			return back;
 		}if(rpc.contains("scal") && method == BowlerMethod.POST){
 			Object[] back = new Object[0];

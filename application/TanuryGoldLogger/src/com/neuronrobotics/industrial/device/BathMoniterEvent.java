@@ -45,7 +45,7 @@ public class BathMoniterEvent {
 	}
 
 	public long getTimestamp() {
-		return timestamp;
+		return timestamp;//hours
 	}
 
 	public void setTimestamp(long timestamp) {
@@ -53,11 +53,18 @@ public class BathMoniterEvent {
 	}
 
 	public double getCurrentOzHrRate() {
-		return currentOzHrRate;
+		return currentOzHrRate;//MiliAmps
 	}
 
 	public void setCurrentOzHrRate(double currentOzHrRate) {
 		this.currentOzHrRate = currentOzHrRate;
+	}
+	public double getTotalUsedToday() {
+		return totalUsedToday;//amp-hour*scale;
+	}
+
+	public void setTotalUsedToday(double totalUsedToday) {
+		this.totalUsedToday = totalUsedToday;
 	}
 	
 	
@@ -72,12 +79,6 @@ public class BathMoniterEvent {
 		return s;
 	}
 
-	public double getTotalUsedToday() {
-		return totalUsedToday;
-	}
 
-	public void setTotalUsedToday(double totalUsedToday) {
-		this.totalUsedToday = totalUsedToday;
-	}
 
 }

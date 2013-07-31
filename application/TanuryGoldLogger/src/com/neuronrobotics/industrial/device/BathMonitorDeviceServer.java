@@ -18,9 +18,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
-	private int pollingRate = 1000*2;
+	private double pollingRate = 1000*2;
 	private double totalUsedToday =0;
-	private double scaleValue=37.37;
+	private double scaleValue=.01;
 	
 	private DyIO dyio;
 	private String name = null;
@@ -35,7 +35,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		dyio=device;
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
-		signalVoltage = 	new AnalogInputChannel(dyio, 13);
+		signalVoltage = 	new AnalogInputChannel(dyio, 12);
 		reference = referenceVoltage.getValue();
 		signal    = signalVoltage.getValue();
 		integral = new RollingAverageFilter(20, getCurrent());
@@ -46,23 +46,29 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				while(dyio.isAvailable()){
 					onAnalogValueChange(signalVoltage, signalVoltage.getValue());
-					ThreadUtil.wait(100);
+					ThreadUtil.wait(200);
 				}
 			}
 		}.start();
 		new Thread(){
 			public void run(){
-				ThreadUtil.wait(getPollingRate());
+				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					totalUsedToday +=getCurrent();
-					BathMoniterEvent be = new BathMoniterEvent(getDeviceName(), System.currentTimeMillis(), getCurrent(),totalUsedToday*getScale());
+					totalUsedToday +=getCurrent()*(getPollingRate()/1000);
+					//System.out.println("Current voltage= "+ signal+ " Scaled= "+getCurrent());
+					
+					BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
+																System.currentTimeMillis(), 
+																getCurrent(),
+																totalUsedToday*getScale());
 					pushAsyncPacket(be.getPacket(dyio.getAddress()));
-					ThreadUtil.wait(getPollingRate());
+					ThreadUtil.wait((int) getPollingRate());
 				}
 			}
 		}.start();
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
+		System.out.println("System ONLINE");
 	}
 	
 	public double getCurrent(){
@@ -72,13 +78,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				/reference;
 		double i=150;//Ohms of shunt
 		
-		double ampScale = .046/1.494;
+		double ampScale = (1/32.5)*0.8064;//Amp gain
 		double val = 0;
 		if(integral== null)
 			val = signal;
 		else
 			val = integral.getValue();
-		return (((val/1024)*scale)*ampScale);
+		return (((val/1024)*scale)*ampScale)/(i/1000);
 	}
 	
 	@Override
@@ -131,7 +137,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		dyio.setInfo(name);
 	}
 
-	public int getPollingRate() {
+	public double getPollingRate() {
 		return pollingRate;
 	}
 	/**

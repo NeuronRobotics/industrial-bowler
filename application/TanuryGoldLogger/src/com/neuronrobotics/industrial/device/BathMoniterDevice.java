@@ -22,6 +22,7 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 
 	public BathMoniterDevice(BowlerUDPClient bowlerUDPClient) {
 		setConnection(bowlerUDPClient);
+		startHeartBeat(2000);
 	}
 	
 	@Override

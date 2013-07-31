@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -101,8 +103,8 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		}
 		textField_1.setText(new Double(total).toString());
 		File file = new File(filename);
-		//"Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current"
-		String data = event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+"\n";
+		//"Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current"
+		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+"\n";
 		boolean header = false;
 		if(!file.exists()){
 			File tmp = new File(file.getParent());
