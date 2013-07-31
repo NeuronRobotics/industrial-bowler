@@ -27,4 +27,6 @@ public interface IBathMoniterUpdateListener {
 	 */
 	public void onAlarmEvenFire(String bathName, long timestamp, double currentOzHrRate, double alarmThreshhold);
 	
+	public void onClearData();
+	
 }

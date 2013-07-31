@@ -48,7 +48,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JButton btnClear;
 	private MainWindow mainWindow;
 	private BathMoniterDevice dyio;
-	private long startTimestamp;
+	//private long startTimestamp;
 
 
 	
@@ -79,6 +79,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				getDyio().clearData();
+				onClearData();
 			}
 		});
 		
@@ -170,7 +171,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		XYPlot plot = (XYPlot) chart.getPlot();
 		ValueAxis axis = plot.getDomainAxis();
 		axis.setFixedAutoRange((60*24)/5);
-		startTimestamp =System.currentTimeMillis();
 		
 		updateName(tmpmyName);
 	}
@@ -216,7 +216,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
-		ozHour.add(((event.getTimestamp()-startTimestamp)/1000), event.getCurrentOzHrRate());
+		ozHour.add(((event.getTimestamp())/60000), event.getCurrentOzHrRate());
 		textField_2.setText(new Double(event.getTotalUsedToday() ).toString());
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
@@ -226,6 +226,12 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
 		if(mainWindow!=null)
 			mainWindow.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
+	}
+
+	@Override
+	public void onClearData() {
+		if(mainWindow!=null)
+			mainWindow.onClearData();
 	}
 	
 

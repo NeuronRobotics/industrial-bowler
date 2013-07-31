@@ -54,7 +54,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 640, 480);
+		frame.setBounds(100, 100, 720, 480);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -106,6 +106,11 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	public void onAlarmEvenFire(String bathName, long timestamp,
 			double currentOzHrRate, double alarmThreshhold) {
 		dashBoard.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
+	}
+
+	@Override
+	public void onClearData() {
+		dashBoard.onClearData();
 	}
 
 }
