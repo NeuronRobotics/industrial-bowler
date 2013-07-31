@@ -14,7 +14,7 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 	public TanuryBathNamespaceImp(BathMonitorDeviceServer bathMonitorDeviceServer, MACAddress mac){
 		super(mac,"tanury.bath.*;;");
 		this.bathMonitorDeviceServer = bathMonitorDeviceServer;
-		rpc.add(new RpcEncapsulation(1, 
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
 				getNamespace() , 
 				"name", 
 				BowlerMethod.GET, 
@@ -22,11 +22,19 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 				BowlerMethod.POST, 
 				new BowlerDataType[]{BowlerDataType.ASCII}));//Name
 		
-		rpc.add(new RpcEncapsulation(1, 
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
 				getNamespace()  , 
 				"name", 
 				BowlerMethod.POST, 
 				new BowlerDataType[]{BowlerDataType.ASCII},//name
+				BowlerMethod.POST, 
+				new BowlerDataType[]{}));
+		
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
+				getNamespace()  , 
+				"rate", 
+				BowlerMethod.POST, 
+				new BowlerDataType[]{BowlerDataType.I32},//name
 				BowlerMethod.POST, 
 				new BowlerDataType[]{}));
 	}
@@ -39,6 +47,10 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 		}if(rpc.contains("name") && method == BowlerMethod.POST){
 			Object[] back = new Object[0];
 			bathMonitorDeviceServer.setName((String) data[0]);
+			return back;
+		}if(rpc.contains("rate") && method == BowlerMethod.POST){
+			Object[] back = new Object[0];
+			bathMonitorDeviceServer.setPollingRate((Integer)data[0]);
 			return back;
 		}
 		

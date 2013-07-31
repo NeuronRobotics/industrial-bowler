@@ -66,5 +66,12 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				"name",
 				args);
 	}
+	
+	public void setPollingRate(int seconds){
+		Object[] args = new Object[]{seconds};
+		send("tanury.bath.*",BowlerMethod.POST,
+				"rate",
+				args);
+	}
 
 }

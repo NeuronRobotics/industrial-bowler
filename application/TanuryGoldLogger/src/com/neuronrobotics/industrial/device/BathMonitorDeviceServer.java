@@ -18,7 +18,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double reference;
 	private double signal;
 	
+	private int pollingRate = 1000*60*2;
+	
 	private DyIO dyio;
+	private String name = null;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -26,23 +29,33 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		setServer(new BowlerUDPServer(1865));
-		Log.enableDebugPrint(true);
+		//Log.enableDebugPrint(true);
 		dyio=device;
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
 		signalVoltage = 	new AnalogInputChannel(dyio, 13);
 		reference = referenceVoltage.getValue();
-		signalVoltage.configAdvancedAsyncAutoSample(500);
+		//signalVoltage.configAdvancedAsyncAutoSample(5000);
 		referenceVoltage.addAnalogInputListener(this);
 		signalVoltage.addAnalogInputListener(this);
 		new Thread(){
 			public void run(){
 				while(dyio.isAvailable()){
-					ThreadUtil.wait(100);
 					onAnalogValueChange(signalVoltage, signalVoltage.getValue());
+					ThreadUtil.wait(100);
 				}
 			}
 		}.start();
+		new Thread(){
+			public void run(){
+				while(dyio.isAvailable()){
+					BathMoniterEvent be = new BathMoniterEvent(getName(), System.currentTimeMillis(), getCurrent());
+					pushAsyncPacket(be.getPacket(dyio.getAddress()));
+					ThreadUtil.wait(getPollingRate());
+				}
+			}
+		}.start();
+		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
 	}
 	
@@ -64,9 +77,6 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			reference =  value;
 		}if(chan == signalVoltage){
 			signal =  value;
-			BathMoniterEvent be = new BathMoniterEvent(dyio.getInfo(), System.currentTimeMillis(), getCurrent());
-			pushAsyncPacket(be.getPacket(dyio.getAddress()));
-			
 		}
 		
 	}
@@ -101,9 +111,23 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	}
 
 	public String getName() {
-		return dyio.getInfo();
+		if(name == null)
+			name=dyio.getInfo();
+		return name;
 	}
 	public void setName(String name) {
+		this.name = name;
 		dyio.setInfo(name);
+	}
+
+	public int getPollingRate() {
+		return pollingRate;
+	}
+	/**
+	 * Sets the internal variable for the polling rate
+	 * @param pollingRate The polling rate in seconds
+	 */
+	public void setPollingRate(int pollingRate) {
+		this.pollingRate = 1000*60*pollingRate;
 	}
 }
