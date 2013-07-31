@@ -51,7 +51,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	public BathMoniter(BathMoniterDevice dyio){
 		this();
 		this.setDyio(dyio);
-		updateName(getDyio().getInfo());
+		updateName(getDyio().getName());
 		dyio.addBathUi(this);
 	}
 	
@@ -145,7 +145,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private void updateName(String newName){
 		 myName=newName;
 		 if(getDyio()!=null)
-			 getDyio().setInfo(newName);
+			 getDyio().setName(newName);
 		 chart.setTitle(newName);
 		 setName(newName);
 		 txtbathName.setText(newName);
