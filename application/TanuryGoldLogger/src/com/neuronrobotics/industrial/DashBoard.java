@@ -31,14 +31,12 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField;
 	private JTextField textField_1;
 	private ArrayList<BathMoniter> list;
-	private int iterationOfLog=0;
-	private String filename = System.getProperty("user.home")+"/Tanury/Tanury-Logs-"+getDate()+"_"+iterationOfLog+".csv";
 	private String dataHeader = "Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current\n";
 
 	public DashBoard(ArrayList<BathMoniter> list) {
 		this.list = list;
 		setName("Dash Board");
-		setLayout(new MigLayout("", "[grow][grow]", "[grow][][]"));
+		setLayout(new MigLayout("", "[grow][]", "[grow][][]"));
 		
 		table = new JTable(list.size(),2);
 		int i=0;
@@ -54,14 +52,9 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		
 		textField = new JTextField();
 		textField.setText("<value>");
-		textField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				filename=textField.getText();
-			}
-		});
-		textField.setText(filename);
-		add(textField, "cell 1 1,growx");
+
+		textField.setText(getFileName("<bath>"));
+		add(textField, "cell 0 1,growx");
 		textField.setColumns(10);
 		
 		JLabel lblTroyOzRate = new JLabel("Troy Oz. Rate");
@@ -70,7 +63,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		textField_1 = new JTextField();
 		
 		
-		add(textField_1, "cell 1 2,growx");
+		add(textField_1, "cell 0 2,growx");
 		textField_1.setColumns(10);
 	
 	}
@@ -102,7 +95,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 			total+=new Double(table.getValueAt( i, 1).toString());
 		}
 		textField_1.setText(new Double(total).toString());
-		File file = new File(filename);
+		File file = new File(getFileName(event.getBathName()));
 		//"Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current"
 		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+"\n";
 		boolean header = false;
@@ -115,13 +108,13 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 				header = true;
 				
 			} catch (IOException e) {
-				System.err.println(filename);
+				System.err.println(getFileName(event.getBathName()));
 				e.printStackTrace();
 			}
 			
 		}
 		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)));
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(getFileName(event.getBathName()), true)));
 			if(header){
 				out.println(dataHeader+data);
 			}else
@@ -139,11 +132,13 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private String getFileName(String bath){
+		return System.getProperty("user.home")+"/Tanury/"+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
+	}
 
 	@Override
 	public void onClearData() {
-		iterationOfLog++;
-		filename = System.getProperty("user.home")+"/Tanury/Tanury-Logs-"+getDate()+"_"+iterationOfLog+".csv";
-		textField.setText(filename);
+		textField.setText(getFileName("<bath>"));
 	}
 }

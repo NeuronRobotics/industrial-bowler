@@ -49,7 +49,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private MainWindow mainWindow;
 	private BathMoniterDevice dyio;
 	//private long startTimestamp;
-
+	Integer startTime=null;
 
 	
 	public BathMoniter(BathMoniterDevice dyio){
@@ -216,7 +216,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
-		ozHour.add(((	event.getTimestamp())), 
+		if (startTime == null)
+			startTime = new Integer((int) event.getTimestamp()); 
+		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
+		
+		System.out.println("Startime = "+ startTime+" timestamp = "+timestamp);
+		
+		ozHour.add( timestamp , 
 						event.getCurrentOzHrRate()); 
 		textField_2.setText(new Double(	event.getTotalUsedToday() 
 										).toString());
