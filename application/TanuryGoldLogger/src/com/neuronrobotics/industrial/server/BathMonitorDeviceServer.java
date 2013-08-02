@@ -19,7 +19,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
-	private double pollingRate = 1000*2;
+	//private double pollingRate = 1000*2;
 	//private double totalUsedToday =0;
 	
 	private DyIO dyio;
@@ -138,14 +138,14 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	}
 
 	public double getPollingRate() {
-		return pollingRate;
+		return configuration.getSecondsPolling();
 	}
 	/**
 	 * Sets the internal variable for the polling rate
 	 * @param pollingRate The polling rate in seconds
 	 */
 	public void setPollingRate(int pollingRate) {
-		this.pollingRate = 1000*pollingRate;
+		configuration.setSecondsPolling(pollingRate*1000);
 	}
 
 	public void setScale(double integer) {

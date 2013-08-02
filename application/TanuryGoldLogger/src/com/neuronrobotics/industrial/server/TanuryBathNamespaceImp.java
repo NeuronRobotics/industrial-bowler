@@ -1,4 +1,4 @@
-package com.neuronrobotics.industrial.device;
+package com.neuronrobotics.industrial.server;
 
 import com.neuronrobotics.sdk.common.BowlerDataType;
 import com.neuronrobotics.sdk.common.BowlerMethod;

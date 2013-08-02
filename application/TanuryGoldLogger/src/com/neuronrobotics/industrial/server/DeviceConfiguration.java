@@ -92,6 +92,7 @@ public class DeviceConfiguration {
 	private class dataStorage{
 		private double scaleFactor = .01;
 		private double dailyTotal = 0;
+		private int secondsPolling = 30;
 		public double getScaleFactor() {
 			return scaleFactor;
 		}
@@ -107,7 +108,24 @@ public class DeviceConfiguration {
 		public void setDailyTotal(double dailyTotal) {
 			this.dailyTotal = dailyTotal;
 		}
+
+		public int getSecondsPolling() {
+			return secondsPolling;
+		}
+
+		public void setSecondsPolling(int secondsPolling) {
+			this.secondsPolling = secondsPolling;
+		}
 		
+	}
+	
+	public int getSecondsPolling() {
+		return data.getSecondsPolling();
+	}
+
+	public void setSecondsPolling(int secondsPolling) {
+		data.setSecondsPolling(secondsPolling);
+		writeFile();
 	}
 	
 	public double getDailyTotal() {
