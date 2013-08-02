@@ -120,7 +120,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(getRecentCurrentRating(), "cell 1 1,growx");
 		getRecentCurrentRating().setColumns(10);
 		
-		lblAmphourToOz = new JLabel("Amp-Hour to Oz. Scale");
+		lblAmphourToOz = new JLabel("Amp-Minute to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 2,alignx trailing");
 		
 		textField_1 = new JTextField();
