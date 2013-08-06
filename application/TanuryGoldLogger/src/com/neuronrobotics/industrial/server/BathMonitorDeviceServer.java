@@ -32,7 +32,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		setServer(new BowlerUDPServer(1865));
-		Log.enableDebugPrint(true);
+		//Log.enableDebugPrint(true);
 		dyio=device;
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
