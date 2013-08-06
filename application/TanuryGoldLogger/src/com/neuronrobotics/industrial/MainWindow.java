@@ -8,6 +8,7 @@ import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
 import java.awt.Component;
@@ -102,15 +103,16 @@ public class MainWindow implements IBathMoniterUpdateListener{
 		dashBoard.onValueChange(event);
 	}
 
-	@Override
-	public void onAlarmEvenFire(String bathName, long timestamp,
-			double currentOzHrRate, double alarmThreshhold) {
-		dashBoard.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
-	}
 
 	@Override
 	public void onClearData() {
 		dashBoard.onClearData();
+	}
+
+	@Override
+	public void onAlarmEvenFire(BathAlarmEvent ev) {
+		dashBoard.onAlarmEvenFire(ev);
+		alarm.onAlarmEvenFire(ev);
 	}
 
 }

@@ -6,9 +6,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
+import com.neuronrobotics.industrial.device.BathMoniterEvent;
+
 import net.miginfocom.swing.MigLayout;
 
-public class AlarmAccount extends JPanel {
+public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 
 	/**
 	 * 
@@ -32,6 +35,30 @@ public class AlarmAccount extends JPanel {
 			add(new JPasswordField("Secret"), 	"cell 3 "+i+",growx");
 			add(new JButton("Add"), 			"cell 4 "+i+",growx");
 		}
+		
+	}
+
+	@Override
+	public void onNameChange(String newName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onValueChange(BathMoniterEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAlarmEvenFire(BathAlarmEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onClearData() {
+		// TODO Auto-generated method stub
 		
 	}
 

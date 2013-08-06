@@ -92,7 +92,8 @@ public class DeviceConfiguration {
 	private class dataStorage{
 		private double scaleFactor = .01;
 		private double dailyTotal = 0;
-		private int secondsPolling = 30;
+		private int secondsPolling = 30000;
+		private double alarmThreshhold = .6;
 		public double getScaleFactor() {
 			return scaleFactor;
 		}
@@ -115,6 +116,14 @@ public class DeviceConfiguration {
 
 		public void setSecondsPolling(int secondsPolling) {
 			this.secondsPolling = secondsPolling;
+		}
+
+		public double getAlarmThreshhold() {
+			return alarmThreshhold;
+		}
+
+		public void setAlarmThreshhold(double alarmThreshhold) {
+			this.alarmThreshhold = alarmThreshhold;
 		}
 		
 	}
@@ -144,6 +153,15 @@ public class DeviceConfiguration {
 
 	public void setScaleFactor(double scaleFactor) {
 		data.setScaleFactor(scaleFactor);
+		writeFile();
+	}
+	
+	public double getAlarmThreshhold() {
+		return data.getAlarmThreshhold();
+	}
+
+	public void setAlarmThreshhold(double alarmThreshhold) {
+		data.setAlarmThreshhold(alarmThreshhold);
 		writeFile();
 	}
 	

@@ -55,6 +55,12 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				
 				getBathMoniter().onValueChange(be);
 			}
+		}if(data.getRPC().contains("alrm")){
+			
+			if(getBathMoniter() !=null){
+				System.out.println("ASYNC << \n"+data);
+				getBathMoniter().onAlarmEvenFire(new BathAlarmEvent(data));
+			}
 		}
 	}
 
@@ -108,6 +114,22 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 		Object[] args = send(	"tanury.bath.*",
 				BowlerMethod.GET,
 				"scal",
+				new Object[]{});
+		return (Double)args[0];
+	}
+	
+	public void setAlarmLevel(double scale) {
+		Object[] args = new Object[]{scale};
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
+				"alrm",
+				args);
+	}
+
+	public double getAlarmLevel() {
+		Object[] args = send(	"tanury.bath.*",
+				BowlerMethod.GET,
+				"alrm",
 				new Object[]{});
 		return (Double)args[0];
 	}

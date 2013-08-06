@@ -14,6 +14,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
@@ -32,7 +33,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	 */
 	private static final long serialVersionUID = -7734077989616188631L;
 	private static int index=1;
-	private String myName;
 	private JTextField txtbathName;
 	private JFreeChart chart;
 	private JLabel lblName;
@@ -46,6 +46,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField_3;
 	private JLabel lblClearDataFor;
 	private JButton btnClear;
+	
+	private JLabel lblAlarm;
+	private JTextField btnAlarm;
+	
 	private MainWindow mainWindow;
 	private BathMoniterDevice dyio;
 	//private long startTimestamp;
@@ -83,6 +87,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			}
 		});
 		
+		btnAlarm.setText(new Double(getDyio().getAlarmLevel()).toString());
+		
 	}
 	
 	private double getScaleValue(){
@@ -112,43 +118,54 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			}
 		});
 		
+		lblAlarm=new JLabel("Alarm Level (Mili-Amps)");;
+		btnAlarm = new JTextField();
+		btnAlarm.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getDyio().setAlarmLevel(Double.parseDouble(btnAlarm.getText()));
+			}
+		});
+		Controls.add(lblAlarm, "cell 0 1,alignx trailing");
+		Controls.add(btnAlarm, "cell 1 1,growx");
+		
 		lblAmphourcurrent = new JLabel("Mili-Amps (Recent)");
-		Controls.add(lblAmphourcurrent, "cell 0 1,alignx trailing");
+		Controls.add(lblAmphourcurrent, "cell 0 2,alignx trailing");
 		
 		setRecentCurrentRating(new JTextField());
 		getRecentCurrentRating().setText("<value>");
-		Controls.add(getRecentCurrentRating(), "cell 1 1,growx");
+		Controls.add(getRecentCurrentRating(), "cell 1 2,growx");
 		getRecentCurrentRating().setColumns(10);
 		
 		lblAmphourToOz = new JLabel("Amp-Minute to Oz. Scale");
-		Controls.add(lblAmphourToOz, "cell 0 2,alignx trailing");
+		Controls.add(lblAmphourToOz, "cell 0 3,alignx trailing");
 		
 		textField_1 = new JTextField();
 		textField_1.setText("<value>");
-		Controls.add(textField_1, "cell 1 2,growx");
+		Controls.add(textField_1, "cell 1 3,growx");
 		textField_1.setColumns(10);
 		
 		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
-		Controls.add(lblTotalOzdaily, "cell 0 3,alignx trailing");
+		Controls.add(lblTotalOzdaily, "cell 0 4,alignx trailing");
 		
 		textField_2 = new JTextField();
 		textField_2.setText("<value>");
-		Controls.add(textField_2, "cell 1 3,growx");
+		Controls.add(textField_2, "cell 1 4,growx");
 		textField_2.setColumns(10);
 		
 		lblSampleRate = new JLabel("Sample Rate");
-		Controls.add(lblSampleRate, "cell 0 4,alignx trailing");
+		Controls.add(lblSampleRate, "cell 0 5,alignx trailing");
 		
 		textField_3 = new JTextField();
 		textField_3.setText("<time in seconds>");
-		Controls.add(textField_3, "cell 1 4,growx");
+		Controls.add(textField_3, "cell 1 5,growx");
 		textField_3.setColumns(10);
 		
 		lblClearDataFor = new JLabel("Clear Data For Day");
-		Controls.add(lblClearDataFor, "cell 0 5,alignx trailing");
+		Controls.add(lblClearDataFor, "cell 0 6,alignx trailing");
 		
 		btnClear = new JButton("Clear");
-		Controls.add(btnClear, "cell 1 5");
+		Controls.add(btnClear, "cell 1 6");
 		
 		xyDataset = new XYSeriesCollection();
 
@@ -176,7 +193,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	}
 	
 	private void updateName(String newName){
-		 myName=newName;
 		 if(getDyio()!=null)
 			 getDyio().setName(newName);
 		 chart.setTitle(newName);
@@ -230,16 +246,17 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			mainWindow.onValueChange(event);
 	}
 
-	@Override
-	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
-		if(mainWindow!=null)
-			mainWindow.onAlarmEvenFire(bathName, timestamp, currentOzHrRate, alarmThreshhold);
-	}
 
 	@Override
 	public void onClearData() {
 		if(mainWindow!=null)
 			mainWindow.onClearData();
+	}
+
+	@Override
+	public void onAlarmEvenFire(BathAlarmEvent ev) {
+		if(mainWindow!=null)
+			mainWindow.onAlarmEvenFire(ev);
 	}
 	
 

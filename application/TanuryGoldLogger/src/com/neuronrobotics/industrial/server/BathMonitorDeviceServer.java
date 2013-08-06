@@ -2,7 +2,9 @@ package com.neuronrobotics.industrial.server;
 
 import java.util.List;
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
@@ -19,8 +21,6 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
-	//private double pollingRate = 1000*2;
-	//private double totalUsedToday =0;
 	
 	private DyIO dyio;
 	private String name = null;
@@ -32,7 +32,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		setServer(new BowlerUDPServer(1865));
-		//Log.enableDebugPrint(true);
+		Log.enableDebugPrint(true);
 		dyio=device;
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
@@ -62,6 +62,14 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																getCurrent(),
 																configuration.getDailyTotal()*getScale());
 					pushAsyncPacket(be.getPacket(dyio.getAddress()));
+					
+					if(getCurrent() > getAlarmThreshhold()){
+						BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
+																System.currentTimeMillis(), 
+																getCurrent(),
+																getAlarmThreshhold());
+						pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+					}
 					ThreadUtil.wait((int) getPollingRate());
 				}
 			}
@@ -159,4 +167,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public void clearData() {
 		configuration.setDailyTotal(0);
 	}
+	
+	public double getAlarmThreshhold() {
+		return configuration.getAlarmThreshhold();
+	}
+
+	public void setAlarmThreshhold(double alarmThreshhold) {
+		configuration.setAlarmThreshhold(alarmThreshhold);
+	}
+	
 }

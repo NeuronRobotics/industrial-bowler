@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
 public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
@@ -31,7 +32,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField;
 	private JTextField textField_1;
 	private ArrayList<BathMoniter> list;
-	private String dataHeader = "Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current\n";
+	private String dataHeader = "Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current\n";
 
 	public DashBoard(ArrayList<BathMoniter> list) {
 		this.list = list;
@@ -126,12 +127,6 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		}
 		
 	}
-
-	@Override
-	public void onAlarmEvenFire(String bathName, long timestamp,double currentOzHrRate, double alarmThreshhold) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	private String getFileName(String bath){
 		return System.getProperty("user.home")+"/Tanury/"+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
@@ -140,5 +135,11 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	@Override
 	public void onClearData() {
 		textField.setText(getFileName("<bath>"));
+	}
+
+	@Override
+	public void onAlarmEvenFire(BathAlarmEvent ev) {
+		// TODO Auto-generated method stub
+		
 	}
 }

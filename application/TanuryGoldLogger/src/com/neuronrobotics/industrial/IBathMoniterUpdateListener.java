@@ -1,5 +1,6 @@
 package com.neuronrobotics.industrial;
 
+import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
 public interface IBathMoniterUpdateListener {
@@ -25,7 +26,7 @@ public interface IBathMoniterUpdateListener {
 	 * @param currentOzHrRate
 	 * @param alarmThreshhold
 	 */
-	public void onAlarmEvenFire(String bathName, long timestamp, double currentOzHrRate, double alarmThreshhold);
+	public void onAlarmEvenFire(BathAlarmEvent ev);
 	
 	public void onClearData();
 	
