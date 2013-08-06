@@ -1,5 +1,7 @@
 package com.neuronrobotics.industrial.device;
 
+import java.sql.Timestamp;
+
 import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.BowlerDatagramFactory;
 import com.neuronrobotics.sdk.common.ByteList;
@@ -57,6 +59,20 @@ public class BathAlarmEvent {
 		this.alarmThreshhold = alarmThreshhold;
 	}
 	
+	private String getDate(){
+		Timestamp t = new Timestamp(System.currentTimeMillis());
+		return t.toString().split("\\ ")[0];
+	}
 	
+	@Override
+	public String toString(){
+		
+		String s="";
+		s+=getBathName()+"\n ";
+		s+=getDate()+"\n";
+		s+=currentOzHrRate+" Mili-Amps (current) \n";
+		s+= alarmThreshhold+" Mili-Amps (Threshhold)";
+		return s;
+	}
 	
 }

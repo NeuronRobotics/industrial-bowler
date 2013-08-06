@@ -2,7 +2,9 @@ package com.neuronrobotics.industrial;
 
 import java.awt.EventQueue;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
@@ -25,6 +27,9 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	private DashBoard dashBoard;
 	private AlarmAccount alarm;
 	private JTabbedPane tabbedPane;
+    JOptionPane pane = new JOptionPane(null, JOptionPane.ERROR_MESSAGE);
+    JDialog dialog = pane.createDialog(frame, "BATH Alarm!!");
+    
 
 	/**
 	 * Launch the application.
@@ -112,7 +117,14 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	@Override
 	public void onAlarmEvenFire(BathAlarmEvent ev) {
 		dashBoard.onAlarmEvenFire(ev);
+		if(dialog.isShowing()){
+			System.out.println("Dialog already open");
+			return;
+		}
 		alarm.onAlarmEvenFire(ev);
+		pane.setMessage(new String(ev.toString()));
+		dialog = pane.createDialog(frame, "BATH Alarm!!");
+		dialog.setVisible(true);	
 	}
 
 }

@@ -39,11 +39,11 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JLabel lblAmphourcurrent;
 	private JTextField recentCurrentRating;
 	private JLabel lblAmphourToOz;
-	private JTextField textField_1;
+	private JTextField textFieldScale;
 	private JLabel lblTotalOzdaily;
 	private JTextField textField_2;
 	private JLabel lblSampleRate;
-	private JTextField textField_3;
+	private JTextField PollingRateTextField;
 	private JLabel lblClearDataFor;
 	private JButton btnClear;
 	
@@ -62,16 +62,23 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		updateName(dyio.getName());
 		dyio.addBathUi(this);
-		textField_3.setText(new Integer(dyio.getPollingRate()).toString());
-		textField_3.addActionListener(new ActionListener() {
+		if(dyio.getPollingRate()<30){
+			getDyio().setPollingRate(30);
+		}
+		PollingRateTextField.setText(new Integer(dyio.getPollingRate()).toString());
+		PollingRateTextField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getDyio().setPollingRate(Integer.parseInt(textField_3.getText()));
+				int rate =Integer.parseInt(PollingRateTextField.getText());
+				if(rate<30)
+					rate = 30;
+				getDyio().setPollingRate(rate);
+				PollingRateTextField.setText(new Integer(getDyio().getPollingRate()).toString());
 			}
 		});
 		
-		textField_1.setText(new Double(dyio.getScale()).toString());
-		textField_1.addActionListener(new ActionListener() {
+		textFieldScale.setText(new Double(dyio.getScale()).toString());
+		textFieldScale.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				getDyio().setScale(getScaleValue());
@@ -92,7 +99,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	}
 	
 	private double getScaleValue(){
-		return Double.parseDouble(textField_1.getText());
+		return Double.parseDouble(textFieldScale.getText());
 	}
 	
 	public BathMoniter(){
@@ -140,10 +147,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		lblAmphourToOz = new JLabel("Amp-Minute to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 3,alignx trailing");
 		
-		textField_1 = new JTextField();
-		textField_1.setText("<value>");
-		Controls.add(textField_1, "cell 1 3,growx");
-		textField_1.setColumns(10);
+		textFieldScale = new JTextField();
+		textFieldScale.setText("<value>");
+		Controls.add(textFieldScale, "cell 1 3,growx");
+		textFieldScale.setColumns(10);
 		
 		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
 		Controls.add(lblTotalOzdaily, "cell 0 4,alignx trailing");
@@ -156,10 +163,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		lblSampleRate = new JLabel("Sample Rate");
 		Controls.add(lblSampleRate, "cell 0 5,alignx trailing");
 		
-		textField_3 = new JTextField();
-		textField_3.setText("<time in seconds>");
-		Controls.add(textField_3, "cell 1 5,growx");
-		textField_3.setColumns(10);
+		PollingRateTextField = new JTextField();
+		PollingRateTextField.setText("<time in seconds>");
+		Controls.add(PollingRateTextField, "cell 1 5,growx");
+		PollingRateTextField.setColumns(10);
 		
 		lblClearDataFor = new JLabel("Clear Data For Day");
 		Controls.add(lblClearDataFor, "cell 0 6,alignx trailing");

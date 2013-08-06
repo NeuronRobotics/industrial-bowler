@@ -52,8 +52,7 @@ public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onAlarmEvenFire(BathAlarmEvent ev) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Stub for sending email");
 	}
 
 	@Override

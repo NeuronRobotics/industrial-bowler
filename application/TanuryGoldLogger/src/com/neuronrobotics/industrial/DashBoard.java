@@ -32,7 +32,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField;
 	private JTextField textField_1;
 	private ArrayList<BathMoniter> list;
-	private String dataHeader = "Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current\n";
+	private String dataHeader = "Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current,TYPE,<Alarm Threshhold>\n";
 
 	public DashBoard(ArrayList<BathMoniter> list) {
 		this.list = list;
@@ -96,35 +96,8 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 			total+=new Double(table.getValueAt( i, 1).toString());
 		}
 		textField_1.setText(new Double(total).toString());
-		File file = new File(getFileName(event.getBathName()));
-		//"Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current"
-		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+"\n";
-		boolean header = false;
-		if(!file.exists()){
-			File tmp = new File(file.getParent());
-			if(!tmp.exists())
-				tmp.mkdirs();
-			try {
-				file.createNewFile();
-				header = true;
-				
-			} catch (IOException e) {
-				System.err.println(getFileName(event.getBathName()));
-				e.printStackTrace();
-			}
-			
-		}
-		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(getFileName(event.getBathName()), true)));
-			if(header){
-				out.println(dataHeader+data);
-			}else
-				out.println(data);
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG\n";
+		writeLine(data, event.getBathName());
 		
 	}
 	
@@ -138,8 +111,39 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	}
 
 	@Override
-	public void onAlarmEvenFire(BathAlarmEvent ev) {
-		// TODO Auto-generated method stub
+	public void onAlarmEvenFire(BathAlarmEvent event) {
+		String data = new Date()+","+event.getTimestamp()+","+0+","+event.getBathName()+","+0+","+event.getCurrentOzHrRate()+",ALARM,"+event.getAlarmThreshhold()+"\n";
+		writeLine(data, event.getBathName());
+	}
+	
+	private void writeLine(String data, String bathName){
 		
+		File file = new File(getFileName(bathName));
+		boolean header = false;
+		if(!file.exists()){
+			File tmp = new File(file.getParent());
+			if(!tmp.exists())
+				tmp.mkdirs();
+			try {
+				file.createNewFile();
+				header = true;
+				
+			} catch (IOException e) {
+				System.err.println(getFileName(bathName));
+				e.printStackTrace();
+			}
+			
+		}
+		try {
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(getFileName(bathName), true)));
+			if(header){
+				out.println(dataHeader+data);
+			}else
+				out.println(data);
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
