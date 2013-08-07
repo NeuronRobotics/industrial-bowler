@@ -179,7 +179,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		chart = ChartFactory.createXYLineChart(
 				"", 
 				"Minutes", 
-				"Oz Gold",
+				"Mili-Amps",
 				xyDataset, 
 				PlotOrientation.VERTICAL, 
 				true, 
