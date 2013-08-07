@@ -62,6 +62,10 @@ public class BathMoniterEvent {
 	public double getTotalUsedToday() {
 		return totalUsedToday;//amp-hour*scale;
 	}
+	
+	public double getScaledTotalUsedToday() {
+		return totalUsedToday/(1);//amp-hour*scale;
+	}
 
 	public void setTotalUsedToday(double totalUsedToday) {
 		this.totalUsedToday = totalUsedToday;

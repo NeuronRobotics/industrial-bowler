@@ -91,12 +91,12 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		double total=0;
 		for(int i=0;i<list.size();i++){
 			if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
-				table.setValueAt(new Double(event.getTotalUsedToday()).toString(), i, 1);
+				table.setValueAt(new Double(event.getScaledTotalUsedToday()).toString(), i, 1);
 			}
 			total+=new Double(table.getValueAt( i, 1).toString());
 		}
 		textField_1.setText(new Double(total).toString());
-		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG\n";
+		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getScaledTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG\n";
 		writeLine(data, event.getBathName());
 		
 	}

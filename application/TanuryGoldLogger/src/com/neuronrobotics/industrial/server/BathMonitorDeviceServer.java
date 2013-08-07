@@ -39,15 +39,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		signalVoltage = 	new AnalogInputChannel(dyio, 12);
 		reference = referenceVoltage.getValue();
 		signal    = signalVoltage.getValue();
-		integral = new RollingAverageFilter(20, getCurrent());
+		integral = new RollingAverageFilter(10, getCurrent());
 		//signalVoltage.configAdvancedAsyncAutoSample(5000);
 		referenceVoltage.addAnalogInputListener(this);
 		signalVoltage.addAnalogInputListener(this);
 		new Thread(){
+			double ioPoll = 300.0;
 			public void run(){
 				while(dyio.isAvailable()){
 					onAnalogValueChange(signalVoltage, signalVoltage.getValue());
-					ThreadUtil.wait(200);
+
+					
+					ThreadUtil.wait((int) ioPoll);
 				}
 			}
 		}.start();
@@ -55,12 +58,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/1000));
-					
+					configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
 					BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
 																System.currentTimeMillis(), 
 																getCurrent(),
-																configuration.getDailyTotal()*getScale());
+																configuration.getDailyTotal()/getScale());
 					pushAsyncPacket(be.getPacket(dyio.getAddress()));
 					
 					if(getCurrent() > getAlarmThreshhold()){
@@ -84,15 +86,15 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		double scale = (2.5//Reference voltage actual volts
 				*1024.0)
 				/reference;
-		double i=150;//Ohms of shunt
+		double i=.001;//Ohms of shunt
 		
-		double ampScale = (1/32.5)*0.8064;//Amp gain
+		double ampScale = (1/32.5)*0.8064*2;//Amp gain
 		double val = 0;
 		if(integral== null)
 			val = signal;
 		else
 			val = integral.getValue();
-		return (((val/1024)*scale)*ampScale)/(i/1000);
+		return (((val/1024)*scale)*ampScale)/(i);
 	}
 	
 	@Override

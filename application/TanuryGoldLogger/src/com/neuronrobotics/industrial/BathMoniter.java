@@ -41,7 +41,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JLabel lblAmphourToOz;
 	private JTextField textFieldScale;
 	private JLabel lblTotalOzdaily;
-	private JTextField textField_2;
+	private JTextField recentTotal;
 	private JLabel lblSampleRate;
 	private JTextField PollingRateTextField;
 	private JLabel lblClearDataFor;
@@ -89,6 +89,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				recentTotal.setText("0.0");
 				getDyio().clearData();
 				onClearData();
 			}
@@ -155,10 +156,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
 		Controls.add(lblTotalOzdaily, "cell 0 4,alignx trailing");
 		
-		textField_2 = new JTextField();
-		textField_2.setText("<value>");
-		Controls.add(textField_2, "cell 1 4,growx");
-		textField_2.setColumns(10);
+		recentTotal = new JTextField();
+		recentTotal.setText("<value>");
+		Controls.add(recentTotal, "cell 1 4,growx");
+		recentTotal.setColumns(10);
 		
 		lblSampleRate = new JLabel("Sample Rate");
 		Controls.add(lblSampleRate, "cell 0 5,alignx trailing");
@@ -247,7 +248,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		ozHour.add( timestamp , 
 						event.getCurrentOzHrRate()); 
-		textField_2.setText(new Double(	event.getTotalUsedToday() 
+		recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 										).toString());
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
