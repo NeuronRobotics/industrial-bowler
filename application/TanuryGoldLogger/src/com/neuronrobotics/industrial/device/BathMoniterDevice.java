@@ -5,6 +5,7 @@ import com.neuronrobotics.industrial.IBathMoniterUpdateListener;
 import com.neuronrobotics.sdk.common.BowlerAbstractDevice;
 import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.BowlerMethod;
+import com.neuronrobotics.sdk.common.DeviceConnectionException;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
@@ -62,6 +63,12 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				getBathMoniter().onAlarmEvenFire(new BathAlarmEvent(data));
 			}
 		}
+	}
+	@Override
+	public Object [] send(String namespace,BowlerMethod method, String rpcString, Object[] arguments) throws DeviceConnectionException{
+		if(!getConnection().isConnected())
+			connect();
+		return super.send(namespace, method, rpcString, arguments);
 	}
 
 	public String getName() {

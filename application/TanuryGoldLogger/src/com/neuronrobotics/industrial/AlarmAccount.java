@@ -23,8 +23,8 @@ public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 	private static final long serialVersionUID = 3719573762649982776L;
 	
 	JTextField adminAccount  = new JTextField("artillect.artificial.intillect");
-	JPasswordField password = new JPasswordField("Asusserver37");
-	ArrayList<JTextField> accounts = new ArrayList<JTextField>();
+	JPasswordField password = new JPasswordField("wumpus3742");
+	JTextField [] accounts = new JTextField[10];
 
 	public AlarmAccount(){
 		setName("Alarm Accounts");
@@ -37,7 +37,7 @@ public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 		
 		for(int i=1;i<11;i++){
 			JTextField tmp = new JTextField(10);
-			accounts.add(tmp);
+			accounts[i-1]=(tmp);
 			add(new JLabel("To Notify"), 		"cell 0 "+i+",growx");
 			add(tmp, 			"cell 1 "+i+",growx");
 			add(new JLabel("@gmail.com"), 		"cell 2 "+i+",growx");
@@ -59,13 +59,12 @@ public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onAlarmEvenFire(BathAlarmEvent ev) {
-		System.out.println("Sending Emails");
 		for(JTextField jtf: accounts){
 			if(jtf.getText().length()>0){
-				sendEmail(jtf.getText()+"@gmail.com", adminAccount + "@gmail.com", new String(password.getPassword()), ev.toString());
+				System.out.println("Sending Email to "+jtf.getText()+"@gmail.com");
+				sendEmail(jtf.getText()+"@gmail.com", adminAccount.getText() + "@gmail.com", new String(password.getPassword()), ev.toString());
 			}
 		}
-		//sendEmail("kharrington@neuronrobotics.com", "mad.hephaestus@gmail.com", "4CoreCube", ev.toString());
 	}
 
 	@Override
@@ -94,20 +93,14 @@ public class AlarmAccount extends JPanel implements IBathMoniterUpdateListener{
 	    		  });
 	      try{
 
-				Message message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(from));
-				message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(to));
-				message.setSubject("ALARM from Bath Monitor");
-				message.setText(content);
-	 
-				Transport.send(message);
-	 
-				System.out.println("Done");
-
-	         // Send message
-	         Transport.send(message);
-	         System.out.println("Sent message successfully....");
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(from));
+			message.setRecipients(Message.RecipientType.TO,
+				InternetAddress.parse(to));
+			message.setSubject("ALARM from Bath Monitor");
+			message.setText(content);
+			Transport.send(message);
+	        System.out.println("Sent message successfully....");
 	      }catch (MessagingException mex) {
 	         mex.printStackTrace();
 	      }

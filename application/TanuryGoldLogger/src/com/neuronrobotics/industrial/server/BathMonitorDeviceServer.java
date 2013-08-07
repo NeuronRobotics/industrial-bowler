@@ -76,7 +76,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
-		System.out.println("System ONLINE");
+		System.err.println("System ONLINE");
 	}
 	
 	public double getCurrent(){
@@ -126,12 +126,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				System.exit(1);
 			}
 		}else{
-			System.out.println("Using port: "+args[0]);
+			System.err.println("Using port: "+args[0]);
 			con  = new SerialConnection(args[0]);
 		}
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		dyio.connect();
+		System.err.println("DyIO Connected");
 		new BathMonitorDeviceServer(dyio);
 	}
 
