@@ -43,6 +43,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
+					System.exit(1);
 				}
 			}
 		});

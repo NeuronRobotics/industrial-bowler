@@ -31,7 +31,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
-		setServer(new BowlerUDPServer(1865));
+		
 		//Log.enableDebugPrint(true);
 		dyio=device;
 		
@@ -78,6 +78,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
+		setServer(new BowlerUDPServer(1865));
 		System.err.println("System ONLINE");
 	}
 	

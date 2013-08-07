@@ -25,7 +25,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
-	private XYSeries ozHour = new XYSeries("Oz/Minutes");
+	private XYSeries ozHour = new XYSeries("Amps/Minutes");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
 	/**
@@ -55,6 +55,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	//private long startTimestamp;
 	Integer startTime=null;
 
+	private String units ="Amps";
 	
 	public BathMoniter(BathMoniterDevice dyio){
 		this();
@@ -126,7 +127,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			}
 		});
 		
-		lblAlarm=new JLabel("Alarm Level (Mili-Amps)");;
+		lblAlarm=new JLabel("Alarm Level ("+units+")");;
 		btnAlarm = new JTextField();
 		btnAlarm.addActionListener(new ActionListener() {
 			@Override
@@ -137,7 +138,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(lblAlarm, "cell 0 1,alignx trailing");
 		Controls.add(btnAlarm, "cell 1 1,growx");
 		
-		lblAmphourcurrent = new JLabel("Mili-Amps (Recent)");
+		lblAmphourcurrent = new JLabel(""+units+" (Recent)");
 		Controls.add(lblAmphourcurrent, "cell 0 2,alignx trailing");
 		
 		setRecentCurrentRating(new JTextField());
@@ -145,7 +146,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(getRecentCurrentRating(), "cell 1 2,growx");
 		getRecentCurrentRating().setColumns(10);
 		
-		lblAmphourToOz = new JLabel("Amp-Minute to Oz. Scale");
+		lblAmphourToOz = new JLabel("Amp-Hour to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 3,alignx trailing");
 		
 		textFieldScale = new JTextField();
@@ -180,7 +181,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		chart = ChartFactory.createXYLineChart(
 				"", 
 				"Minutes", 
-				"Mili-Amps",
+				units,
 				xyDataset, 
 				PlotOrientation.VERTICAL, 
 				true, 
