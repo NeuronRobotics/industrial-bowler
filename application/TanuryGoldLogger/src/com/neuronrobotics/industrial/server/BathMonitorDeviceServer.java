@@ -58,19 +58,20 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
-					BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
-																System.currentTimeMillis(), 
-																getCurrent(),
-																configuration.getDailyTotal()/getScale());
-					pushAsyncPacket(be.getPacket(dyio.getAddress()));
-					
 					if(getCurrent() > getAlarmThreshhold()){
 						BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
 																System.currentTimeMillis(), 
 																getCurrent(),
 																getAlarmThreshhold());
 						pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+					}else{
+						configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
+						BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
+																	System.currentTimeMillis(), 
+																	getCurrent(),
+																	configuration.getDailyTotal()/getScale());
+						pushAsyncPacket(be.getPacket(dyio.getAddress()));
+						
 					}
 					ThreadUtil.wait((int) getPollingRate());
 				}
