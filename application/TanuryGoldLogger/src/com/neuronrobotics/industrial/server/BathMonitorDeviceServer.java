@@ -89,7 +89,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
-		//addServer(new BowlerUDPServer(1865));
+		addServer(new BowlerUDPServer(1865));
 		addServer(new BowlerTCPServer(1866));
 		
 		System.err.println("System ONLINE");

@@ -111,6 +111,8 @@ public class DeviceConfiguration {
 		}
 
 		public int getSecondsPolling() {
+			if(secondsPolling<30000)
+				secondsPolling = 30000;
 			return secondsPolling;
 		}
 
