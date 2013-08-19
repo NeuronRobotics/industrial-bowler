@@ -10,6 +10,7 @@ import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
 import com.neuronrobotics.sdk.dyio.sequencer.ISchedulerListener;
+import com.neuronrobotics.sdk.network.BowlerTCPClient;
 import com.neuronrobotics.sdk.network.BowlerUDPClient;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
@@ -21,8 +22,8 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 		
 	}
 
-	public BathMoniterDevice(BowlerUDPClient bowlerUDPClient) {
-		setConnection(bowlerUDPClient);
+	public BathMoniterDevice(BowlerTCPClient bowlerTCPClient) {
+		setConnection(bowlerTCPClient);
 		startHeartBeat(2000);
 	}
 	

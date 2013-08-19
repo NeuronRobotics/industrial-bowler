@@ -10,8 +10,10 @@ import com.neuronrobotics.sdk.common.BowlerDatagramFactory;
 import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
+import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
 import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
+import com.neuronrobotics.sdk.network.BowlerTCPServer;
 import com.neuronrobotics.sdk.network.BowlerUDPServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 import com.neuronrobotics.sdk.util.RollingAverageFilter;
@@ -38,6 +40,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		Log.enableDebugPrint(true);
 		Log.setMinimumPrintLevel(2);
 		dyio=device;
+		
+		for (int i=0;i<24;i++){
+			dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
+		}
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
 		signalVoltage = 	new AnalogInputChannel(dyio, 12);
@@ -83,7 +89,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
-		setServer(new BowlerUDPServer(1865));
+		//addServer(new BowlerUDPServer(1865));
+		addServer(new BowlerTCPServer(1866));
 		
 		System.err.println("System ONLINE");
 		
