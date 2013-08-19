@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.commands.bcs.core.PingCommand;
+import com.neuronrobotics.sdk.common.BowlerDatagram;
+import com.neuronrobotics.sdk.common.BowlerDatagramFactory;
 import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
@@ -32,7 +35,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		
-		//Log.enableDebugPrint(true);
+		Log.enableDebugPrint(true);
+		Log.setMinimumPrintLevel(2);
 		dyio=device;
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
@@ -80,7 +84,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
 		setServer(new BowlerUDPServer(1865));
+		
 		System.err.println("System ONLINE");
+		
 	}
 	
 	public double getCurrent(){

@@ -12,6 +12,7 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.Log;
 
 import java.awt.Component;
 import java.security.AllPermission;
@@ -41,6 +42,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 					MainWindow window = new MainWindow();
 					window.frame.setLocationRelativeTo(null);
 					window.frame.setVisible(true);
+					Log.enableDebugPrint(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.exit(1);
