@@ -13,15 +13,15 @@ import com.neuronrobotics.sdk.ui.ConnectionDialog;
 
 
 public class BathMoniterFactory {
-	static BowlerUDPClient clnt;
+	//static BowlerUDPClient clnt;
 	
 	public static ArrayList<BathMoniter> getBathMoniterList(){
 		
 		ArrayList<BathMoniter> list = new ArrayList<BathMoniter>();
 		
-		if(clnt == null)
-			clnt=new BowlerUDPClient(1865);
-		ArrayList<InetAddress>  addrs = clnt.getAllAddresses();
+		//if(clnt == null)
+		//	clnt=new BowlerUDPClient(1865);
+		ArrayList<InetAddress>  addrs = BowlerTCPClient.getAvailableSockets();
 		if(addrs.size()>0){
 			for (InetAddress i:addrs) {
 				System.out.println("Adding "+i);
