@@ -2,6 +2,7 @@ package com.neuronrobotics.industrial;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,7 +40,7 @@ public class TanuryDataLogger {
 	}
 	
 	public String getFileName(String bath){
-		return System.getProperty("user.home")+"/Tanury/"+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
+		return System.getProperty("user.home")+"/Tanury/Log/"+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
 	}
 	
 	private void writeLine(String data, String bathName){
@@ -71,6 +72,23 @@ public class TanuryDataLogger {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public void clearData() {
+		File dirToClear = new File(System.getProperty("user.home")+"/Tanury/Log/");
+		try {
+			delete(dirToClear);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	void delete(File f) throws IOException {
+	  if (f.isDirectory()) {
+	    for (File c : f.listFiles())
+	      delete(c);
+	  }
+	  if (!f.delete())
+	    throw new FileNotFoundException("Failed to delete file: " + f);
 	}
 
 }

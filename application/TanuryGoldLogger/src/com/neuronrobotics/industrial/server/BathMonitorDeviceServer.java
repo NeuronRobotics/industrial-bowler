@@ -2,6 +2,7 @@ package com.neuronrobotics.industrial.server;
 
 import java.util.List;
 
+import com.neuronrobotics.industrial.TanuryDataLogger;
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 import com.neuronrobotics.sdk.commands.bcs.core.PingCommand;
@@ -30,6 +31,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private DyIO dyio;
 	private String name = null;
 	private DeviceConfiguration configuration = new DeviceConfiguration();
+	private TanuryDataLogger logger = new TanuryDataLogger();
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -73,6 +75,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																System.currentTimeMillis(), 
 																getCurrent(),
 																getAlarmThreshhold());
+						logger.onAlarmEvenFire(ev);
 						pushAsyncPacket(ev.getPacket(dyio.getAddress()));
 					}else{
 						configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
@@ -80,6 +83,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																	System.currentTimeMillis(), 
 																	getCurrent(),
 																	configuration.getDailyTotal()/getScale());
+						logger.onValueChange(be, 0);
 						pushAsyncPacket(be.getPacket(dyio.getAddress()));
 						
 					}
@@ -184,6 +188,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public void clearData() {
 		configuration.setDailyTotal(0);
+		logger.clearData();
 	}
 	
 	public double getAlarmThreshhold() {
