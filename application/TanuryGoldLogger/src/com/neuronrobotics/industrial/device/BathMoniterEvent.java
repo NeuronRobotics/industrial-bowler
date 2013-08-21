@@ -34,9 +34,7 @@ public class BathMoniterEvent {
 
 	public BathMoniterEvent(String sCurrentLine) {
 		String [] data = sCurrentLine.toString().split(",");
-		for(int i=0;i<data.length;i++){
-			System.out.println(i+" "+data[i]);
-		}
+
 		this.setTotalUsedToday(Double.parseDouble(data[4]));
 		this.setBathName(data[3]);
 		this.setTimestamp(Long.parseLong(data[1]));
