@@ -97,6 +97,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		});
 		
 		btnAlarm.setText(new Double(getDyio().getAlarmLevel()).toString());
+		getDyio().dumpLogs();
 		
 	}
 	
