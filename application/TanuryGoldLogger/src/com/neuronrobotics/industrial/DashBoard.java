@@ -32,7 +32,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField;
 	private JTextField textField_1;
 	private ArrayList<BathMoniter> list;
-	private TanuryDataLogger log = new TanuryDataLogger();
+	private TanuryDataLogger log = new TanuryDataLogger("Log");
 
 	public DashBoard(ArrayList<BathMoniter> list) {
 		this.list = list;

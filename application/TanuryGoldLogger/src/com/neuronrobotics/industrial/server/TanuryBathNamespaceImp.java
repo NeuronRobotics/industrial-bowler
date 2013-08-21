@@ -85,6 +85,15 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 				BowlerMethod.POST, 
 				new BowlerDataType[]{BowlerDataType.FIXED1k}));
 		
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
+				getNamespace()  , 
+				"logd", 
+				BowlerMethod.GET, 
+				new BowlerDataType[]{},
+				BowlerMethod.POST, 
+				new BowlerDataType[]{}));
+		
+		
 	}
 
 
@@ -121,7 +130,12 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 		}if(rpc.contains("alrm") && method == BowlerMethod.GET){
 			Object[] back = new Object[]{new Double(bathMonitorDeviceServer.getAlarmThreshhold())};
 			return back;
+		}if(rpc.contains("logd") && method == BowlerMethod.GET){
+			Object[] back = new Object[0];
+			bathMonitorDeviceServer.dumpLogs();
+			return back;
 		}
+		
 		
 		
 		return data;

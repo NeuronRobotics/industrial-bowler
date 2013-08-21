@@ -32,6 +32,14 @@ public class BathMoniterEvent {
 		
 	}
 
+	public BathMoniterEvent(String sCurrentLine) {
+		String [] data = sCurrentLine.toString().split(",");
+		this.setTotalUsedToday(Double.parseDouble(data[4]));
+		this.setBathName(data[3]);
+		this.setTimestamp(Long.parseLong(data[1]));
+		this.setCurrentOzHrRate(Double.parseDouble(data[5]));
+	}
+
 	public BowlerDatagram getPacket(MACAddress mac) {
 		return BowlerDatagramFactory.build(mac, new BathMonitorCommand(this));
 	}

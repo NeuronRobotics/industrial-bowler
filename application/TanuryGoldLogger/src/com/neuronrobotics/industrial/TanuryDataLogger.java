@@ -1,8 +1,10 @@
 package com.neuronrobotics.industrial;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,18 +17,21 @@ import com.neuronrobotics.industrial.device.BathMoniterEvent;
 public class TanuryDataLogger {
 	private String dataHeader = "Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current,TYPE,<Alarm Threshhold>\n";
 
-
+	private String subDir = "";
+	public TanuryDataLogger(String string) {
+		subDir=string;
+	}
 	public void onNameChange(String newName) {
 		// TODO Auto-generated method stub
 		
 	}
 	public void onValueChange(BathMoniterEvent event, double total) {
-		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getScaledTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG\n";
+		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getScaledTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG";
 		writeLine(data, event.getBathName());
 	}
 
 	public void onAlarmEvenFire(BathAlarmEvent event) {
-		String data = new Date()+","+event.getTimestamp()+","+0+","+event.getBathName()+","+0+","+event.getCurrentOzHrRate()+",ALARM,"+event.getAlarmThreshhold()+"\n";
+		String data = new Date()+","+event.getTimestamp()+","+0+","+event.getBathName()+","+0+","+event.getCurrentOzHrRate()+",ALARM,"+event.getAlarmThreshhold()+"";
 		writeLine(data, event.getBathName());
 	}
 	public void onClearData() {
@@ -39,8 +44,12 @@ public class TanuryDataLogger {
 		return t.toString().split("\\ ")[0];
 	}
 	
+	private String getRoot(){
+		return System.getProperty("user.home")+"/Tanury/"+subDir+"/";
+	}
+	
 	public String getFileName(String bath){
-		return System.getProperty("user.home")+"/Tanury/Log/"+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
+		return getRoot()+getDate()+"/"+bath+"/Tanury-Logs-"+getDate()+"-"+bath+".csv";
 	}
 	
 	private void writeLine(String data, String bathName){
@@ -73,8 +82,69 @@ public class TanuryDataLogger {
 			e.printStackTrace();
 		}
 	}
+	
+	public int getNumberOfLogLines(String bathName){
+		int i=0;
+		BufferedReader br = null;
+		 
+		try {
+ 
+			@SuppressWarnings("unused")
+			String sCurrentLine;
+ 
+			br = new BufferedReader(new FileReader(getFileName(bathName)));
+ 
+			while ((sCurrentLine = br.readLine()) != null) {
+				i++;
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return i;
+	}
+	
+	public BathMoniterEvent getLogLine(int lineNumber,String bathName){
+		int i=0;
+		BufferedReader br = null;
+		try {
+			 
+			String sCurrentLine;
+ 
+			br = new BufferedReader(new FileReader(getFileName(bathName)));
+ 
+			while ((sCurrentLine = br.readLine()) != null) {
+				if(i==lineNumber){
+					try {
+						if (br != null)br.close();
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+					return new BathMoniterEvent(sCurrentLine);
+				}
+				i++;
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
 	public void clearData() {
-		File dirToClear = new File(System.getProperty("user.home")+"/Tanury/Log/");
+		File dirToClear = new File(getRoot());
 		try {
 			delete(dirToClear);
 		} catch (IOException e) {

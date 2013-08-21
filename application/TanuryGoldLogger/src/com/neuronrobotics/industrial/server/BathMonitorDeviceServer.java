@@ -31,7 +31,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private DyIO dyio;
 	private String name = null;
 	private DeviceConfiguration configuration = new DeviceConfiguration();
-	private TanuryDataLogger logger = new TanuryDataLogger();
+	private TanuryDataLogger logger = new TanuryDataLogger("device");
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -197,6 +197,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public void setAlarmThreshhold(double alarmThreshhold) {
 		configuration.setAlarmThreshhold(alarmThreshhold);
+	}
+
+	public void dumpLogs() {
+		new Thread(){
+			public void run(){
+				ThreadUtil.wait(1000);
+				for (int i=0;i<logger.getNumberOfLogLines(name);i++){
+					pushAsyncPacket(logger.getLogLine(i, name).getPacket(dyio.getAddress()));
+					ThreadUtil.wait(100);
+				}
+			}
+		}.start();
 	}
 	
 }
