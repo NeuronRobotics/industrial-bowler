@@ -93,7 +93,8 @@ public class TanuryDataLogger {
 			String sCurrentLine;
  
 			br = new BufferedReader(new FileReader(getFileName(bathName)));
- 
+
+			br.readLine();// read the formatting data at the top
 			while ((sCurrentLine = br.readLine()) != null) {
 				i++;
 			}
@@ -118,7 +119,7 @@ public class TanuryDataLogger {
 			String sCurrentLine;
  
 			br = new BufferedReader(new FileReader(getFileName(bathName)));
- 
+			br.readLine();// read the formatting data at the top
 			while ((sCurrentLine = br.readLine()) != null) {
 				if(i==lineNumber){
 					try {
@@ -142,7 +143,10 @@ public class TanuryDataLogger {
 		}
 		return null;
 	}
-	
+	public void clearTodaysData(String bathName){
+		File dirToClear = new File(getFileName(bathName));
+		dirToClear.delete();
+	}
 	public void clearData() {
 		File dirToClear = new File(getRoot());
 		try {

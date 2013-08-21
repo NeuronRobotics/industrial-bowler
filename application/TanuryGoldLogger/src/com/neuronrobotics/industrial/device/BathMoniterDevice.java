@@ -149,7 +149,7 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 	}
 	public void dumpLogs() {
 		send(	"tanury.bath.*",
-				BowlerMethod.POST,
+				BowlerMethod.GET,
 				"logd",
 				new Object[]{});
 	}

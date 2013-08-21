@@ -42,7 +42,8 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		table = new JTable(list.size(),2);
 		int i=0;
 		for (BathMoniter b:list){
-			table.setValueAt("<value>", i++, 1);			
+			table.setValueAt("<value>", i++, 1);
+			log.clearTodaysData(b.getName());
 		}
 		updateTableData();
 		
