@@ -84,6 +84,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																	getCurrent(),
 																	configuration.getDailyTotal()/getScale());
 						logger.onValueChange(be, 0);
+						
 						pushAsyncPacket(be.getPacket(dyio.getAddress()));
 						
 					}
