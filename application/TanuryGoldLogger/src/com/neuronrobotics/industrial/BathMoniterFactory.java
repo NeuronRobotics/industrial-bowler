@@ -27,7 +27,9 @@ public class BathMoniterFactory {
 				System.out.println("Adding "+i);
 				BathMoniterDevice d;
 				try {
-					d = new BathMoniterDevice(new BowlerTCPClient(i, 1866));
+					BowlerTCPClient tcp = new BowlerTCPClient(i, 1866);
+					System.out.println("TCP socket connected");
+					d = new BathMoniterDevice(tcp);
 					d.connect();
 					list.add(new BathMoniter(d));
 				} catch (IOException e) {

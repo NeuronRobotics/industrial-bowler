@@ -24,6 +24,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	private AnalogInputChannel referenceVoltage;
 	private AnalogInputChannel signalVoltage;
+	private AnalogInputChannel tempVoltage;
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
@@ -44,10 +45,15 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		dyio=device;
 		
 		for (int i=0;i<24;i++){
-			dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
+			if(	i!=12 &&
+				i!=13 &&
+				i!=15	){
+				dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
+			}
 		}
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
+		tempVoltage = 	new AnalogInputChannel(dyio,13);
 		signalVoltage = 	new AnalogInputChannel(dyio, 12);
 		reference = referenceVoltage.getValue();
 		signal    = signalVoltage.getValue();
