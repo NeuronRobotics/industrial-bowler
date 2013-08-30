@@ -53,8 +53,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}
 		
 		referenceVoltage = 	new AnalogInputChannel(dyio,15);
-		tempVoltage = 	new AnalogInputChannel(dyio,13);
-		signalVoltage = 	new AnalogInputChannel(dyio, 12);
+		tempVoltage 	 = 	new AnalogInputChannel(dyio,13);
+		signalVoltage 	 = 	new AnalogInputChannel(dyio, 12);
 		reference = referenceVoltage.getValue();
 		signal    = signalVoltage.getValue();
 		integral = new RollingAverageFilter(10, getCurrent());
