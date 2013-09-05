@@ -41,18 +41,24 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		
+		Log.warning("Adding namespaces");
+		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
+		Log.warning("Starting UDP");
+		addServer(new BowlerUDPServer(1865));
+
+		
 		Log.enableDebugPrint(true);
-		Log.setMinimumPrintLevel(2);
+		Log.setMinimumPrintLevel(Log.WARNING);
 		dyio=device;
 		Log.warning("Resetting Inputs");
-		for (int i=0;i<24;i++){
-			if(	i!=12 &&
-				i!=13 &&
-				i!=14 &&
-				i!=15	){
-				dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
-			}
-		}
+//		for (int i=0;i<24;i++){
+//			if(	i!=12 &&
+//				i!=13 &&
+//				i!=14 &&
+//				i!=15	){
+//				dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
+//			}
+//		}
 		
 		Log.warning("Starting analog");
 		referenceVoltage = 	new AnalogInputChannel(dyio, 15);
@@ -77,7 +83,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
+					Log.setMinimumPrintLevel(Log.WARNING);
 					onAnalogValueChange(signalVoltage, signalVoltage.getValue());
+					Log.setMinimumPrintLevel(Log.DEBUG);
 				}
 			}
 		}.start();
@@ -108,10 +116,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				}
 			}
 		}.start();
-		Log.warning("Adding namespaces");
-		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
-		Log.warning("Starting UDP");
-		addServer(new BowlerUDPServer(1865));
+		
 		for (int i=0;i<2;i++){
 			Log.warning("Starting TCP "+(1866+i));
 			addServer(new BowlerTCPServer(1866+i));
@@ -144,6 +149,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}if(chan == signalVoltage){
 			signal = value;
 			integral.add( value);
+			Log.warning("Voltage = "+getCurrent());
 		}
 		
 	}
