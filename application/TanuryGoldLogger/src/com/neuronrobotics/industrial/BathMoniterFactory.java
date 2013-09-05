@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import org.jfree.util.Log;
 
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
@@ -38,12 +40,8 @@ public class BathMoniterFactory {
 				}
 			}
 		}else{
-			BathMoniterDevice d =new BathMoniterDevice();
-			d.setConnection(ConnectionDialog.promptConnection());
-			d.connect();
-			for(int i=0;i<5;i++){
-				list.add(new BathMoniter(d));
-			}
+			JOptionPane.showMessageDialog(null, "No bath detected, check internet connection", "No Baths Found", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
 		}
 		
 		return list;
