@@ -94,7 +94,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					if(getCurrent() > getAlarmThreshhold()){
+					if(signalVoltage.getValue() > getAlarmThreshhold()){
 						BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
 																System.currentTimeMillis(), 
 																getCurrent(),
