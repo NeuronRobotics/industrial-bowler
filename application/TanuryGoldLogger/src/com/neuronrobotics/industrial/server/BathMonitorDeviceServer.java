@@ -147,8 +147,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		if(chan == referenceVoltage){
 			reference =  value;
 		}if(chan == signalVoltage){
-			signal = value;
-			integral.add( value);
+			if(value < getAlarmThreshhold()){
+				signal = value;
+				integral.add( value);
+			}
 			Log.warning("Voltage = "+getCurrent());
 		}
 		
