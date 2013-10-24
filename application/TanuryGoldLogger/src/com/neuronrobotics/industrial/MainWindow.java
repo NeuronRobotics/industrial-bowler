@@ -40,8 +40,6 @@ public class MainWindow implements IBathMoniterUpdateListener{
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frame.setLocationRelativeTo(null);
-					window.frame.setVisible(true);
 					Log.enableDebugPrint(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -67,6 +65,8 @@ public class MainWindow implements IBathMoniterUpdateListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 		loadTabs();
 		frame.getContentPane().add(tabbedPane);
 		

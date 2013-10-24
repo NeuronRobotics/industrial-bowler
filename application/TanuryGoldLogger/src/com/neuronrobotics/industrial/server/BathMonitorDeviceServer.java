@@ -32,8 +32,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	private DyIO dyio;
 	private String name = null;
-	private DeviceConfiguration configuration = new DeviceConfiguration();
-	private TanuryDataLogger logger = new TanuryDataLogger("device");
+	private DeviceConfiguration configuration = null;
+	private TanuryDataLogger logger = null;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -41,6 +41,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		
+		Log.warning("Starting configuration XML");
+		configuration = new DeviceConfiguration();
+		Log.warning("Starting logger");
+		logger = new TanuryDataLogger("device");
 		Log.warning("Adding namespaces");
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
 		Log.warning("Starting UDP");
@@ -112,12 +116,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 						pushAsyncPacket(be.getPacket(dyio.getAddress()));
 						
 					}
+					Log.warning("Voltage = "+getCurrent());
 					ThreadUtil.wait((int) getPollingRate());
 				}
 			}
 		}.start();
 		
-		for (int i=0;i<2;i++){
+		for (int i=0;i<5;i++){
 			Log.warning("Starting TCP "+(1866+i));
 			addServer(new BowlerTCPServer(1866+i));
 		}
@@ -151,7 +156,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				signal = value;
 				integral.add( value);
 			}
-			Log.warning("Voltage = "+getCurrent());
+			
 		}
 		
 	}

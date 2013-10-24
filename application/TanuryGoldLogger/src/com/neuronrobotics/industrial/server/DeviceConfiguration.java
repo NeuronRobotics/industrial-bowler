@@ -24,22 +24,25 @@ public class DeviceConfiguration {
 		//System.out.println(getXML());
 		
 		File file = new File(filename);
-		if(!file.exists()){
-			System.out.println("File does not exist");
-			File tmp = new File(file.getParent());
-			if(!tmp.exists())
-				tmp.mkdirs();
-			try {
-				file.createNewFile();
-				
-				writeFile();
-			} catch (IOException e) {
-				e.printStackTrace();
+		if(file.exists()){
+			try{
+				file = new File(filename);
+				data = (dataStorage)xstream.fromXML(fileContents(file));
+				return;
+			}catch(Exception ex){
+				ex.printStackTrace();
 			}
+		}
+		System.out.println("File does not exist");
+		File tmp = new File(file.getParent());
+		if(!tmp.exists())
+			tmp.mkdirs();
+		try {
+			file.createNewFile();
 			
-		}else{
-			file = new File(filename);
-			data = (dataStorage)xstream.fromXML(fileContents(file));
+			writeFile();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

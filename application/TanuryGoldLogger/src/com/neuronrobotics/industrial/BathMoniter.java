@@ -57,6 +57,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 
 	private String units ="Amps";
 	
+	private int range = (60*24)/5;
+	
 	public BathMoniter(BathMoniterDevice dyio){
 		this();
 		this.setDyio(dyio);
@@ -197,7 +199,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		add(chartPanel, "cell 0 1,grow");
 		XYPlot plot = (XYPlot) chart.getPlot();
 		ValueAxis axis = plot.getDomainAxis();
-		axis.setFixedAutoRange((60*24)/5);
+		axis.setFixedAutoRange(range);
 		
 		updateName(tmpmyName);
 	}
@@ -250,6 +252,9 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		ozHour.add( timestamp , 
 						event.getCurrentOzHrRate()); 
+		if(ozHour.getItemCount()>range){
+			ozHour.remove(0);
+		}
 		recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 										).toString());
 		if(mainWindow!=null)
