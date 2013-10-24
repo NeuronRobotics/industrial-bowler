@@ -1,5 +1,6 @@
 package com.neuronrobotics.industrial.server;
 
+import java.util.Calendar;
 import java.util.List;
 
 import com.neuronrobotics.industrial.TanuryDataLogger;
@@ -29,6 +30,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
+	private int lastPacketDay=0;
+	private Calendar cal = Calendar.getInstance();
 	
 	private DyIO dyio;
 	private String name = null;
@@ -40,7 +43,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
-		
+		lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
 		Log.warning("Starting configuration XML");
 		configuration = new DeviceConfiguration();
 		Log.warning("Starting logger");
@@ -114,6 +117,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 						logger.onValueChange(be, 0);
 						
 						pushAsyncPacket(be.getPacket(dyio.getAddress()));
+						
+						if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
+							lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
+							//This is where the daily total is reset at midnight
+							configuration.setDailyTotal(0);
+						}
 						
 					}
 					Log.warning("Voltage = "+getCurrent());
