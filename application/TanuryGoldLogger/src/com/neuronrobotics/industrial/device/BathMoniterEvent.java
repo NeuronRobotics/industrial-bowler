@@ -26,7 +26,11 @@ public class BathMoniterEvent {
 		String s = data.asString();
 		data.popList(s.length()+1);
 		this.setBathName(s );
-		this.setTimestamp( new Integer(ByteList.convertToInt(data.popList(4),true)));
+		
+		long high = new Integer(ByteList.convertToInt(data.popList(4),false));
+		long low  = new Integer(ByteList.convertToInt(data.popList(4),false));
+		this.setTimestamp( ((high+1)<<32) +low );
+		//this.setTimestamp( new Integer(ByteList.convertToInt(data.popList(4),true)));
 		this.setCurrentOzHrRate(new Double(ByteList.convertToInt(data.popList(4)))/1000.0);
 		this.setTotalUsedToday(new Double(ByteList.convertToInt(data.popList(4)))/1000.0);
 		

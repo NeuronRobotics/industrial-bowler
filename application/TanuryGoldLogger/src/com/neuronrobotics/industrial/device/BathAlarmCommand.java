@@ -10,6 +10,7 @@ public class BathAlarmCommand extends BowlerAbstractCommand {
 		 setMethod(BowlerMethod.ASYNCHRONOUS);
 		 getCallingDataStorage().add(ev.getBathName());
 		 getCallingDataStorage().add(0);
+		 getCallingDataStorage().addAs32((int) (ev.getTimestamp()>>32));
 		 getCallingDataStorage().addAs32((int) ev.getTimestamp());
 		 getCallingDataStorage().addAs32((int)(ev.getCurrentOzHrRate()*1000));
 		 getCallingDataStorage().addAs32((int)(ev.getAlarmThreshhold()*1000));

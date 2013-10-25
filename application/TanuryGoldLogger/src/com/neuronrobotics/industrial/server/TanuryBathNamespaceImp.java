@@ -89,7 +89,7 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 				getNamespace()  , 
 				"logd", 
 				BowlerMethod.GET, 
-				new BowlerDataType[]{},
+				new BowlerDataType[]{BowlerDataType.I32},
 				BowlerMethod.POST, 
 				new BowlerDataType[]{}));
 		
@@ -132,7 +132,7 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 			return back;
 		}if(rpc.contains("logd") && method == BowlerMethod.GET){
 			Object[] back = new Object[0];
-			bathMonitorDeviceServer.dumpLogs();
+			bathMonitorDeviceServer.dumpLogs((Integer)data[0]);
 			return back;
 		}
 		

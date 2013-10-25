@@ -115,7 +115,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																	getCurrent(),
 																	configuration.getDailyTotal()/getScale());
 						logger.onValueChange(be, 0);
-						
+						System.out.println("Pushing time "+System.currentTimeMillis()+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 						pushAsyncPacket(be.getPacket(dyio.getAddress()));
 						
 						if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
@@ -131,7 +131,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			}
 		}.start();
 		
-		for (int i=0;i<5;i++){
+		for (int i=0;i<10;i++){
 			Log.warning("Starting TCP "+(1866+i));
 			addServer(new BowlerTCPServer(1866+i));
 		}
@@ -234,7 +234,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public void clearData() {
 		configuration.setDailyTotal(0);
-		logger.clearData();
+		logger.clearData(name);
 	}
 	
 	public double getAlarmThreshhold() {
@@ -245,13 +245,22 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		configuration.setAlarmThreshhold(alarmThreshhold);
 	}
 
-	public void dumpLogs() {
+	public void dumpLogs(final int num) {
 		new Thread(){
 			public void run(){
 				ThreadUtil.wait(1000);
-				for (int i=0;i<logger.getNumberOfLogLines(name);i++){
-					pushAsyncPacket(logger.getLogLine(i, name).getPacket(dyio.getAddress()));
-					ThreadUtil.wait(100);
+				int fileIndex=-1;
+				for(int j=0;j<logger.getNumberOfFiles();j++){
+					if(num==0){
+						fileIndex=j;	
+					}else{
+						//cause the loop to exit after just the one
+						j=logger.getNumberOfFiles();
+					}
+					for (int i=0;i<logger.getNumberOfLogLines(name,fileIndex);i++){
+						pushAsyncPacket(logger.getLogLine(i, name,fileIndex).getPacket(dyio.getAddress()));
+						ThreadUtil.wait(100);
+					}
 				}
 			}
 		}.start();

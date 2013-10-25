@@ -147,11 +147,11 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				"cler",
 				new Object[]{});
 	}
-	public void dumpLogs() {
+	public void dumpLogs(Integer numberOfDays) {
 		send(	"tanury.bath.*",
 				BowlerMethod.GET,
 				"logd",
-				new Object[]{});
+				new Object[]{numberOfDays});
 	}
 
 }

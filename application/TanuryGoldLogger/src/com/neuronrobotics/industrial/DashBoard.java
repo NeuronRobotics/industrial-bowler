@@ -55,7 +55,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		textField = new JTextField();
 		textField.setText("<value>");
 
-		textField.setText(log.getFileName("<bath>"));
+		textField.setText(log.getFileName("<bath>",System.currentTimeMillis()));
 		add(textField, "cell 0 1,growx");
 		textField.setColumns(10);
 		
@@ -100,7 +100,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onClearData() {
-		textField.setText(log.getFileName("<bath>"));
+		textField.setText(log.getFileName("<bath>",System.currentTimeMillis()));
 	}
 
 	@Override

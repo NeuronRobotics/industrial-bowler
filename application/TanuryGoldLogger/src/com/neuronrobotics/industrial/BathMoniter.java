@@ -18,6 +18,7 @@ import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
+import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -46,6 +47,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField PollingRateTextField;
 	private JLabel lblClearDataFor;
 	private JButton btnClear;
+	private JComboBox howMuchData;
 	
 	private JLabel lblAlarm;
 	private JTextField btnAlarm;
@@ -53,7 +55,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private MainWindow mainWindow;
 	private BathMoniterDevice dyio;
 	//private long startTimestamp;
-	Integer startTime=null;
+	Long startTime=null;
 
 	private String units ="Amps";
 	
@@ -66,7 +68,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		updateName(dyio.getName());
 		dyio.addBathUi(this);
 		if(dyio.getPollingRate()<30){
-			getDyio().setPollingRate(30);
+			getBathDevice().setPollingRate(30);
 		}
 		PollingRateTextField.setText(new Integer(dyio.getPollingRate()).toString());
 		PollingRateTextField.addActionListener(new ActionListener() {
@@ -75,8 +77,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 				int rate =Integer.parseInt(PollingRateTextField.getText());
 				if(rate<30)
 					rate = 30;
-				getDyio().setPollingRate(rate);
-				PollingRateTextField.setText(new Integer(getDyio().getPollingRate()).toString());
+				getBathDevice().setPollingRate(rate);
+				PollingRateTextField.setText(new Integer(getBathDevice().getPollingRate()).toString());
 			}
 		});
 		
@@ -84,7 +86,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		textFieldScale.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getDyio().setScale(getScaleValue());
+				getBathDevice().setScale(getScaleValue());
 			}
 		});
 		
@@ -93,13 +95,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				recentTotal.setText("0.0");
-				getDyio().clearData();
+				getBathDevice().clearData();
 				onClearData();
 			}
 		});
 		
-		btnAlarm.setText(new Double(getDyio().getAlarmLevel()).toString());
-		getDyio().dumpLogs();
+		btnAlarm.setText(new Double(getBathDevice().getAlarmLevel()).toString());
+		getBathDevice().dumpLogs(1);
 		
 	}
 	
@@ -135,7 +137,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		btnAlarm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getDyio().setAlarmLevel(Double.parseDouble(btnAlarm.getText()));
+				getBathDevice().setAlarmLevel(Double.parseDouble(btnAlarm.getText()));
 			}
 		});
 		Controls.add(lblAlarm, "cell 0 1,alignx trailing");
@@ -173,11 +175,29 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(PollingRateTextField, "cell 1 5,growx");
 		PollingRateTextField.setColumns(10);
 		
-		lblClearDataFor = new JLabel("Clear Data For Day");
-		Controls.add(lblClearDataFor, "cell 0 6,alignx trailing");
 		
+		
+		howMuchData = new JComboBox();
+		howMuchData.addItem("All Data");
+		howMuchData.addItem("Last Day");
+		Controls.add(howMuchData, "cell 0 6,alignx trailing");
+		JButton howMuchDataReq = new JButton("Request Data");
+		howMuchDataReq.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(howMuchData.getSelectedItem().toString().contains("All Data")){
+					getBathDevice().dumpLogs(0);
+				}else if(howMuchData.getSelectedItem().toString().contains("Last Day")){
+					getBathDevice().dumpLogs(1);
+				}
+			}
+		});
+		Controls.add(howMuchDataReq, "cell 1 6");
+		
+		lblClearDataFor = new JLabel("Clear Device Logs");
+		Controls.add(lblClearDataFor, "cell 0 7,alignx trailing");
 		btnClear = new JButton("Clear");
-		Controls.add(btnClear, "cell 1 6");
+		Controls.add(btnClear, "cell 1 7");
 		
 		xyDataset = new XYSeriesCollection();
 
@@ -205,8 +225,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	}
 	
 	private void updateName(String newName){
-		 if(getDyio()!=null)
-			 getDyio().setName(newName);
+		 if(getBathDevice()!=null)
+			 getBathDevice().setName(newName);
 		 chart.setTitle(newName);
 		 setName(newName);
 		 txtbathName.setText(newName);
@@ -219,7 +239,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			this.mainWindow = mainWindow;		
 	}
 
-	public BathMoniterDevice getDyio() {
+	public BathMoniterDevice getBathDevice() {
 		return dyio;
 	}
 
@@ -245,10 +265,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	public void onValueChange(BathMoniterEvent event) {
 		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 		if (startTime == null)
-			startTime = new Integer((int) event.getTimestamp()); 
+			startTime = new Long((long) event.getTimestamp()); 
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
 		
-		System.out.println("Startime = "+ startTime+" timestamp = "+timestamp);
+		System.out.println("Startime = "+ TanuryDataLogger.getDate(event.getTimestamp())+" timestamp = "+event.getTimestamp());
 		
 		ozHour.add( timestamp , 
 						event.getCurrentOzHrRate()); 

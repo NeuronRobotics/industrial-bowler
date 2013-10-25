@@ -1,6 +1,5 @@
 package com.neuronrobotics.industrial;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -10,8 +9,6 @@ import org.jfree.util.Log;
 
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.sdk.network.BowlerTCPClient;
-import com.neuronrobotics.sdk.network.BowlerUDPClient;
-import com.neuronrobotics.sdk.ui.ConnectionDialog;
 
 
 public class BathMoniterFactory {
@@ -36,7 +33,7 @@ public class BathMoniterFactory {
 						d = new BathMoniterDevice(tcp);
 						d.connect();
 						list.add(new BathMoniter(d));
-					} catch (IOException e) {
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						d=null;
