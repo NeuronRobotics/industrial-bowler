@@ -25,7 +25,7 @@ import com.neuronrobotics.sdk.util.ThreadUtil;
 public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAnalogInputListener{
 	
 	private AnalogInputChannel referenceVoltage;
-	private AnalogInputChannel signalVoltage;
+	private AnalogInputChannel signalChannel;
 	private AnalogInputChannel tempVoltage;
 	private AnalogInputChannel otherVoltage;
 	private double reference;
@@ -38,6 +38,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private String name = null;
 	private DeviceConfiguration configuration = null;
 	private TanuryDataLogger logger = null;
+	private double currentSensorValue;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -71,17 +72,17 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		referenceVoltage = 	new AnalogInputChannel(dyio, 15);
 		otherVoltage	 = 	new AnalogInputChannel(dyio, 14);
 		tempVoltage 	 = 	new AnalogInputChannel(dyio, 13);
-		signalVoltage 	 = 	new AnalogInputChannel(dyio, 12);
+		signalChannel 	 = 	new AnalogInputChannel(dyio, 12);
 		
 		referenceVoltage.setAsync(false);
 		otherVoltage.setAsync(false);
 		tempVoltage.setAsync(false);
-		signalVoltage.setAsync(false);
+		signalChannel.setAsync(false);
 		
 		
 		Log.warning("Initializing values");
 		reference = referenceVoltage.getValue();
-		signal    = signalVoltage.getValue();
+		signal    = signalChannel.getValue();
 		integral = new RollingAverageFilter(10, getCurrent());
 
 		Log.warning("Starting poll thread");
@@ -91,7 +92,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
 					Log.setMinimumPrintLevel(Log.WARNING);
-					onAnalogValueChange(signalVoltage, signalVoltage.getValue());
+					onAnalogValueChange(signalChannel, signalChannel.getValue());
 					Log.setMinimumPrintLevel(Log.DEBUG);
 				}
 			}
@@ -101,13 +102,17 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					if(signalVoltage.getValue() > getAlarmThreshhold()){
+					
+					double currentVal = scaleValue(currentSensorValue);
+					
+					if(currentVal > getAlarmThreshhold()){
 						BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
 																System.currentTimeMillis(), 
 																getCurrent(),
 																getAlarmThreshhold());
 						logger.onAlarmEvenFire(ev);
 						pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+						
 					}else{
 						configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
 						BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
@@ -145,29 +150,39 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	}
 	
 	public double getCurrent(){
-		
+		double val=0;
+		if(integral== null)
+			val = signal;
+		else{
+			//val = integral.getValue();
+			val=currentSensorValue;
+		}
+		return scaleValue(val);
+	}
+	
+	private double scaleValue(double in){
 		double scale = (2.5//Reference voltage actual volts
 				*1024.0)
 				/reference;
 		double i=.001;//Ohms of shunt
 		
 		double ampScale = (1/32.5)*0.8064*2;//Amp gain
-		double val = 0;
-		if(integral== null)
-			val = signal;
-		else
-			val = integral.getValue();
-		return (((val/1024)*scale)*ampScale)/(i);
+		
+		
+		return (((in/1024.0)*scale)*ampScale)/(i);
 	}
 	
 	@Override
 	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+		this.currentSensorValue = value;
 		if(chan == referenceVoltage){
 			reference =  value;
-		}if(chan == signalVoltage){
-			if(value < getAlarmThreshhold()){
+		}if(chan == signalChannel){
+			if(scaleValue(value) < getAlarmThreshhold()){
 				signal = value;
 				integral.add( value);
+			}else{
+				//System.out.println("Curren val = "+scaleValue(value)+ " treshhold= "+getAlarmThreshhold());
 			}
 			
 		}

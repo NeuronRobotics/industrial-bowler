@@ -75,8 +75,8 @@ public class BathAlarmEvent {
 		String s="";
 		s+=getBathName()+"\n ";
 		s+=getDate()+"\n";
-		s+=currentOzHrRate+" Mili-Amps (current) \n";
-		s+= alarmThreshhold+" Mili-Amps (Threshhold)";
+		s+=currentOzHrRate+" Amps (current) \n";
+		s+= alarmThreshhold+" Amps (Threshhold)";
 		return s;
 	}
 	
