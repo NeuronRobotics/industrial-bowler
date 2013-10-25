@@ -1,5 +1,6 @@
 package com.neuronrobotics.industrial.server;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -50,8 +51,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		logger = new TanuryDataLogger("device");
 		Log.warning("Adding namespaces");
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
-		Log.warning("Starting UDP");
-		addServer(new BowlerUDPServer(1865));
+	
 
 		
 		Log.enableDebugPrint(true);
@@ -131,11 +131,15 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			}
 		}.start();
 		
-		for (int i=0;i<10;i++){
-			Log.warning("Starting TCP "+(1866+i));
-			addServer(new BowlerTCPServer(1866+i));
+		Log.warning("Starting UDP");
+		try {
+			startNetworkServer();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
 		}
-		
+
 		System.err.println("System ONLINE");
 		
 	}
