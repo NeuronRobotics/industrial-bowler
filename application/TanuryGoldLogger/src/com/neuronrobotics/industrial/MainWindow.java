@@ -41,6 +41,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 				try {
 					MainWindow window = new MainWindow();
 					Log.enableDebugPrint(true);
+					Log.setMinimumPrintLevel(Log.WARNING);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.exit(1);

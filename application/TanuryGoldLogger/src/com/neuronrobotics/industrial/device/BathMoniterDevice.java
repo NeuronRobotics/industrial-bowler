@@ -64,11 +64,11 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 			}
 		}
 	}
-	@Override
+
 	public Object [] send(String namespace,BowlerMethod method, String rpcString, Object[] arguments) throws DeviceConnectionException{
 		if(!getConnection().isConnected())
 			connect();
-		return super.send(namespace, method, rpcString, arguments);
+		return super.send(namespace, method, rpcString, arguments,5);
 	}
 
 	public String getName() {
