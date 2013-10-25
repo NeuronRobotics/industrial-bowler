@@ -13,7 +13,8 @@ public class TestBathMoniterTimestamp {
 
 	@Test
 	public void testBathMoniterEvent() {
-		long time = System.currentTimeMillis();
+		long time = 1380658184678L;
+		
 		BathMoniterEvent be = new BathMoniterEvent(	"testName", 
 													time, 
 													13,
@@ -41,8 +42,36 @@ public class TestBathMoniterTimestamp {
 			System.err.println("High word "+(int)(be.getTimestamp()>>32));
 			System.err.println("Low Word  "+(int)(be.getTimestamp()));
 			fail();
-			
-			
+		}
+		
+		time = 1382658184678L;
+		be = new BathMoniterEvent(	"testName", 
+						time, 
+						13,
+						200);
+		System.out.println(be);
+		
+		dg = be.getPacket(new MACAddress());
+		System.out.println(dg);
+		
+		newEvent = new BathMoniterEvent(dg);
+		
+		System.out.println(newEvent);
+		System.out.println(newEvent.getPacket(new MACAddress()));
+		
+		System.out.println("Actual time was "+time);
+		if(be.getTimestamp() != time){
+			System.err.println("The first event was wrong");
+			fail();
+		}
+		
+		if(newEvent.getTimestamp() != be.getTimestamp()){
+				System.err.println("The two events are different");
+				System.err.println("High word "+(int)(newEvent.getTimestamp()>>32));
+				System.err.println("Low Word  "+(int)(newEvent.getTimestamp()));
+				System.err.println("High word "+(int)(be.getTimestamp()>>32));
+				System.err.println("Low Word  "+(int)(be.getTimestamp()));
+				fail();
 		}
 		
 	}

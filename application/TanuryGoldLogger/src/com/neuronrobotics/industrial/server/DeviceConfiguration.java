@@ -93,7 +93,7 @@ public class DeviceConfiguration {
 	}
 
 	private class dataStorage{
-		private double scaleFactor = .01;
+		private double scaleFactor = 29.7;
 		private double dailyTotal = 0;
 		private int secondsPolling = 30000;
 		private double alarmThreshhold = .6;

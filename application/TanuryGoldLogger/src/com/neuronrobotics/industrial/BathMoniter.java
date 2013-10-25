@@ -19,6 +19,7 @@ import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -94,9 +95,16 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				recentTotal.setText("0.0");
-				getBathDevice().clearData();
-				onClearData();
+				int selectedOption = JOptionPane.showConfirmDialog(null, 
+				                        "Are your sure you want to clear the bath data?", 
+				                        "Choose", 
+				                        JOptionPane.YES_NO_OPTION); 
+				if (selectedOption == JOptionPane.YES_OPTION) {
+					recentTotal.setText("0.0");
+					getBathDevice().clearData();
+					onClearData();
+					
+				}
 			}
 		});
 		

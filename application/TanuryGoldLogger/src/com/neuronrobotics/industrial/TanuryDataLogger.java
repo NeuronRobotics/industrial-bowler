@@ -34,12 +34,12 @@ public class TanuryDataLogger {
 		
 	}
 	public void onValueChange(BathMoniterEvent event, double total) {
-		String data = new Date()+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getScaledTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG";
+		String data = new Date(event.getTimestamp())+","+event.getTimestamp()+","+total+","+event.getBathName()+","+event.getScaledTotalUsedToday()+","+event.getCurrentOzHrRate()+",LOG";
 		writeLine(data, event.getBathName(),event.getTimestamp());
 	}
 
 	public void onAlarmEvenFire(BathAlarmEvent event) {
-		String data = new Date()+","+event.getTimestamp()+","+0+","+event.getBathName()+","+0+","+event.getCurrentOzHrRate()+",ALARM,"+event.getAlarmThreshhold()+"";
+		String data = new Date(event.getTimestamp())+","+event.getTimestamp()+","+0+","+event.getBathName()+","+0+","+event.getCurrentOzHrRate()+",ALARM,"+event.getAlarmThreshhold()+"";
 		writeLine(data, event.getBathName(),event.getTimestamp());
 	}
 
