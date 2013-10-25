@@ -103,7 +103,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 					recentTotal.setText("0.0");
 					getBathDevice().clearData();
 					onClearData();
-					
 				}
 			}
 		});
@@ -275,8 +274,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		if (startTime == null)
 			startTime = new Long((long) event.getTimestamp()); 
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
-		
-		System.out.println("Startime = "+ TanuryDataLogger.getDate(event.getTimestamp())+" timestamp = "+event.getTimestamp());
 		
 		ozHour.add( timestamp , 
 						event.getCurrentOzHrRate()); 

@@ -40,6 +40,14 @@ public class BathMoniterEvent {
 	}
 
 	public BathMoniterEvent(String sCurrentLine) {
+		setData( sCurrentLine);
+	}
+
+	public BathMoniterEvent() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public void setData(String sCurrentLine){
 		String [] data = sCurrentLine.toString().split(",");
 
 		this.setTotalUsedToday(Double.parseDouble(data[4]));

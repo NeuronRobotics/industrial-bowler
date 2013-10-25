@@ -80,19 +80,48 @@ public class TanuryDataLogger {
 			}
 			
 		}
-		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(getFileName(bathName,timestamp), true)));
-			if(header){
-				out.println(dataHeader+data);
-			}else
-				out.println(data);
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String filenameLocal = getFileName(bathName,timestamp);
+		if(!logContainsTimestamp(timestamp,filenameLocal)){
+			try {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filenameLocal, true)));
+				if(header){
+					out.println(dataHeader+data);
+				}else
+					out.println(data);
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
+	private boolean logContainsTimestamp(long timestamp,String filename) {
+		// TODO Auto-generated method stub
+		BufferedReader br = null;
+		BathMoniterEvent ev= new BathMoniterEvent();
+		try {
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader(filename));
+
+			br.readLine();// read the formatting data at the top
+			while ((sCurrentLine = br.readLine()) != null) {
+				ev.setData(sCurrentLine);
+				if(ev.getTimestamp() == timestamp)
+					return true;
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return false;
+	}
 	public int getNumberOfFiles(){
 		return filesAccessed.size();
 	}
