@@ -25,9 +25,11 @@ public class TanuryDataLogger {
 		subDir=string;
 		File folder = new File(getRoot());
 		File[] listOfFiles = folder.listFiles(); 
-		for( File f:listOfFiles ){
-			filesAccessed.add(f.getAbsolutePath());
-		}
+		if(listOfFiles!=null)
+			if(listOfFiles.length>0)
+				for( File f:listOfFiles ){
+					filesAccessed.add(f.getAbsolutePath());
+				}
 	}
 	public void onNameChange(String newName) {
 		// TODO Auto-generated method stub

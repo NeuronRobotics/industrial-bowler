@@ -108,7 +108,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		});
 		
 		btnAlarm.setText(new Double(getBathDevice().getAlarmLevel()).toString());
-		getBathDevice().dumpLogs(1);
+		//getBathDevice().dumpLogs(1);
 		
 	}
 	
@@ -274,11 +274,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		if (startTime == null)
 			startTime = new Long((long) event.getTimestamp()); 
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
-		
-		ozHour.add( timestamp , 
-						event.getCurrentOzHrRate()); 
-		if(ozHour.getItemCount()>range){
-			ozHour.remove(0);
+
+		if((event.getTimestamp()-startTime)<0){
+			ozHour.add( timestamp , 
+							event.getCurrentOzHrRate()); 
+			if(ozHour.getItemCount()>range){
+				ozHour.remove(0);
+			}
 		}
 		recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 										).toString());

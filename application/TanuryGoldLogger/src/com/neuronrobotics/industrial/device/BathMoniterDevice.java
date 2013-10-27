@@ -52,7 +52,7 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 			BathMoniterEvent be = new BathMoniterEvent(data);
 			
 			if(getBathMoniter() !=null){
-				System.out.println("ASYNC << "+be+"\n"+data);
+				//System.out.println("ASYNC << "+be+"\n"+data);
 				
 				getBathMoniter().onValueChange(be);
 			}

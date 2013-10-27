@@ -21,26 +21,26 @@ public class BathMoniterFactory {
 		//if(clnt == null)
 		//	clnt=new BowlerUDPClient(1865);
 		ArrayList<InetAddress>  addrs = BowlerTCPClient.getAvailableSockets();
+		int j=0;
+		for (InetAddress i:addrs) {
+			System.out.println((j++) +" Adding "+i);
+		}
 		if(addrs.size()>0){
 			for (InetAddress i:addrs) {
-				System.out.println("Adding "+i);
+				//System.out.println("Adding "+i);
 				BathMoniterDevice d=null;
-				int socket=0;
-				do{
-					try {
-						BowlerTCPClient tcp = new BowlerTCPClient(i, 1866+socket);
-						System.out.println("TCP socket connected");
-						d = new BathMoniterDevice(tcp);
-						d.connect();
-						list.add(new BathMoniter(d));
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						d=null;
-						socket++;
-						Log.error("Soccet in use, trying "+(1866+socket) );
-					}
-				}while(d==null && socket<10);
+				try {
+					BowlerTCPClient tcp = new BowlerTCPClient(i, 1866);
+					System.out.println("TCP socket connected");
+					d = new BathMoniterDevice(tcp);
+					d.connect();
+					list.add(new BathMoniter(d));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					d=null;
+					Log.error("Soccet in use, trying "+(1866) );
+				}
 			}
 		}else{
 			JOptionPane.showMessageDialog(null, "No bath detected, check internet connection", "No Baths Found", JOptionPane.ERROR_MESSAGE);
