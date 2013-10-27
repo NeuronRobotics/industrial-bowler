@@ -21,3 +21,4 @@ sleep 105
 
 echo Looking for devices...
 java -jar FindDevices.jar
+java -jar TanuryGUI.jar
