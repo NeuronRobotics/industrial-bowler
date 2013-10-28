@@ -19,6 +19,6 @@ do
 	
 	ssh root@$VAR 'mount -o remount,ro /'
 	
-	ssh root@$VAR 'pkill java'
+	ssh root@$VAR 'reboot'
 done
 
