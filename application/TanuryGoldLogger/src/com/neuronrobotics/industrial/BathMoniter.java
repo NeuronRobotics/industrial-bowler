@@ -62,8 +62,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	
 	private int range = (60*24)/5;
 	
-	public BathMoniter(BathMoniterDevice dyio){
-		this();
+	public BathMoniter(BathMoniterDevice dyio,String address){
+		this(address);
 		this.setDyio(dyio);
 		
 		updateName(dyio.getName());
@@ -116,7 +116,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		return Double.parseDouble(textFieldScale.getText());
 	}
 	
-	public BathMoniter(){
+	public BathMoniter(String address){
 		String tmpmyName = "Bath Moniter "+ index++;
 		
 		setLayout(new MigLayout("", "[grow][]", "[grow][]"));
@@ -125,7 +125,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		add(Controls, "cell 0 0,grow");
 		Controls.setLayout(new MigLayout("", "[grow][grow]", "[][][][][][grow]"));
 		
-		lblName = new JLabel("Name");
+		lblName = new JLabel(address+" Name");
 		Controls.add(lblName, "cell 0 0,alignx trailing");
 		
 		txtbathName = new JTextField();

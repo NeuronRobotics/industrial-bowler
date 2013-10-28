@@ -79,6 +79,8 @@ public class MainWindow implements IBathMoniterUpdateListener{
 				frame.getContentPane().add(tabbedPane);
 				frame.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane}));
 				frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane, frame.getContentPane()}));
+				frame.setLocationRelativeTo(null);
+				frame.setVisible(true);
 			}
 		}.start();
 		JPanel p = new JPanel(new MigLayout());

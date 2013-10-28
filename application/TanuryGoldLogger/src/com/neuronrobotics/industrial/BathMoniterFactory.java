@@ -34,7 +34,7 @@ public class BathMoniterFactory {
 					System.out.println("TCP socket connected");
 					d = new BathMoniterDevice(tcp);
 					d.connect();
-					list.add(new BathMoniter(d));
+					list.add(new BathMoniter(d,i.getHostAddress()));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
