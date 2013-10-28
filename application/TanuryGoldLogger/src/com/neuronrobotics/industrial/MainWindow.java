@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -13,8 +14,10 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
 import com.neuronrobotics.sdk.common.Log;
+import com.neuronrobotics.sdk.network.BowlerTCPClient;
 
 import java.awt.Component;
+import java.net.InetAddress;
 import java.security.AllPermission;
 import java.util.ArrayList;
 
@@ -68,13 +71,23 @@ public class MainWindow implements IBathMoniterUpdateListener{
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		loadTabs();
-		frame.getContentPane().add(tabbedPane);
+		ArrayList<InetAddress>  addrs = BowlerTCPClient.getAvailableSockets();
+		new Thread(){
+			public void run(){
+				loadTabs();
+				frame.getContentPane().removeAll();
+				frame.getContentPane().add(tabbedPane);
+				frame.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane}));
+				frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane, frame.getContentPane()}));
+			}
+		}.start();
+		JPanel p = new JPanel(new MigLayout());
+		for(InetAddress a:addrs){
+			p.add(new JLabel("Found bath at: "+a.getHostAddress()), "wrap");
+		}
+		p.add(new JLabel("Loading..."), "wrap");
+		frame.getContentPane().add(p);
 		
-		
-
-		frame.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane}));
-		frame.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tabbedPane, frame.getContentPane()}));
 	}
 	
 	private void loadTabs(){

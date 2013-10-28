@@ -85,16 +85,18 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
-		double total=0;
-		for(int i=0;i<list.size();i++){
-			if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
-				table.setValueAt(new Double(event.getScaledTotalUsedToday()).toString(), i, 1);
+		try{
+			double total=0;
+			for(int i=0;i<list.size();i++){
+				if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
+					table.setValueAt(new Double(event.getScaledTotalUsedToday()).toString(), i, 1);
+				}
+				total+=new Double(table.getValueAt( i, 1).toString());
 			}
-			total+=new Double(table.getValueAt( i, 1).toString());
-		}
-		textField_1.setText(new Double(total).toString());
-		
-		log.onValueChange(event, total);
+			textField_1.setText(new Double(total).toString());
+			
+			log.onValueChange(event, total);
+		}catch (Exception ex){}
 	}
 	
 

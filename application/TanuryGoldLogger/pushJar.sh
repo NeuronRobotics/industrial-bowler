@@ -15,6 +15,8 @@ do
 	
 	scp target/TanuryDeviceServer.jar root@$VAR:/
 	
+	ssh root@$VAR 'ntptime;rpi-update'
+	
 	ssh root@$VAR 'mount -o remount,ro /'
 	
 	ssh root@$VAR 'pkill java'

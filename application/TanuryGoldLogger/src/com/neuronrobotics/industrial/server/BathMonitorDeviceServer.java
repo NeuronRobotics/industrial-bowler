@@ -58,15 +58,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		Log.enableDebugPrint(true);
 		Log.setMinimumPrintLevel(Log.WARNING);
 		dyio=device;
+		dyio.getConnection().setSynchronusPacketTimeoutTime(1000);
 		Log.warning("Resetting Inputs");
-//		for (int i=0;i<24;i++){
-//			if(	i!=12 &&
-//				i!=13 &&
-//				i!=14 &&
-//				i!=15	){
-//				dyio.setMode(i, DyIOChannelMode.DIGITAL_IN, false);
-//			}
-//		}
+		for (int i=0;i<24;i++){
+			if(	i!=12 &&
+				i!=13 &&
+				i!=14 &&
+				i!=15	){
+				dyio.setMode(i, DyIOChannelMode.DIGITAL_OUT, false);
+			}
+		}
 		
 		Log.warning("Starting analog");
 		referenceVoltage = 	new AnalogInputChannel(dyio, 15);
@@ -102,37 +103,44 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(dyio.isAvailable()){
-					
-					double currentVal = scaleValue(signal);
-					
-					if(currentVal > getAlarmThreshhold()){
-						BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
-																System.currentTimeMillis(), 
-																getCurrent(),
-																getAlarmThreshhold());
-						logger.onAlarmEvenFire(ev);
-						pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+					try{
+						double currentVal = scaleValue(signal);
 						
-					}else{
-						configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
-						BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
+						if(currentVal > getAlarmThreshhold()){
+							BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
 																	System.currentTimeMillis(), 
 																	getCurrent(),
-																	configuration.getDailyTotal()/getScale());
-						logger.onValueChange(be, 0);
-						System.out.println("Pushing time "+System.currentTimeMillis()+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
-						pushAsyncPacket(be.getPacket(dyio.getAddress()));
-						
-						if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
-							lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
-							//This is where the daily total is reset at midnight
-							configuration.setDailyTotal(0);
+																	getAlarmThreshhold());
+							logger.onAlarmEvenFire(ev);
+							pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+							
+						}else{
+							configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
+							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
+																		System.currentTimeMillis(), 
+																		getCurrent(),
+																		configuration.getDailyTotal()/getScale());
+							logger.onValueChange(be, 0);
+							System.out.println("Pushing time "+System.currentTimeMillis()+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
+							
+							pushAsyncPacket(bd);
+							
+							if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
+								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
+								//This is where the daily total is reset at midnight
+								configuration.setDailyTotal(0);
+							}
+							
 						}
-						
+						//Log.warning("Voltage = "+getCurrent());
+						ThreadUtil.wait((int) getPollingRate());
+					}catch(Exception ex){
+						ex.printStackTrace();
 					}
-					Log.warning("Voltage = "+getCurrent());
-					ThreadUtil.wait((int) getPollingRate());
 				}
+				new RuntimeException("The main opperating thread died").printStackTrace();
+				System.exit(-1);
 			}
 		}.start();
 		
