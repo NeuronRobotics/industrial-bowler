@@ -104,7 +104,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 			tabbedPane.addTab(b.getName(), null, b, null);
 			b.setMainWindow(this);
 		}
-		tabbedPane.addTab("Allarm Notifications",alarm );
+		tabbedPane.addTab("Alarm Notifications",alarm );
 		dashBoard.updateTableData();
 		updateTabData();
 	}
