@@ -181,7 +181,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		
 		double calcVal = (((in/1024.0)*scale)*ampScale)/(i);
 		
-		if(calcVal>25)
+		if(calcVal>20)
 			calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);
 		
 		return calcVal;
