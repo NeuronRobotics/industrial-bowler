@@ -2,6 +2,8 @@ package com.neuronrobotics.industrial;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
@@ -275,12 +277,15 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			startTime = new Long((long) event.getTimestamp()); 
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
 
-		if((event.getTimestamp()-startTime)<0){
+		if((event.getTimestamp()-startTime)>0){
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
 			if(ozHour.getItemCount()>range){
 				ozHour.remove(0);
 			}
+		}else{
+			System.err.println("Timestamp is old "+new Timestamp(event.getTimestamp())+", current is: "+new Timestamp(System.currentTimeMillis()));
+			System.err.println("Started at "+new Timestamp(startTime));
 		}
 		recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 										).toString());
