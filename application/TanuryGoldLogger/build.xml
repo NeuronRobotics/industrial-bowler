@@ -47,7 +47,7 @@
 		<echo message="Done building the nrsdk" />
 	</target>
 
-	<target name="prepare" depends="nrsdk"
+	<target name="prepare" depends="clean" 
 		description="Create the file structure for assembly">
 		<mkdir dir="${build.home}" />
 

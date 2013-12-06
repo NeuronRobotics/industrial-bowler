@@ -21,7 +21,7 @@ do
 	#ssh root@$VAR 'ntptime;rpi-update'
 	ssh root@$VAR 'mount -o remount,ro /'
 
-	ssh root@$VAR 'fsck -y /dev/mmcblk0p2'
+	#ssh root@$VAR 'fsck -y /dev/mmcblk0p2'
 	
 	ssh root@$VAR 'reboot'
 done
