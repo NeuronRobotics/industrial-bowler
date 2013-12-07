@@ -3,9 +3,6 @@
 #ssh-keygen -t dsa
 HOME=$PWD
 
-cd ../NRSDK/
-rm target/*.jar
-ant
 cd $HOME
 
 

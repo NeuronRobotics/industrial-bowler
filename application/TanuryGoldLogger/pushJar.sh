@@ -11,7 +11,7 @@ do
 	
 	ssh pi@$VAR 'mkdir -p Tanury/device'
 	
-	ssh root@$VAR 'mount -o remount,rw /'
+	#ssh root@$VAR 'mount -o remount,rw /'
 	
 	scp target/TanuryDeviceServer.jar root@$VAR:/
 
@@ -19,7 +19,7 @@ do
 	scp tanuryCron.sh root@$VAR:/
 	
 	#ssh root@$VAR 'ntptime;rpi-update'
-	ssh root@$VAR 'mount -o remount,ro /'
+	#ssh root@$VAR 'mount -o remount,ro /'
 
 	#ssh root@$VAR 'fsck -y /dev/mmcblk0p2'
 	
