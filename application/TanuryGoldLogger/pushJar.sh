@@ -9,7 +9,7 @@ do
 	#scp ~/.ssh/id_dsa.pub pi@$VAR:.ssh/authorized_keys2
 	#scp setupRoot.sh pi@$VAR: 
 	
-	ssh pi@$VAR 'mkdir -p Tanury/device'
+	ssh tanury@$VAR 'mkdir -p Tanury/device'
 	
 	#ssh root@$VAR 'mount -o remount,rw /'
 	
