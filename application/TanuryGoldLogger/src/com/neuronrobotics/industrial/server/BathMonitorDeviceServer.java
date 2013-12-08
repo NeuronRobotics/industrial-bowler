@@ -179,15 +179,15 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				/reference;
 		double i=.001;//Ohms of shunt
 		
-		//double ampScale = (1.0/32.5)*0.8064*2* 0.5362349021241151;//Amp gain
+		double ampScale = (1.0/32.6)*0.8064*2* 0.5362349021241151;//Amp gain
 		
-		double ampScale = 		(1.0/28)	*0.8648396501457726;//Amp gain simplified
-		double ampScaleHigh = 	(1.0/32.5)	*0.8648396501457726;//Amp gain simplified
+		//double ampScale = 		(1.0/28)	*0.8648396501457726;//Amp gain simplified
+		//double ampScaleHigh = 	(1.0/32.6)	*0.8648396501457726;//Amp gain simplified
 		
 		double calcVal = (((in/1024.0)*scale)*ampScale)/(i);
 		
-		if(calcVal>20)
-			calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);
+		//if(calcVal>20)
+		//	calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);
 		
 		return calcVal;
 	}
