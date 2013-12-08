@@ -1,6 +1,7 @@
 package com.neuronrobotics.industrial.server;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private String name = null;
 	private DeviceConfiguration configuration = null;
 	private TanuryDataLogger logger = null;
+	private double localTotal=0;
+	private double msSampleTime=300.0;
 	//private double currentSensorValue;
 	static{
 		DyIO.disableFWCheck();
@@ -88,7 +91,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 		Log.warning("Starting poll thread");
 		new Thread(){
-			double ioPoll = 300.0;
+			double ioPoll =  msSampleTime;
 			public void run(){
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
@@ -115,13 +118,15 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							pushAsyncPacket(ev.getPacket(dyio.getAddress()));
 							
 						}else{
-							configuration.setDailyTotal(configuration.getDailyTotal() + getCurrent()*(getPollingRate()/(60*60*1000.0)));
+							
+							configuration.setDailyTotal(localTotal);
 							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
 																		System.currentTimeMillis(), 
 																		getCurrent(),
-																		configuration.getDailyTotal()/getScale());
+																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							System.out.println("Pushing time "+System.currentTimeMillis()+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							System.out.println("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+					
 							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
 							
 							pushAsyncPacket(bd);
@@ -194,6 +199,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}if(chan == signalChannel){
 			if(scaleValue(value) < getAlarmThreshhold()){
 				signal = value;
+				localTotal += getCurrent()*( msSampleTime/(60.0*60.0*1000.0));
 				//integral.add( value);
 			}else{
 				//System.out.println("Curren val = "+scaleValue(value)+ " treshhold= "+getAlarmThreshhold());
