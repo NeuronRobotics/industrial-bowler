@@ -31,7 +31,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private AnalogInputChannel otherVoltage;
 	private double reference;
 	private double signal;
-	//private RollingAverageFilter integral; 
+	private RollingAverageFilter integral; 
 	private int lastPacketDay=0;
 	private Calendar cal = Calendar.getInstance();
 	
@@ -41,7 +41,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private TanuryDataLogger logger = null;
 	private double localTotal=0;
 	private double msSampleTime=300.0;
-	//private double currentSensorValue;
+	private double currentSensorValue;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -87,7 +87,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		Log.warning("Initializing values");
 		reference = referenceVoltage.getValue();
 		signal    = signalChannel.getValue();
-		//integral = new RollingAverageFilter(10, getCurrent());
+		integral = new RollingAverageFilter(10, getCurrent());
 
 		Log.warning("Starting poll thread");
 		new Thread(){
@@ -164,12 +164,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	public double getCurrent(){
 		double val=0;
-//		if(integral== null)
-//			val = signal;
-//		else{
-//			//val = integral.getValue();
+		if(integral== null)
+			val = signal;
+		else{
+			val = integral.getValue();
 			val=signal;
-//		}
+		}
 		return scaleValue(val);
 	}
 	
@@ -189,7 +189,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		//if(calcVal>20)
 		//	calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);
 		
-		return calcVal;
+		return in;
 	}
 	
 	@Override

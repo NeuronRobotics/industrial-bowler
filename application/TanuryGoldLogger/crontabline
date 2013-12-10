@@ -1,1 +1,2 @@
-* * * * *	root	/TanuryDeviceServer.jar
+* * * * *	root	/tanuryCron.sh
+0 * * * *	root	/tanuryCronStatus.sh

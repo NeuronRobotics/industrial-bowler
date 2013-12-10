@@ -17,12 +17,13 @@ do
 
 	scp 80-neuronrobotics.rules root@$VAR:/etc/udev/rules.d/
 	scp tanuryCron.sh root@$VAR:/
+	scp tanuryCronStatus.sh root@$VAR:/
 	
 	#ssh root@$VAR 'ntptime;rpi-update'
 	#ssh root@$VAR 'mount -o remount,ro /'
 
 	#ssh root@$VAR 'fsck -y /dev/mmcblk0p2'
 	
-	ssh root@$VAR 'reboot'
+	ssh root@$VAR 'pkill java'
 done
 
