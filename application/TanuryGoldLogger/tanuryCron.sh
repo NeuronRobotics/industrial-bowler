@@ -6,7 +6,8 @@ else
 	logger "Bath process not detected. Restarting."
 	echo "[tanuryMonitor]\tStarting Bath Monitor" | wall
 	echo "[tanuryMonitor] Uh Oh.. I don't see the logger... Starting logger."
-	java -jar /TanuryDeviceServer.jar /dev/DyIO0  >/dev/null 2 >&1  &
+	now=$(date +"%Y-%m-%d-%H:%M:%S")
+	java -jar /TanuryDeviceServer.jar /dev/DyIO0 >/var/log/Tanury/tanury$now 2>&1 &
 	sleep 10
 	if ps -ef | grep -v grep | grep java ; then
 		logger "  Logger is back!"
