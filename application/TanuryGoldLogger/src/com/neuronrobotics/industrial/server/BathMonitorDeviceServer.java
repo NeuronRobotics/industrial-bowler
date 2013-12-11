@@ -40,7 +40,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private DeviceConfiguration configuration = null;
 	private TanuryDataLogger logger = null;
 	private double localTotal=0;
-	private double msSampleTime=300.0;
+	private double msSampleTime=1000.0;
 	private double currentSensorValue;
 	static{
 		DyIO.disableFWCheck();
@@ -87,7 +87,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		Log.warning("Initializing values");
 		reference = referenceVoltage.getValue();
 		signal    = signalChannel.getValue();
-		integral = new RollingAverageFilter(10, getCurrent());
+		//integral = new RollingAverageFilter(30, getCurrent());
 
 		Log.warning("Starting poll thread");
 		new Thread(){
@@ -96,7 +96,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
 					Log.setMinimumPrintLevel(Log.WARNING);
-					onAnalogValueChange(signalChannel, signalChannel.getValue());
+					// Software lowpass, pull 100 values average them and push this up
+					double signalAvg = 0.0;
+					
+					for(int l=0; l<100; l++)
+						signalAvg = signalAvg+signalChannel.getValue();
+					signalAvg=signalAvg/100.0;
+					
+					System.out.println("Avg Val:\t"+signalAvg);
+
+					onAnalogValueChange(signalChannel, signalAvg);
 					Log.setMinimumPrintLevel(Log.DEBUG);
 				}
 			}
@@ -174,22 +183,40 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	}
 	
 	private double scaleValue(double in){
+		// get a fresh reference value
+		reference = referenceVoltage.getValue();
+
+		// the adc can't discern the diff between the ref and the supply.
 		double scale = (2.5//Reference voltage actual volts
 				*1024.0)
-				/reference;
-		double i=.001;//Ohms of shunt
+				/512;
+		double shunt=.001;//Ohms of shunt
+		double gain=33.0;
+		double pivotGain=gain*1.02;
 		
-		double ampScale = (1.0/32.6)*0.8064*2* 0.5362349021241151;//Amp gain
-		
+		//double ampScale = (1.0/32.6)*0.8064*2* 0.5362349021241151;//Amp gain
+		/*
 		//double ampScale = 		(1.0/28)	*0.8648396501457726;//Amp gain simplified
-		//double ampScaleHigh = 	(1.0/32.6)	*0.8648396501457726;//Amp gain simplified
+		double ampScale = 	(1.0/gain)	*0.8648396501457726;//Amp gain simplified
 		
 		double calcVal = (((in/1024.0)*scale)*ampScale)/(i);
 		
 		//if(calcVal>20)
-		//	calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);
+		//	calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);*/
+		double vCorrect= (2.5/(reference*(5.0/1024.0)));
+		// a litttle bit of a pivot. gain drops off when we're below about 10mv
 		
-		return in;
+
+		
+		double calcVal = ((in*(5.0/1024.0))/gain)*(1.0/shunt)*vCorrect;
+		
+		if(calcVal<15)
+			calcVal = ((in*(5.0/1024.0))/pivotGain)*(1.0/shunt)*vCorrect;
+		
+	//System.out.println("raw:\t"+in+"\tref:"+reference+"\tcalc:\t"+calcVal+"\tgain:\t"+gain);
+	
+
+		return calcVal;
 	}
 	
 	@Override
