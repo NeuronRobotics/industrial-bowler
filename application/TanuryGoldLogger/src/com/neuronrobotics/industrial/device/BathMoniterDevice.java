@@ -29,6 +29,7 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 	
 	@Override
 	public boolean connect(){
+		super.connect();
 		return true;
 	}
 	

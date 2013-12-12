@@ -64,16 +64,16 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	
 	private int range = (60*24)/5;
 	
-	public BathMoniter(BathMoniterDevice dyio,String address){
+	public BathMoniter(BathMoniterDevice bath,String address){
 		this(address);
-		this.setDyio(dyio);
+		this.setBath(bath);
 		
-		updateName(dyio.getName());
-		dyio.addBathUi(this);
-		if(dyio.getPollingRate()<30){
+		updateName(bath.getName());
+		bath.addBathUi(this);
+		if(bath.getPollingRate()<30){
 			getBathDevice().setPollingRate(30);
 		}
-		PollingRateTextField.setText(new Integer(dyio.getPollingRate()).toString());
+		PollingRateTextField.setText(new Integer(bath.getPollingRate()).toString());
 		PollingRateTextField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -85,7 +85,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			}
 		});
 		
-		textFieldScale.setText(new Double(dyio.getScale()).toString());
+		textFieldScale.setText(new Double(bath.getScale()).toString());
 		textFieldScale.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -252,7 +252,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		return dyio;
 	}
 
-	public void setDyio(BathMoniterDevice dyio) {
+	public void setBath(BathMoniterDevice dyio) {
 		this.dyio = dyio;
 	}
 
