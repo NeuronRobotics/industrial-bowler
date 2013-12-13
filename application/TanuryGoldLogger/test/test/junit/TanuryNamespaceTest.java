@@ -4,21 +4,45 @@ import static org.junit.Assert.*;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jfree.util.Log;
 import org.junit.Test;
 
 import com.neuronrobotics.industrial.BathMoniter;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
+import com.neuronrobotics.industrial.server.BathMonitorDeviceServer;
+import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.network.BowlerTCPClient;
+import com.neuronrobotics.sdk.serial.SerialConnection;
 
 public class TanuryNamespaceTest {
-
+	private void StartServer(){
+		SerialConnection con=null;
+		List<String> ports = SerialConnection.getAvailableSerialPorts();
+		for(String s:ports){
+			System.err.println(s);
+		}
+		
+		if(ports.size() >0)
+			con = new SerialConnection(ports.get(0));
+		
+		DyIO.disableFWCheck();
+		DyIO dyio = new DyIO(con);
+		System.err.println("Connecting DyIO");
+		dyio.connect();
+		System.err.println("DyIO Connected");
+		new BathMonitorDeviceServer(dyio);
+	}
 	@Test
 	public void test() {
-		ArrayList<InetAddress>  addrs = BowlerTCPClient.getAvailableSockets();
-		if(addrs.size() ==0)
-			fail("No baths online");
+		ArrayList<InetAddress>  addrs;
+		do{
+			addrs = BowlerTCPClient.getAvailableSockets();
+			if(addrs.size() ==0)
+				StartServer();
+		}while(addrs.size() ==0);
+		
 		int j=0;
 		for (InetAddress i:addrs) {
 			System.out.println((j++) +" Adding "+i);
@@ -48,8 +72,6 @@ public class TanuryNamespaceTest {
 				//alarm
 				double alarm = d.getAlarmLevel();
 				d.setAlarmLevel(alarm);
-				
-				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
