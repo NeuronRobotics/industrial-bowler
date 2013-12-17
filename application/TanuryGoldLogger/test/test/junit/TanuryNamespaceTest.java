@@ -59,6 +59,13 @@ public class TanuryNamespaceTest {
 				System.out.println("TCP socket connected");
 				d = new BathMoniterDevice(tcp);
 				d.connect();
+				d.stopHeartBeat();
+				d.ping();
+				
+				ArrayList<String> namespaces = d.getNamespaces();
+				for(String s: namespaces){
+					System.out.println(d.getRpcList(s));
+				}
 				//Name test
 				System.out.println("Name test");
 				String name = d.getName();
