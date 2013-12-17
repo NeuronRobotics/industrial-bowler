@@ -6,12 +6,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jfree.util.Log;
 import org.junit.Test;
 
 import com.neuronrobotics.industrial.BathMoniter;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.industrial.server.BathMonitorDeviceServer;
+import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.network.BowlerTCPClient;
 import com.neuronrobotics.sdk.serial.SerialConnection;
@@ -36,6 +36,7 @@ public class TanuryNamespaceTest {
 	}
 	@Test
 	public void test() {
+		
 		ArrayList<InetAddress>  addrs;
 		do{
 			addrs = BowlerTCPClient.getAvailableSockets();
@@ -47,6 +48,8 @@ public class TanuryNamespaceTest {
 		for (InetAddress i:addrs) {
 			System.out.println((j++) +" Adding "+i);
 		}
+		
+		Log.enableInfoPrint(true);
 		
 		for (InetAddress i:addrs) {
 			//System.out.println("Adding "+i);
