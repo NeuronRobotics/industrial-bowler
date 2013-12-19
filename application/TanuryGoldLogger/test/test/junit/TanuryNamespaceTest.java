@@ -49,7 +49,7 @@ public class TanuryNamespaceTest {
 			System.out.println((j++) +" Adding "+i);
 		}
 		
-		Log.enableInfoPrint(true);
+		Log.enableInfoPrint();
 		
 		for (InetAddress i:addrs) {
 			//System.out.println("Adding "+i);

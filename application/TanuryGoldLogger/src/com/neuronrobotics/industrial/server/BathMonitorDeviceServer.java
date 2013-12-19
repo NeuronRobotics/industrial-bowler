@@ -49,17 +49,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	public BathMonitorDeviceServer(DyIO device) {
 		super(device.getAddress());
 		lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
-		Log.warning("Starting configuration XML");
+		Log.info("Starting configuration XML");
 		configuration = new DeviceConfiguration();
-		Log.warning("Starting logger");
+		Log.info("Starting logger");
 		logger = new TanuryDataLogger("device");
-		Log.warning("Adding namespaces");
+		Log.info("Adding namespaces");
 		addBowlerDeviceServerNamespace(new TanuryBathNamespaceImp(this,getMacAddress()));
 	
 
 		
-		Log.enableDebugPrint(true);
-		Log.setMinimumPrintLevel(Log.WARNING);
+		Log.enableInfoPrint();
 		dyio=device;
 		dyio.getConnection().setSynchronusPacketTimeoutTime(1000);
 		Log.warning("Resetting Inputs");
@@ -133,7 +132,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																		getCurrent(),
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							System.out.println("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
 							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
 							
@@ -146,7 +145,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							}
 							
 						}
-						Log.warning("Voltage = "+getCurrent());
+						Log.info("Voltage = "+getCurrent());
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
 						ex.printStackTrace();
@@ -262,8 +261,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
 		Log.setMinimumPrintLevel(Log.INFO);
+		Log.setUseColoredPrints(true);
 		dyio.connect();
-		Log.setMinimumPrintLevel(Log.INFO);
+		
 		System.err.println("DyIO Connected");
 		new BathMonitorDeviceServer(dyio);
 	}
