@@ -95,18 +95,17 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
-					Log.setMinimumPrintLevel(Log.WARNING);
-					// Software lowpass, pull 100 values average them and push this up
-					double signalAvg = 0.0;
+//					// Software lowpass, pull 100 values average them and push this up
+//					double signalAvg = 0.0;
+//					
+//					for(int l=0; l<100; l++)
+//						signalAvg = signalAvg+signalChannel.getValue();
+//					signalAvg=signalAvg/100.0;
+//					
+//					System.out.println("Avg Val:\t"+signalAvg);
+//
+//					onAnalogValueChange(signalChannel, signalAvg);
 					
-					for(int l=0; l<100; l++)
-						signalAvg = signalAvg+signalChannel.getValue();
-					signalAvg=signalAvg/100.0;
-					
-					System.out.println("Avg Val:\t"+signalAvg);
-
-					onAnalogValueChange(signalChannel, signalAvg);
-					Log.setMinimumPrintLevel(Log.DEBUG);
 				}
 			}
 		}.start();
@@ -264,7 +263,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		System.err.println("Connecting DyIO");
 		Log.setMinimumPrintLevel(Log.INFO);
 		dyio.connect();
-		Log.setMinimumPrintLevel(Log.WARNING);
+		Log.setMinimumPrintLevel(Log.INFO);
 		System.err.println("DyIO Connected");
 		new BathMonitorDeviceServer(dyio);
 	}
