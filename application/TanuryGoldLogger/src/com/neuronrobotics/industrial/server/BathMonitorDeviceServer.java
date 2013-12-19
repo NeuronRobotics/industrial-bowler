@@ -58,10 +58,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 
 		
-		Log.enableInfoPrint();
+		
 		dyio=device;
 		dyio.getConnection().setSynchronusPacketTimeoutTime(1000);
-		Log.warning("Resetting Inputs");
+		Log.info("Resetting Inputs");
 		for (int i=0;i<24;i++){
 			if(	i!=12 &&
 				i!=13 &&
@@ -71,7 +71,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			}
 		}
 		
-		Log.warning("Starting analog");
+		Log.info("Starting analog");
 		referenceVoltage = 	new AnalogInputChannel(dyio, 15);
 		otherVoltage	 = 	new AnalogInputChannel(dyio, 14);
 		tempVoltage 	 = 	new AnalogInputChannel(dyio, 13);
@@ -83,12 +83,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		signalChannel.setAsync(false);
 		
 		
-		Log.warning("Initializing values");
+		Log.info("Initializing values");
 		reference = referenceVoltage.getValue();
 		signal    = signalChannel.getValue();
 		//integral = new RollingAverageFilter(30, getCurrent());
 
-		Log.warning("Starting poll thread");
+		Log.info("Starting poll thread");
 		new Thread(){
 			double ioPoll =  msSampleTime;
 			public void run(){
@@ -108,7 +108,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				}
 			}
 		}.start();
-		Log.warning("Starting up stream thread");
+		Log.info("Starting up stream thread");
 		new Thread(){
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
@@ -132,7 +132,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																		getCurrent(),
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							Log.debug("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
 							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
 							
@@ -145,7 +145,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							}
 							
 						}
-						Log.info("Voltage = "+getCurrent());
+						Log.debug("Voltage = "+getCurrent());
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
 						ex.printStackTrace();
@@ -156,7 +156,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			}
 		}.start();
 		
-		Log.warning("Starting UDP");
+		Log.info("Starting UDP");
 		try {
 			startNetworkServer();
 		} catch (IOException e) {
@@ -165,8 +165,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			System.exit(1);
 		}
 
-		System.err.println("System ONLINE");
-		
+		Log.info("System ONLINE");
+		Log.enableDebugPrint();
 	}
 	
 	public double getCurrent(){
@@ -260,11 +260,14 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-		Log.setMinimumPrintLevel(Log.INFO);
+		Log.enableDebugPrint();
+		
 		Log.setUseColoredPrints(true);
+		
 		dyio.connect();
 		
 		System.err.println("DyIO Connected");
+		
 		new BathMonitorDeviceServer(dyio);
 	}
 
