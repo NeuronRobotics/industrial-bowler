@@ -95,16 +95,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			public void run(){
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
-//					// Software lowpass, pull 100 values average them and push this up
-//					double signalAvg = 0.0;
-//					
-//					for(int l=0; l<100; l++)
-//						signalAvg = signalAvg+signalChannel.getValue();
-//					signalAvg=signalAvg/100.0;
-//					
-//					System.out.println("Avg Val:\t"+signalAvg);
-//
-//					onAnalogValueChange(signalChannel, signalAvg);
+					// Software lowpass, pull 100 values average them and push this up
+					double signalAvg = 0.0;
+					
+					for(int l=0; l<100; l++)
+						signalAvg = signalAvg+signalChannel.getValue();
+					signalAvg=signalAvg/100.0;
+					
+					Log.info("Avg Val:\t"+signalAvg);
+
+					onAnalogValueChange(signalChannel, signalAvg);
 					
 				}
 			}
