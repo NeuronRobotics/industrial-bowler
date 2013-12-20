@@ -262,7 +262,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		System.err.println("Connecting DyIO");
 		Log.enableDebugPrint();
 		
-		Log.setUseColoredPrints(true);
+		//Log.setUseColoredPrints(true);
 		
 		dyio.connect();
 		
