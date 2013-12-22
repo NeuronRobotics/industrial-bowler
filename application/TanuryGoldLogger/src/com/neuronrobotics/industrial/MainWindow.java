@@ -31,8 +31,8 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	private DashBoard dashBoard;
 	private AlarmAccount alarm;
 	private JTabbedPane tabbedPane;
-    JOptionPane pane = new JOptionPane(null, JOptionPane.ERROR_MESSAGE);
-    JDialog dialog = pane.createDialog(frame, "BATH Alarm!!");
+	private JOptionPane pane = new JOptionPane(null, JOptionPane.ERROR_MESSAGE);
+	private JDialog dialog = pane.createDialog(frame, "BATH Alarm!!");
     
 
 	/**
@@ -133,16 +133,20 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	}
 
 	@Override
-	public void onAlarmEvenFire(BathAlarmEvent ev) {
+	public void onAlarmEvenFire(final BathAlarmEvent ev) {
 		dashBoard.onAlarmEvenFire(ev);
 		if(dialog.isShowing()){
 			System.out.println("Dialog already open");
 			return;
 		}
-		alarm.onAlarmEvenFire(ev);
-		pane.setMessage(new String(ev.toString()));
-		dialog = pane.createDialog(frame, "BATH Alarm!!");
-		dialog.setVisible(true);	
+		new Thread(){
+			public void run(){
+				alarm.onAlarmEvenFire(ev);
+				pane.setMessage(new String(ev.toString()));
+				dialog = pane.createDialog(frame, "BATH Alarm!!");
+				dialog.setVisible(true);	
+			}
+		}.start();
 	}
 
 }
