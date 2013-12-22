@@ -1,5 +1,6 @@
 package com.neuronrobotics.industrial.server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -325,9 +326,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 						//cause the loop to exit after just the one
 						j=logger.getNumberOfFiles();
 					}
-					for (int i=0;i<logger.getNumberOfLogLines(name,fileIndex);i++){
-						pushAsyncPacket(logger.getLogLine(i, name,fileIndex).getPacket(dyio.getAddress()));
-						ThreadUtil.wait(100);
+					try{
+						for (int i=0;i<logger.getNumberOfLogLines(name,fileIndex);i++){
+							pushAsyncPacket(logger.getLogLine(i, name,fileIndex).getPacket(dyio.getAddress()));
+							ThreadUtil.wait(100);
+						}
+					}catch (Exception e){
+						
 					}
 				}
 			}
