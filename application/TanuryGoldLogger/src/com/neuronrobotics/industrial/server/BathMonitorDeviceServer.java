@@ -41,7 +41,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private DeviceConfiguration configuration = null;
 	private TanuryDataLogger logger = null;
 	private double localTotal=0;
-	private double msSampleTime=1000.0;
+	private double msSampleTime=300.0;
 	private double currentSensorValue;
 	private long lastSampleTime=-1;
 	static{
@@ -144,6 +144,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
 								//This is where the daily total is reset at midnight
 								configuration.setDailyTotal(0);
+								localTotal=0;
 							}
 							
 						}
@@ -311,6 +312,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public void clearData() {
 		configuration.setDailyTotal(0);
+		localTotal=0;
 		logger.clearData(name);
 	}
 	
