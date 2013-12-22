@@ -132,7 +132,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																		getCurrent(),
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							Log.debug("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
 							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
 							
@@ -145,7 +145,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							}
 							
 						}
-						Log.debug("Voltage = "+getCurrent());
+						Log.info("Voltage = "+getCurrent());
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
 						ex.printStackTrace();
