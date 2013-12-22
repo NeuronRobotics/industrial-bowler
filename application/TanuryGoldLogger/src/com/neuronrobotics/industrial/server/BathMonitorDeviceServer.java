@@ -43,6 +43,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double localTotal=0;
 	private double msSampleTime=1000.0;
 	private double currentSensorValue;
+	private long lastSampleTime=-1;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -165,7 +166,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			e.printStackTrace();
 			System.exit(1);
 		}
-
+		
+		localTotal = configuration.getDailyTotal();
+		
 		Log.info("System ONLINE");
 		Log.enableDebugPrint();
 	}
@@ -220,11 +223,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	@Override
 	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+		
+		if(lastSampleTime<0){
+			lastSampleTime=System.currentTimeMillis();
+		}
 		if(chan == referenceVoltage){
 			reference =  value;
 		}if(chan == signalChannel){
 			if(scaleValue(value) < getAlarmThreshhold()){
 				signal = value;
+				msSampleTime = System.currentTimeMillis()-lastSampleTime;
 				localTotal += getCurrent()*( msSampleTime/(60.0*60.0*1000.0));
 				//integral.add( value);
 			}else{
