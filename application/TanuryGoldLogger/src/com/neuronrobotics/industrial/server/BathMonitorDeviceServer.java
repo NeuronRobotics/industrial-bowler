@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.neuronrobotics.industrial.TanuryDataLogger;
@@ -92,19 +93,27 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		new Thread(){
 			double ioPoll =  300;
 			public void run(){
-				while(dyio.isAvailable()){
-					ThreadUtil.wait((int) ioPoll);
-					// Software lowpass, pull 100 values average them and push this up
-					double signalAvg = 0.0;
-					
-					for(int l=0; l<100; l++)
-						signalAvg = signalAvg+signalChannel.getValue();
-					signalAvg=signalAvg/100.0;
-					
-					Log.info("Avg Val:\t"+signalAvg);
-
-					onAnalogValueChange(signalChannel, signalAvg);
-					
+				while(true){
+					while(dyio.isAvailable()){
+						try{
+							ThreadUtil.wait((int) ioPoll);
+							// Software lowpass, pull 100 values average them and push this up
+							double signalAvg = 0.0;
+							
+							for(int l=0; l<100; l++)
+								signalAvg = signalAvg+signalChannel.getValue();
+							signalAvg=signalAvg/100.0;
+							
+							Log.info("Avg Val:\t"+signalAvg);
+		
+							onAnalogValueChange(signalChannel, signalAvg);
+						}catch(Exception e){
+							dyio.disconnect();
+							dyio.connect();
+						}
+					}
+					dyio.disconnect();
+					dyio.connect();
 				}
 			}
 		}.start();
@@ -132,7 +141,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																		getCurrent(),
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							//Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
 							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
 							
@@ -143,6 +152,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 								//This is where the daily total is reset at midnight
 								configuration.setDailyTotal(0);
 								localTotal=0;
+								Log.warning("Resetting the daily total "+localTotal+" ");
 							}
 							
 						}
@@ -169,7 +179,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		localTotal = configuration.getDailyTotal();
 		
 		Log.info("System ONLINE");
-		Log.enableDebugPrint();
+
 	}
 	
 	public double getCurrent(){
@@ -268,7 +278,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-		Log.enableDebugPrint();
+		Log.enableWarningPrint();
 		
 		Log.setUseColoredPrints(true);
 		
