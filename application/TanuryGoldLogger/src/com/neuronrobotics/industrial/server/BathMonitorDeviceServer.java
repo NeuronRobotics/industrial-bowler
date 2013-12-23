@@ -14,6 +14,7 @@ import com.neuronrobotics.sdk.commands.bcs.core.PingCommand;
 import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.BowlerDatagramFactory;
 import com.neuronrobotics.sdk.common.Log;
+import com.neuronrobotics.sdk.common.MACAddress;
 import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
@@ -43,6 +44,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private TanuryDataLogger logger = null;
 	private double localTotal=0;
 	private double lastSampleTime=-1;
+	private MACAddress mymac;
+	
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -71,7 +74,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				dyio.setMode(i, DyIOChannelMode.DIGITAL_OUT, false);
 			}
 		}
-		
+		setMymac(dyio.getAddress());
 		Log.info("Starting analog");
 		referenceVoltage = 	new AnalogInputChannel(dyio, 15);
 		otherVoltage	 = 	new AnalogInputChannel(dyio, 14);
@@ -124,7 +127,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		new Thread(){
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
-				while(dyio.isAvailable()){
+				while(true){
 					try{
 						double currentVal = scaleValue(signal);
 						
@@ -134,7 +137,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																	getCurrent(),
 																	getAlarmThreshhold());
 							logger.onAlarmEvenFire(ev);
-							pushAsyncPacket(ev.getPacket(dyio.getAddress()));
+							pushAsyncPacket(ev.getPacket(getMymac() ));
 							
 						}else{
 							
@@ -146,7 +149,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							logger.onValueChange(be, 0);
 							//Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
-							BowlerDatagram bd  = be.getPacket(dyio.getAddress());
+							BowlerDatagram bd  = be.getPacket(getMymac() );
 							
 							pushAsyncPacket(bd);
 							
@@ -165,8 +168,6 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 						ex.printStackTrace();
 					}
 				}
-				new RuntimeException("The main opperating thread died").printStackTrace();
-				System.exit(-1);
 			}
 		}.start();
 		
@@ -358,6 +359,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				}
 			}
 		}.start();
+	}
+
+	public MACAddress getMymac() {
+		if(mymac==null)
+			mymac=dyio.getAddress();
+		return mymac;
+	}
+
+	public void setMymac(MACAddress mymac) {
+		this.mymac = mymac;
 	}
 	
 }
