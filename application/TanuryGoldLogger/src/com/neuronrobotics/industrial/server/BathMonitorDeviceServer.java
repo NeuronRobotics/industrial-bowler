@@ -108,10 +108,13 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		
 							onAnalogValueChange(signalChannel, signalAvg);
 						}catch(Exception e){
+							e.printStackTrace();
+							Log.error("Exception in main loop, reconnecting");
 							dyio.disconnect();
 							dyio.connect();
 						}
 					}
+					Log.error("Main loop exiting, resetting");
 					dyio.disconnect();
 					dyio.connect();
 				}
