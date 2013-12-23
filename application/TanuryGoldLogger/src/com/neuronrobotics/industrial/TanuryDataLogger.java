@@ -108,9 +108,13 @@ public class TanuryDataLogger {
 
 			br.readLine();// read the formatting data at the top
 			while ((sCurrentLine = br.readLine()) != null) {
-				ev.setData(sCurrentLine);
-				if(ev.getTimestamp() == timestamp)
-					return true;
+				try{
+					ev.setData(sCurrentLine);
+					if(ev.getTimestamp() == timestamp)
+						return true;
+				}catch(Exception e){
+					e.printStackTrace();
+				}
 			}
  
 		} catch (IOException e) {

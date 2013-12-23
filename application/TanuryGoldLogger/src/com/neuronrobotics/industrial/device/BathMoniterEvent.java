@@ -48,12 +48,16 @@ public class BathMoniterEvent {
 	}
 	
 	public void setData(String sCurrentLine){
-		String [] data = sCurrentLine.toString().split(",");
-
-		this.setTotalUsedToday(Double.parseDouble(data[4]));
-		this.setBathName(data[3]);
-		this.setTimestamp(Long.parseLong(data[1]));
-		this.setCurrentOzHrRate(Double.parseDouble(data[5]));
+		try{
+			String [] data = sCurrentLine.toString().split(",");
+	
+			this.setTotalUsedToday(Double.parseDouble(data[4]));
+			this.setBathName(data[3]);
+			this.setTimestamp(Long.parseLong(data[1]));
+			this.setCurrentOzHrRate(Double.parseDouble(data[5]));
+		}catch (Exception e){
+			throw new RuntimeException("Data from log failed to parse '"+sCurrentLine+"'");
+		}
 	}
 
 	public BowlerDatagram getPacket(MACAddress mac) {
