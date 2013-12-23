@@ -41,9 +41,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private DeviceConfiguration configuration = null;
 	private TanuryDataLogger logger = null;
 	private double localTotal=0;
-	private double msSampleTime=300.0;
-	private double currentSensorValue;
-	private long lastSampleTime=-1;
+	private double lastSampleTime=-1;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -92,7 +90,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 		Log.info("Starting poll thread");
 		new Thread(){
-			double ioPoll =  msSampleTime;
+			double ioPoll =  300;
 			public void run(){
 				while(dyio.isAvailable()){
 					ThreadUtil.wait((int) ioPoll);
@@ -233,8 +231,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}if(chan == signalChannel){
 			if(scaleValue(value) < getAlarmThreshhold()){
 				signal = value;
-				msSampleTime = System.currentTimeMillis()-lastSampleTime;
-				localTotal += getCurrent()*( msSampleTime/(60.0*60.0*1000.0));
+				double msSample = ((double)System.currentTimeMillis())-lastSampleTime;
+				localTotal += getCurrent()*( msSample/(60.0*60.0*1000.0));
 				//integral.add( value);
 			}else{
 				//System.out.println("Curren val = "+scaleValue(value)+ " treshhold= "+getAlarmThreshhold());
