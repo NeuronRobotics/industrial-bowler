@@ -1,7 +1,9 @@
 package com.neuronrobotics.industrial.server;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,7 +47,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double localTotal=0;
 	private double lastSampleTime=-1;
 	private MACAddress mymac;
-	
+	private double currentVal;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -102,19 +104,21 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							ThreadUtil.wait((int) ioPoll);
 							// Software lowpass, pull 100 values average them and push this up
 							double signalAvg = 0.0;
-							
-							for(int l=0; l<100; l++)
+							int level = Log.getMinimumPrintLevel();
+							Log.enableDebugPrint();
+							for(int l=0; l<100; l++){
 								signalAvg = signalAvg+signalChannel.getValue();
-							signalAvg=signalAvg/100.0;
-							
+							}
+							signalAvg=signalAvg/100.0;							
 							Log.info("Avg Val:\t"+signalAvg);
+							Log.setMinimumPrintLevel(level);
 		
 							onAnalogValueChange(signalChannel, signalAvg);
+							currentVal = scaleValue(signal);
 						}catch(Exception e){
-							e.printStackTrace();
-							Log.error("Exception in main loop, reconnecting");
+							
+							Log.error("Exception in main loop, reconnecting "+e.getMessage());
 							dyio.disconnect();
-							dyio.connect();
 						}
 					}
 					Log.error("Main loop exiting, resetting");
@@ -125,11 +129,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}.start();
 		Log.info("Starting up stream thread");
 		new Thread(){
+			
+
 			public void run(){
 				ThreadUtil.wait((int) getPollingRate());
 				while(true){
 					try{
-						double currentVal = scaleValue(signal);
 						
 						if(currentVal > getAlarmThreshhold()){
 							BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
@@ -147,24 +152,28 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 																		getCurrent(),
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
-							//Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
 							BowlerDatagram bd  = be.getPacket(getMymac() );
 							
 							pushAsyncPacket(bd);
-							
+							cal = Calendar.getInstance();
 							if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
+								Log.warning("Resetting the daily total "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
 								//This is where the daily total is reset at midnight
 								configuration.setDailyTotal(0);
 								localTotal=0;
-								Log.warning("Resetting the daily total "+localTotal+" ");
+								
+							}else{
+								Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 							}
 							
 						}
 						Log.info("Voltage = "+getCurrent());
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
+						Log.error("Exception in main upstream thread "+ex.getMessage());
 						ex.printStackTrace();
 					}
 				}
@@ -199,8 +208,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	private double scaleValue(double in){
 		// get a fresh reference value
+		int level = Log.getMinimumPrintLevel();
+		Log.enableDebugPrint();
 		reference = referenceVoltage.getValue();
-
+		Log.setMinimumPrintLevel(level);
+		
 		// the adc can't discern the diff between the ref and the supply.
 		double scale = (2.5//Reference voltage actual volts
 				*1024.0)
@@ -282,7 +294,17 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-		Log.enableWarningPrint();
+		File l = new File("RobotLog"+".txt");
+		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
+		try {
+			PrintStream p =new PrintStream(l);
+			Log.setOutStream(new PrintStream(p));
+			Log.setErrStream(new PrintStream(p));						
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		Log.enableInfoPrint();
 		
 		Log.setUseColoredPrints(true);
 		
