@@ -90,13 +90,13 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 			startTime = new Long((long) event.getTimestamp()); 
 		try{
 			double total=0;
-			for(int i=0;i<list.size();i++){
-				if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
-					table.setValueAt(new Double(event.getScaledTotalUsedToday()).toString(), i, 1);
-				}
-				total+=new Double(table.getValueAt( i, 1).toString());
-			}
 			if((event.getTimestamp()-startTime)>1000){// one second of leeway
+				for(int i=0;i<list.size();i++){
+					if(table.getValueAt( i, 0).toString().contains(event.getBathName())){
+						table.setValueAt(new Double(event.getScaledTotalUsedToday()).toString(), i, 1);
+					}
+					total+=new Double(table.getValueAt( i, 1).toString());
+				}
 				textField_1.setText(new Double(total).toString());
 			}else{
 				//do not update display with old data
