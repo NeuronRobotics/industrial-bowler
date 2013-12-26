@@ -272,12 +272,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
-		getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
+		
 		if (startTime == null)
 			startTime = new Long((long) event.getTimestamp()); 
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
 
 		if((event.getTimestamp()-startTime)>1000){// one second of leeway
+			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
 			if(ozHour.getItemCount()>range){

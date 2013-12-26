@@ -32,7 +32,7 @@ public class TanuryNamespaceTest {
 		System.err.println("Connecting DyIO");
 		dyio.connect();
 		System.err.println("DyIO Connected");
-		new BathMonitorDeviceServer(dyio);
+		new BathMonitorDeviceServer(dyio, dyio.getAddress());
 	}
 	@Test
 	public void test() {

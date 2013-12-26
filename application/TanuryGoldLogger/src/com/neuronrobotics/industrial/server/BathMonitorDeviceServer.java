@@ -51,9 +51,86 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	static{
 		DyIO.disableFWCheck();
 	}
+	
+	
 
-	public BathMonitorDeviceServer(DyIO device) {
-		super(device.getAddress());
+	public BathMonitorDeviceServer(DyIO device, MACAddress addr) {
+		super(addr);
+		if(device!= null){
+			setupDevice(device);
+			
+		}else{
+			Log.error("No device connected");
+		}
+		Log.info("Starting up stream thread");
+		new Thread(){
+			
+
+			public void run(){
+				ThreadUtil.wait((int) getPollingRate());
+				while(true){
+					try{
+						
+						if(currentVal > getAlarmThreshhold()){
+							BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
+																	System.currentTimeMillis(), 
+																	currentVal,
+																	getAlarmThreshhold());
+							logger.onAlarmEvenFire(ev);
+							pushAsyncPacket(ev.getPacket(getMymac() ));
+							
+						}else{
+							
+							configuration.setDailyTotal(localTotal);
+							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
+																		System.currentTimeMillis(), 
+																		currentVal,
+																		localTotal/getScale());
+							logger.onValueChange(be, 0);
+							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
+					
+							BowlerDatagram bd  = be.getPacket(getMymac() );
+							
+							pushAsyncPacket(bd);
+							cal = Calendar.getInstance();
+							if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
+								Log.warning("Resetting the daily total "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
+								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
+								//This is where the daily total is reset at midnight
+								configuration.setDailyTotal(0);
+								localTotal=0;
+								
+							}else{
+								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
+							}
+							
+						}
+						Log.info("Voltage = "+currentVal);
+						ThreadUtil.wait((int) getPollingRate());
+					}catch(Exception ex){
+						Log.error("Exception in main upstream thread "+ex.getMessage());
+						ex.printStackTrace();
+					}
+				}
+			}
+		}.start();
+		
+		Log.info("Starting UDP");
+		try {
+			startNetworkServer();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		localTotal = configuration.getDailyTotal();
+		
+		Log.info("System ONLINE");
+
+	}
+	
+	private void setupDevice(DyIO device){
 		lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
 		Log.info("Starting configuration XML");
 		configuration = new DeviceConfiguration();
@@ -127,72 +204,6 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 				}
 			}
 		}.start();
-		Log.info("Starting up stream thread");
-		new Thread(){
-			
-
-			public void run(){
-				ThreadUtil.wait((int) getPollingRate());
-				while(true){
-					try{
-						
-						if(currentVal > getAlarmThreshhold()){
-							BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
-																	System.currentTimeMillis(), 
-																	currentVal,
-																	getAlarmThreshhold());
-							logger.onAlarmEvenFire(ev);
-							pushAsyncPacket(ev.getPacket(getMymac() ));
-							
-						}else{
-							
-							configuration.setDailyTotal(localTotal);
-							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
-																		System.currentTimeMillis(), 
-																		currentVal,
-																		localTotal/getScale());
-							logger.onValueChange(be, 0);
-							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
-					
-							BowlerDatagram bd  = be.getPacket(getMymac() );
-							
-							pushAsyncPacket(bd);
-							cal = Calendar.getInstance();
-							if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
-								Log.warning("Resetting the daily total "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
-								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
-								//This is where the daily total is reset at midnight
-								configuration.setDailyTotal(0);
-								localTotal=0;
-								
-							}else{
-								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
-							}
-							
-						}
-						Log.info("Voltage = "+currentVal);
-						ThreadUtil.wait((int) getPollingRate());
-					}catch(Exception ex){
-						Log.error("Exception in main upstream thread "+ex.getMessage());
-						ex.printStackTrace();
-					}
-				}
-			}
-		}.start();
-		
-		Log.info("Starting UDP");
-		try {
-			startNetworkServer();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		localTotal = configuration.getDailyTotal();
-		
-		Log.info("System ONLINE");
-
 	}
 	
 	public double getCurrent(){
@@ -270,46 +281,46 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SerialConnection con=null;
-		List<String> ports = SerialConnection.getAvailableSerialPorts();
-		for(String s:ports){
-			System.err.println(s);
-		}
-		if(args.length != 1){
-			System.err.println("No port specified, choosing first");
-			
-			if(ports.size() >0){
-				con = new SerialConnection(ports.get(0));
-			}else{
-				System.err.println("No port availible");
-				System.exit(1);
-			}
-		}else{
-			System.err.println("Using port: "+args[0]);
-			con  = new SerialConnection(args[0]);
-		}
-		DyIO.disableFWCheck();
-		DyIO dyio = new DyIO(con);
-		System.err.println("Connecting DyIO");
-		File l = new File("RobotLog"+".txt");
-		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
-		try {
-			PrintStream p =new PrintStream(l);
-			Log.setOutStream(new PrintStream(p));
-			Log.setErrStream(new PrintStream(p));						
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		
-		Log.enableInfoPrint();
-		
-		Log.setUseColoredPrints(true);
-		
-		dyio.connect();
-		
-		System.err.println("DyIO Connected");
-		
-		new BathMonitorDeviceServer(dyio);
+//		SerialConnection con=null;
+//		List<String> ports = SerialConnection.getAvailableSerialPorts();
+//		for(String s:ports){
+//			System.err.println(s);
+//		}
+//		if(args.length != 1){
+//			System.err.println("No port specified, choosing first");
+//			
+//			if(ports.size() >0){
+//				con = new SerialConnection(ports.get(0));
+//			}else{
+//				System.err.println("No port availible");
+//				System.exit(1);
+//			}
+//		}else{
+//			System.err.println("Using port: "+args[0]);
+//			con  = new SerialConnection(args[0]);
+//		}
+//		DyIO.disableFWCheck();
+//		DyIO dyio = new DyIO(con);
+//		System.err.println("Connecting DyIO");
+//		File l = new File("RobotLog"+".txt");
+//		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
+//		try {
+//			PrintStream p =new PrintStream(l);
+//			Log.setOutStream(new PrintStream(p));
+//			Log.setErrStream(new PrintStream(p));						
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+//		Log.enableInfoPrint();
+//		
+//		Log.setUseColoredPrints(true);
+//		
+//		dyio.connect();
+//		
+//		System.err.println("DyIO Connected");
+//		new BathMonitorDeviceServer(dyio. dyio.getAddress());
+		new BathMonitorDeviceServer(null,new MACAddress());
 	}
 
 	public String getDeviceName() {
