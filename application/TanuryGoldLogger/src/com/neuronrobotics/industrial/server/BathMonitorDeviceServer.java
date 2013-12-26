@@ -222,12 +222,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		reference = referenceVoltage.getValue();
 		
 		// the adc can't discern the diff between the ref and the supply.
-		double scale = (2.5//Reference voltage actual volts
+		double scale = (reference//Reference voltage
 				*1024.0)
 				/512;
 		double shunt=.001;//Ohms of shunt
-		double gain=33.0;
-		double pivotGain=gain*1.02;
+		double gain=32.64;
+		double pivotGain=gain*0.96;
 		
 		//double ampScale = (1.0/32.6)*0.8064*2* 0.5362349021241151;//Amp gain
 		/*
@@ -281,46 +281,46 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		SerialConnection con=null;
-//		List<String> ports = SerialConnection.getAvailableSerialPorts();
-//		for(String s:ports){
-//			System.err.println(s);
-//		}
-//		if(args.length != 1){
-//			System.err.println("No port specified, choosing first");
-//			
-//			if(ports.size() >0){
-//				con = new SerialConnection(ports.get(0));
-//			}else{
-//				System.err.println("No port availible");
-//				System.exit(1);
-//			}
-//		}else{
-//			System.err.println("Using port: "+args[0]);
-//			con  = new SerialConnection(args[0]);
-//		}
-//		DyIO.disableFWCheck();
-//		DyIO dyio = new DyIO(con);
-//		System.err.println("Connecting DyIO");
-//		File l = new File("RobotLog"+".txt");
-//		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
-//		try {
-//			PrintStream p =new PrintStream(l);
+		SerialConnection con=null;
+		List<String> ports = SerialConnection.getAvailableSerialPorts();
+		for(String s:ports){
+			System.err.println(s);
+		}
+		if(args.length != 1){
+			System.err.println("No port specified, choosing first");
+			
+			if(ports.size() >0){
+				con = new SerialConnection(ports.get(0));
+			}else{
+				System.err.println("No port availible");
+				System.exit(1);
+			}
+		}else{
+			System.err.println("Using port: "+args[0]);
+			con  = new SerialConnection(args[0]);
+		}
+		DyIO.disableFWCheck();
+		DyIO dyio = new DyIO(con);
+		System.err.println("Connecting DyIO");
+		File l = new File("RobotLog"+".txt");
+		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
+		try {
+			PrintStream p =new PrintStream(l);
 //			Log.setOutStream(new PrintStream(p));
 //			Log.setErrStream(new PrintStream(p));						
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		}
-//		
-//		Log.enableInfoPrint();
-//		
-//		Log.setUseColoredPrints(true);
-//		
-//		dyio.connect();
-//		
-//		System.err.println("DyIO Connected");
-//		new BathMonitorDeviceServer(dyio. dyio.getAddress());
-		new BathMonitorDeviceServer(null,new MACAddress());
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		Log.enableInfoPrint();
+		
+		Log.setUseColoredPrints(true);
+		
+		dyio.connect();
+		
+		System.err.println("DyIO Connected");
+		new BathMonitorDeviceServer(dyio, dyio.getAddress());
+		//new BathMonitorDeviceServer(null,new MACAddress());
 	}
 
 	public String getDeviceName() {
