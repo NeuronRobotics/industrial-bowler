@@ -33,6 +33,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 	private JTextField textField_1;
 	private ArrayList<BathMoniter> list;
 	private TanuryDataLogger log = new TanuryDataLogger("Log");
+	Long startTime=null;
 
 	public DashBoard(ArrayList<BathMoniter> list) {
 		this.list = list;
@@ -85,6 +86,8 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
+		if (startTime == null)
+			startTime = new Long((long) event.getTimestamp()); 
 		try{
 			double total=0;
 			for(int i=0;i<list.size();i++){
@@ -93,8 +96,11 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 				}
 				total+=new Double(table.getValueAt( i, 1).toString());
 			}
-			textField_1.setText(new Double(total).toString());
-			
+			if((event.getTimestamp()-startTime)>1000){// one second of leeway
+				textField_1.setText(new Double(total).toString());
+			}else{
+				//do not update display with old data
+			}
 			log.onValueChange(event, total);
 		}catch (Exception ex){}
 	}

@@ -111,10 +111,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							}
 							signalAvg=signalAvg/100.0;							
 							Log.info("Avg Val:\t"+signalAvg);
-							Log.setMinimumPrintLevel(level);
-		
 							onAnalogValueChange(signalChannel, signalAvg);
-							currentVal = scaleValue(signal);
+							currentVal = getCurrent();
+							
+							Log.setMinimumPrintLevel(level);
 						}catch(Exception e){
 							
 							Log.error("Exception in main loop, reconnecting "+e.getMessage());
@@ -139,7 +139,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 						if(currentVal > getAlarmThreshhold()){
 							BathAlarmEvent ev = new BathAlarmEvent(	getDeviceName(),
 																	System.currentTimeMillis(), 
-																	getCurrent(),
+																	currentVal,
 																	getAlarmThreshhold());
 							logger.onAlarmEvenFire(ev);
 							pushAsyncPacket(ev.getPacket(getMymac() ));
@@ -149,7 +149,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 							configuration.setDailyTotal(localTotal);
 							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
 																		System.currentTimeMillis(), 
-																		getCurrent(),
+																		currentVal,
 																		localTotal/getScale());
 							logger.onValueChange(be, 0);
 							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
@@ -166,11 +166,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 								localTotal=0;
 								
 							}else{
-								Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
+								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 							}
 							
 						}
-						Log.info("Voltage = "+getCurrent());
+						Log.info("Voltage = "+currentVal);
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
 						Log.error("Exception in main upstream thread "+ex.getMessage());
@@ -208,10 +208,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	
 	private double scaleValue(double in){
 		// get a fresh reference value
-		int level = Log.getMinimumPrintLevel();
-		Log.enableDebugPrint();
 		reference = referenceVoltage.getValue();
-		Log.setMinimumPrintLevel(level);
 		
 		// the adc can't discern the diff between the ref and the supply.
 		double scale = (2.5//Reference voltage actual volts

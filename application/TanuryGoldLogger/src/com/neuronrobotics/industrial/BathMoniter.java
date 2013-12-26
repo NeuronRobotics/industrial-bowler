@@ -283,12 +283,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			if(ozHour.getItemCount()>range){
 				ozHour.remove(0);
 			}
+			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
+					).toString());
 		}else{
 			System.err.println("Timestamp is old "+new Timestamp(event.getTimestamp())+", current is: "+new Timestamp(System.currentTimeMillis()));
 			System.err.println("Started at "+new Timestamp(startTime));
 		}
-		recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
-										).toString());
+		
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
 	}
