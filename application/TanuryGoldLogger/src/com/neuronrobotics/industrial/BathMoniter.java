@@ -295,7 +295,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
-			if(ozHour.getItemCount()>range){
+			if(ozHour.getItemCount()>range*2){
 				ozHour.remove(0);
 			}
 			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
