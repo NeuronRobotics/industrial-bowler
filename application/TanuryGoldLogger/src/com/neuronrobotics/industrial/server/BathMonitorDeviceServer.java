@@ -306,11 +306,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
 		File l = new File("RobotLog"+".txt");
-		//File e = new File("RobotError_"+getDate()+"_"+System.currentTimeMillis()+".txt");
 		try {
 			PrintStream p =new PrintStream(l);
-//			Log.setOutStream(new PrintStream(p));
-//			Log.setErrStream(new PrintStream(p));						
+			Log.setOutStream(new PrintStream(p));
+			Log.setErrStream(new PrintStream(p));						
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}

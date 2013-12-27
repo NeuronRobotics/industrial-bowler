@@ -124,7 +124,13 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		dashBoard.onValueChange(event);
-		frame.revalidate();
+		try{
+			frame.revalidate();
+		}catch(Error ex){
+			frame.invalidate();
+			frame.validate();
+		}// ignore on java 6
+		
 		frame.repaint();
 	}
 
