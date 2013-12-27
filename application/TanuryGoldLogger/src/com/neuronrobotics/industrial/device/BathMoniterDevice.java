@@ -154,5 +154,21 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				"logd",
 				new Object[]{numberOfDays});
 	}
+	
+	public double getAmpTune() {
+		Object[] args = send(	"tanury.bath.*",
+				BowlerMethod.GET,
+				"gtun",
+				new Object[]{});
+		return (Double)args[0];
+	}
+	
+	public void setAmpTune(double scale) {
+		Object[] args = new Object[]{scale};
+		send(	"tanury.bath.*",
+				BowlerMethod.POST,
+				"tune",
+				args);
+	}
 
 }

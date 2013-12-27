@@ -92,7 +92,20 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 				new BowlerDataType[]{BowlerDataType.I32},
 				BowlerMethod.POST, 
 				new BowlerDataType[]{}));
-		
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
+				getNamespace()  , 
+				"tune", 
+				BowlerMethod.POST, 
+				new BowlerDataType[]{BowlerDataType.FIXED1k},
+				BowlerMethod.STATUS, 
+				new BowlerDataType[]{}));
+		rpc.add(new RpcEncapsulation(getNamespaceIndex(), 
+				getNamespace()  , 
+				"gtun", 
+				BowlerMethod.GET, 
+				new BowlerDataType[]{},
+				BowlerMethod.POST, 
+				new BowlerDataType[]{BowlerDataType.FIXED1k}));
 		
 	}
 
@@ -133,6 +146,15 @@ public class TanuryBathNamespaceImp extends BowlerAbstractDeviceServerNamespace 
 		}if(rpc.contains("logd") && method == BowlerMethod.GET){
 			Object[] back = new Object[0];
 			bathMonitorDeviceServer.dumpLogs((Integer)data[0]);
+			return back;
+		}
+		
+		if(rpc.contains("tune") && method == BowlerMethod.POST){
+			Object[] back = new Object[0];
+			bathMonitorDeviceServer.setAmpTune((Double)data[0]);
+			return back;
+		}if(rpc.contains("gtun") && method == BowlerMethod.GET){
+			Object[] back = new Object[]{new Double(bathMonitorDeviceServer.getAmpTune())};
 			return back;
 		}
 		

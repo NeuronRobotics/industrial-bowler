@@ -97,6 +97,7 @@ public class DeviceConfiguration {
 		private double dailyTotal = 0;
 		private int secondsPolling = 30000;
 		private double alarmThreshhold = .6;
+		private double ampTuneValue = 1;
 		public double getScaleFactor() {
 			return scaleFactor;
 		}
@@ -129,6 +130,14 @@ public class DeviceConfiguration {
 
 		public void setAlarmThreshhold(double alarmThreshhold) {
 			this.alarmThreshhold = alarmThreshhold;
+		}
+
+		public double getAmpTuneValue() {
+			return ampTuneValue;
+		}
+
+		public void setAmpTuneValue(double ampTuneValue) {
+			this.ampTuneValue = ampTuneValue;
 		}
 		
 	}
@@ -167,6 +176,14 @@ public class DeviceConfiguration {
 
 	public void setAlarmThreshhold(double alarmThreshhold) {
 		data.setAlarmThreshhold(alarmThreshhold);
+		writeFile();
+	}
+	public double getAmpTuneValue() {
+		return data.getAmpTuneValue();
+	}
+
+	public void setAmpTuneValue(double ampTuneValue) {
+		data.setAmpTuneValue(ampTuneValue);
 		writeFile();
 	}
 	

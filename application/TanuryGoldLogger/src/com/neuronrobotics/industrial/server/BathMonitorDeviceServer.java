@@ -48,6 +48,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 	private double lastSampleTime=-1;
 	private MACAddress mymac;
 	private double currentVal;
+	private double ampTuneValue =1;
 	static{
 		DyIO.disableFWCheck();
 	}
@@ -125,6 +126,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		}
 		
 		localTotal = configuration.getDailyTotal();
+		ampTuneValue= configuration.getAmpTuneValue();
 		
 		Log.info("System ONLINE");
 
@@ -238,7 +240,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		
 		//if(calcVal>20)
 		//	calcVal = (((in/1024.0)*scale)*ampScaleHigh)/(i);*/
-		double vCorrect= (2.5/(reference*(5.0/1024.0)));
+		double vCorrect= (2.5/(reference*(5.0/1024.0)))*ampTuneValue;
+		//double vCorrect= (2.5/(reference*(5.0/1024.0)))*4;// bath 1 only
 		// a litttle bit of a pivot. gain drops off when we're below about 10mv
 		
 
@@ -399,6 +402,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 	public void setMymac(MACAddress mymac) {
 		this.mymac = mymac;
+	}
+
+	public void setAmpTune(Double double1) {
+		ampTuneValue=double1;
+		configuration.setAmpTuneValue(double1);
+	}
+
+	public double getAmpTune() {
+		// TODO Auto-generated method stub
+		return ampTuneValue=configuration.getAmpTuneValue();
 	}
 	
 }

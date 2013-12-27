@@ -63,6 +63,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private String units ="Amps";
 	
 	private int range = (60*24)/5;
+	private JTextField ampTuneData;
 	
 	public BathMoniter(BathMoniterDevice bath,String address){
 		this(address);
@@ -110,7 +111,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		});
 		
 		btnAlarm.setText(new Double(getBathDevice().getAlarmLevel()).toString());
-		//getBathDevice().dumpLogs(1);
+		ampTuneData.setText(new Double(getBathDevice().getAmpTune()).toString());
 		
 	}
 	
@@ -207,6 +208,19 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(lblClearDataFor, "cell 0 7,alignx trailing");
 		btnClear = new JButton("Clear");
 		Controls.add(btnClear, "cell 1 7");
+		
+		JLabel tuneAmp= new JLabel("Tune amplifier");
+		Controls.add(tuneAmp, "cell 0 8,alignx trailing");
+		ampTuneData = new JTextField();
+		ampTuneData.setColumns(10);
+		
+		ampTuneData.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				getBathDevice().setAmpTune(Double.parseDouble(ampTuneData.getText()));
+			}
+		});
+		Controls.add(ampTuneData, "cell 1 8");
 		
 		xyDataset = new XYSeriesCollection();
 
