@@ -28,7 +28,7 @@ import com.neuronrobotics.sdk.serial.SerialConnection;
 import com.neuronrobotics.sdk.util.RollingAverageFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
 
-public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAnalogInputListener{
+public class BathMonitorDeviceServer extends BowlerAbstractServer{
 	
 	private AnalogInputChannel referenceVoltage;
 	private AnalogInputChannel signalChannel;
@@ -177,21 +177,38 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 		new Thread(){
 			double ioPoll =  300;
 			public void run(){
+				long ts=-1;
+				double LastIntegral=0;
 				while(true){
 					while(dyio.isAvailable()){
 						try{
-							ThreadUtil.wait((int) ioPoll);
+							//ThreadUtil.wait((int) ioPoll);
 							// Software lowpass, pull 100 values average them and push this up
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
 							Log.enableDebugPrint();
 							for(int l=0; l<100; l++){
-								signalAvg = signalAvg+signalChannel.getValue();
+								signalAvg += signalChannel.getValue();
 							}
-							signalAvg=signalAvg/100.0;							
-							Log.info("Avg Val:\t"+signalAvg);
+							signalAvg /= 100.0;
 							onAnalogValueChange(signalChannel, signalAvg);
 							currentVal = getCurrent();
+							if (ts<0){
+								ts=System.currentTimeMillis();
+							}
+							double diffMs = (double)(System.currentTimeMillis()-ts);
+							double diffHours = diffMs/(60.0*60.0*1000.0);
+							double calcTotalDifference = localTotal-LastIntegral;
+							double ampHrIncrease = currentVal * diffHours;
+							ts=System.currentTimeMillis();
+							LastIntegral=localTotal;
+							
+							Log.debug(	"Avg Amps\t\t="+currentVal+"" +
+										"\nFor\t\t\t="+diffHours+ "hr "+diffMs+"ms"+
+										"\nAmp-hour difference\t="+calcTotalDifference+
+										"\nExpected\t\t="+ ampHrIncrease);
+							
+							
 							
 							Log.setMinimumPrintLevel(level);
 						}catch(Exception e){
@@ -256,9 +273,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 
 		return calcVal;
 	}
-	
-	@Override
-	public void onAnalogValueChange(AnalogInputChannel chan, double value) {
+
+	private void onAnalogValueChange(AnalogInputChannel chan, double value) {
 		
 		if(lastSampleTime<0){
 			lastSampleTime=System.currentTimeMillis();
@@ -269,7 +285,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer implements IAn
 			if(scaleValue(value) < getAlarmThreshhold()){
 				signal = value;
 				double msSample = ((double)System.currentTimeMillis())-lastSampleTime;
-				localTotal += getCurrent()*( msSample/(60.0*60.0*1000.0));
+				double current =getCurrent(); 
+				double hrSample = ( msSample/(60.0*60.0*1000.0));
+				double ampHrIncrease = current * hrSample;
+				Log.warning("Adding "+ampHrIncrease+" amp-hours "+msSample);
+				localTotal += ampHrIncrease;
+				lastSampleTime=System.currentTimeMillis();
 				//integral.add( value);
 			}else{
 				//System.out.println("Curren val = "+scaleValue(value)+ " treshhold= "+getAlarmThreshhold());
