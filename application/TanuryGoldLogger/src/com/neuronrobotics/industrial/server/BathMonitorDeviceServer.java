@@ -203,7 +203,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							ts=System.currentTimeMillis();
 							LastIntegral=localTotal;
 							
-							Log.debug(	"Avg Amps\t\t="+currentVal+"" +
+							Log.info(	"Avg Amps\t\t="+currentVal+"" +
 										"\nFor\t\t\t="+diffHours+ "hr "+diffMs+"ms"+
 										"\nAmp-hour difference\t="+calcTotalDifference+
 										"\nExpected\t\t="+ ampHrIncrease);
@@ -288,7 +288,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 				double current =getCurrent(); 
 				double hrSample = ( msSample/(60.0*60.0*1000.0));
 				double ampHrIncrease = current * hrSample;
-				Log.warning("Adding "+ampHrIncrease+" amp-hours "+msSample);
+				Log.info("Adding "+ampHrIncrease+" amp-hours "+msSample);
 				localTotal += ampHrIncrease;
 				lastSampleTime=System.currentTimeMillis();
 				//integral.add( value);
