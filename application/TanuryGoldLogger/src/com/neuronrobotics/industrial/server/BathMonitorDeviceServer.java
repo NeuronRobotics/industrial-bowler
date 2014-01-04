@@ -175,7 +175,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 
 		Log.info("Starting poll thread");
 		new Thread(){
-			double ioPoll =  300;
+			double ioPoll =  50;
 			public void run(){
 				long ts=-1;
 				double LastIntegral=0;
@@ -187,10 +187,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
 							Log.enableDebugPrint();
-							for(int l=0; l<100; l++){
+							for(int l=0; l<ioPoll; l++){
 								signalAvg += signalChannel.getValue();
 							}
-							signalAvg /= 100.0;
+							signalAvg /= ioPoll;
 							onAnalogValueChange(signalChannel, signalAvg);
 							currentVal = getCurrent();
 							if (ts<0){
@@ -282,7 +282,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		if(chan == referenceVoltage){
 			reference =  value;
 		}if(chan == signalChannel){
-			if(scaleValue(value) < getAlarmThreshhold()){
+			double scaled = scaleValue(value);
+			if(scaled<.9)
+				scaled=0;
+			if(scaled < getAlarmThreshhold()){
 				signal = value;
 				double msSample = ((double)System.currentTimeMillis())-lastSampleTime;
 				double current =getCurrent(); 
