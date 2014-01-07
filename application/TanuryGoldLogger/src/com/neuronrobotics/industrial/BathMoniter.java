@@ -19,6 +19,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.Log;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -112,7 +113,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		btnAlarm.setText(new Double(getBathDevice().getAlarmLevel()).toString());
 		ampTuneData.setText(new Double(getBathDevice().getAmpTune()).toString());
-		
+		startTime = System.currentTimeMillis();
 	}
 	
 	private double getScaleValue(){
@@ -287,11 +288,13 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		
-		if (startTime == null)
+		if (startTime == null){
 			startTime = new Long((long) event.getTimestamp()); 
+			Log.warning("Start time was null");
+		}
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
 
-		if((event.getTimestamp()-startTime)>1000){// one second of leeway
+		if((event.getTimestamp()-startTime)>1){// one second of leeway
 			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
@@ -301,8 +304,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 					).toString());
 		}else{
-			System.err.println("Timestamp is old "+new Timestamp(event.getTimestamp())+", current is: "+new Timestamp(System.currentTimeMillis()));
-			System.err.println("Started at "+new Timestamp(startTime));
+			Log.error("Timestamp is old "+new Timestamp(event.getTimestamp())+", current is: "+new Timestamp(System.currentTimeMillis()));
+			Log.error("Started at "+new Timestamp(startTime));
 		}
 		
 		if(mainWindow!=null)

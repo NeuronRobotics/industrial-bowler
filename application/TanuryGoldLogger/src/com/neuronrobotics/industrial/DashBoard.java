@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.Log;
 
 public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
@@ -68,7 +69,7 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 		
 		add(textField_1, "cell 0 2,growx");
 		textField_1.setColumns(10);
-	
+		startTime = System.currentTimeMillis();
 	}
 
 
@@ -86,8 +87,10 @@ public class DashBoard extends JPanel implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
-		if (startTime == null)
-			startTime = new Long((long) event.getTimestamp()); 
+		if (startTime == null){
+			startTime = new Long((long) event.getTimestamp());
+			Log.warning("Start time was null");
+		}
 		try{
 			double total=0;
 			if((event.getTimestamp()-startTime)>1000){// one second of leeway
