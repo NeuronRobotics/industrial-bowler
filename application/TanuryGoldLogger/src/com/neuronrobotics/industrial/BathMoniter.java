@@ -1,7 +1,10 @@
 package com.neuronrobotics.industrial;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -42,11 +45,11 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JFreeChart chart;
 	private JLabel lblName;
 	private JLabel lblAmphourcurrent;
-	private JTextField recentCurrentRating;
+	private JLabel recentCurrentRating;
 	private JLabel lblAmphourToOz;
 	private JTextField textFieldScale;
 	private JLabel lblTotalOzdaily;
-	private JTextField recentTotal;
+	private JLabel recentTotal;
 	private JLabel lblSampleRate;
 	private JTextField PollingRateTextField;
 	private JLabel lblClearDataFor;
@@ -79,6 +82,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		PollingRateTextField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				PollingRateTextField.setBackground(Color.green);
 				int rate =Integer.parseInt(PollingRateTextField.getText());
 				if(rate<30)
 					rate = 30;
@@ -91,6 +95,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		textFieldScale.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				textFieldScale.setBackground(Color.green);
 				getBathDevice().setScale(getScaleValue());
 			}
 		});
@@ -133,6 +138,21 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(lblName, "cell 0 0,alignx trailing");
 		
 		txtbathName = new JTextField();
+		txtbathName.setBackground(Color.green);
+		txtbathName.addFocusListener(new FocusListener()
+		{
+			@Override
+		    public void focusGained(FocusEvent fe)
+		    {
+		    	fe.getComponent().setBackground(Color.red);
+		    }
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		Controls.add(txtbathName, "cell 1 0,growx");
 		txtbathName.setColumns(10);
 		txtbathName.addActionListener(new ActionListener() {
@@ -140,15 +160,32 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			public void actionPerformed(ActionEvent arg0) {
 				String newName = txtbathName.getText();
 				updateName(newName);
+				txtbathName.setBackground(Color.green);
 			}
 		});
 		
 		lblAlarm=new JLabel("Alarm Level ("+units+")");;
 		btnAlarm = new JTextField();
+		btnAlarm.setBackground(Color.green);
 		btnAlarm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				getBathDevice().setAlarmLevel(Double.parseDouble(btnAlarm.getText()));
+				btnAlarm.setBackground(Color.green);
+			}
+		});
+		btnAlarm.addFocusListener(new FocusListener()
+		{
+			@Override
+		    public void focusGained(FocusEvent fe)
+		    {
+		    	fe.getComponent().setBackground(Color.red);
+		    }
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Controls.add(lblAlarm, "cell 0 1,alignx trailing");
@@ -157,15 +194,30 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		lblAmphourcurrent = new JLabel(""+units+" (Recent)");
 		Controls.add(lblAmphourcurrent, "cell 0 2,alignx trailing");
 		
-		setRecentCurrentRating(new JTextField());
+		setRecentCurrentRating(new JLabel());
 		getRecentCurrentRating().setText("<value>");
 		Controls.add(getRecentCurrentRating(), "cell 1 2,growx");
-		getRecentCurrentRating().setColumns(10);
+		//getRecentCurrentRating().setColumns(10);
 		
 		lblAmphourToOz = new JLabel("Amp-Hour to Oz. Scale");
 		Controls.add(lblAmphourToOz, "cell 0 3,alignx trailing");
 		
 		textFieldScale = new JTextField();
+		textFieldScale.setBackground(Color.green);
+		textFieldScale.addFocusListener(new FocusListener()
+		{
+			@Override
+		    public void focusGained(FocusEvent fe)
+		    {
+		    	fe.getComponent().setBackground(Color.red);
+		    }
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		textFieldScale.setText("<value>");
 		Controls.add(textFieldScale, "cell 1 3,growx");
 		textFieldScale.setColumns(10);
@@ -173,15 +225,30 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
 		Controls.add(lblTotalOzdaily, "cell 0 4,alignx trailing");
 		
-		recentTotal = new JTextField();
+		recentTotal = new JLabel();
 		recentTotal.setText("<value>");
 		Controls.add(recentTotal, "cell 1 4,growx");
-		recentTotal.setColumns(10);
+		//recentTotal.setColumns(10);
 		
 		lblSampleRate = new JLabel("Sample Rate");
 		Controls.add(lblSampleRate, "cell 0 5,alignx trailing");
 		
 		PollingRateTextField = new JTextField();
+		PollingRateTextField.setBackground(Color.green);
+		PollingRateTextField.addFocusListener(new FocusListener()
+		{
+			@Override
+		    public void focusGained(FocusEvent fe)
+		    {
+		    	fe.getComponent().setBackground(Color.red);
+		    }
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		PollingRateTextField.setText("<time in seconds>");
 		Controls.add(PollingRateTextField, "cell 1 5,growx");
 		PollingRateTextField.setColumns(10);
@@ -271,11 +338,11 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		this.dyio = dyio;
 	}
 
-	public JTextField getRecentCurrentRating() {
+	public JLabel getRecentCurrentRating() {
 		return recentCurrentRating;
 	}
 
-	public void setRecentCurrentRating(JTextField recentCurrentRating) {
+	public void setRecentCurrentRating(JLabel recentCurrentRating) {
 		this.recentCurrentRating = recentCurrentRating;
 	}
 
