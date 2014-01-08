@@ -83,6 +83,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				PollingRateTextField.setBackground(Color.green);
+				PollingRateTextField.setFocusable(false);
+				PollingRateTextField.setFocusable(true);
 				int rate =Integer.parseInt(PollingRateTextField.getText());
 				if(rate<30)
 					rate = 30;
@@ -96,6 +98,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				textFieldScale.setBackground(Color.green);
+				textFieldScale.setFocusable(false);
+				textFieldScale.setFocusable(true);
 				getBathDevice().setScale(getScaleValue());
 			}
 		});
@@ -161,6 +165,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 				String newName = txtbathName.getText();
 				updateName(newName);
 				txtbathName.setBackground(Color.green);
+				txtbathName.setFocusable(false);
+				txtbathName.setFocusable(true);
 			}
 		});
 		
@@ -172,6 +178,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			public void actionPerformed(ActionEvent arg0) {
 				getBathDevice().setAlarmLevel(Double.parseDouble(btnAlarm.getText()));
 				btnAlarm.setBackground(Color.green);
+				btnAlarm.setFocusable(false);
+				btnAlarm.setFocusable(true);
 			}
 		});
 		btnAlarm.addFocusListener(new FocusListener()
