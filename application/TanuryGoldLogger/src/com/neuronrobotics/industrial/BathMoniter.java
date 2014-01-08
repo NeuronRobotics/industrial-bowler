@@ -5,8 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
@@ -53,6 +52,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JLabel lblSampleRate;
 	private JTextField PollingRateTextField;
 	private JLabel lblClearDataFor;
+	private JLabel packetTimeStamp;
 	private JButton btnClear;
 	private JComboBox howMuchData;
 	
@@ -290,6 +290,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		});
 		Controls.add(ampTuneData, "cell 1 8");
 		
+		Controls.add(new JLabel("Timestamp Of Last Packet"), "cell 0 9,alignx trailing");
+		packetTimeStamp = new JLabel("<date>");
+		Controls.add(packetTimeStamp, "cell 1 9");
+		
 		xyDataset = new XYSeriesCollection();
 
 		chart = ChartFactory.createXYLineChart(
@@ -360,7 +364,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			Log.warning("Start time was null");
 		}
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
-
+		// no matter wate, update teh timestamp
+		packetTimeStamp.setText(new Date(event.getTimestamp()).toString());
 		if((event.getTimestamp()-startTime)>1){// one second of leeway
 			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
@@ -371,8 +376,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 					).toString());
 		}else{
-			Log.error("Timestamp is old "+new Timestamp(event.getTimestamp())+", current is: "+new Timestamp(System.currentTimeMillis()));
-			Log.error("Started at "+new Timestamp(startTime));
+			Log.error("Timestamp is old "+new Date(event.getTimestamp())+", current is: "+new Date(System.currentTimeMillis()));
+			Log.error("Started at "+new Date(startTime));
 		}
 		
 		if(mainWindow!=null)

@@ -1,18 +1,15 @@
 package com.neuronrobotics.industrial.device;
 
+import java.util.Date;
+
 import com.neuronrobotics.industrial.BathMoniter;
 import com.neuronrobotics.industrial.IBathMoniterUpdateListener;
 import com.neuronrobotics.sdk.common.BowlerAbstractDevice;
 import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.BowlerMethod;
 import com.neuronrobotics.sdk.common.DeviceConnectionException;
-import com.neuronrobotics.sdk.dyio.DyIO;
-import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
-import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
-import com.neuronrobotics.sdk.dyio.sequencer.ISchedulerListener;
+import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.network.BowlerTCPClient;
-import com.neuronrobotics.sdk.network.BowlerUDPClient;
-import com.neuronrobotics.sdk.util.ThreadUtil;
 
 public class BathMoniterDevice extends BowlerAbstractDevice{
 	
@@ -53,7 +50,7 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 			BathMoniterEvent be = new BathMoniterEvent(data);
 			
 			if(getBathMoniter() !=null){
-				System.out.println("ASYNC << "+be+"\n"+data);
+				Log.warning(new Date(System.currentTimeMillis())+"\nASYNC << "+be+"\n"+data);
 				
 				getBathMoniter().onValueChange(be);
 			}
