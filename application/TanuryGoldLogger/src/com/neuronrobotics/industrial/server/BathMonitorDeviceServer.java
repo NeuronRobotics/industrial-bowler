@@ -145,7 +145,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		
 		
 		dyio=device;
-		dyio.getConnection().setSynchronusPacketTimeoutTime(1000);
+		dyio.getConnection().setSynchronusPacketTimeoutTime(500);
 		Log.info("Resetting Inputs");
 		for (int i=0;i<24;i++){
 			if(	i!=12 &&
@@ -187,6 +187,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
 							Log.enableDebugPrint();
+							//dyio.getConnection().reconnect();
 							for(int l=0; l<ioPoll; l++){
 								signalAvg += signalChannel.getValue();
 							}
