@@ -374,7 +374,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
 		// no matter wate, update teh timestamp
 		packetTimeStamp.setText(new Date(event.getTimestamp()).toString());
-		if((event.getTimestamp()-startTime)>1){// one second of leeway
+		if((event.getTimestamp()-startTime-(300*60*1000))>1){// one second of leeway
 			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
