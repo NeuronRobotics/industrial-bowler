@@ -145,7 +145,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		
 		
 		dyio=device;
-		dyio.getConnection().setSynchronusPacketTimeoutTime(750);
+		dyio.getConnection().setSynchronusPacketTimeoutTime(1750);
 		Log.info("Resetting Inputs");
 		for (int i=0;i<24;i++){
 			if(	i!=12 &&
