@@ -15,8 +15,11 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import antlr.collections.List;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterDevice;
@@ -54,7 +57,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private JLabel lblClearDataFor;
 	private JLabel packetTimeStamp;
 	private JButton btnClear;
-	private JComboBox howMuchData;
+	private JComboBox<String> howMuchData;
 	
 	private JLabel lblAlarm;
 	private JTextField btnAlarm;
@@ -263,7 +266,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		
 		
-		howMuchData = new JComboBox();
+		howMuchData = new JComboBox<String>();
 		howMuchData.addItem("All Data");
 		howMuchData.addItem("Last Day");
 		Controls.add(howMuchData, "cell 0 6,alignx trailing");
@@ -363,7 +366,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		if(mainWindow!=null)
 			mainWindow.onNameChange(newName);
 	}
-
+	private double oldest=0;
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
 		
@@ -372,20 +375,41 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 			Log.warning("Start time was null");
 		}
 		double timestamp = ((double)(event.getTimestamp()-startTime))/(1000.0*60) ;
+		if(timestamp<oldest)
+			oldest=timestamp;
 		// no matter wate, update teh timestamp
 		packetTimeStamp.setText(new Date(event.getTimestamp()).toString());
-		if((event.getTimestamp()-startTime-(300*60*1000))>1){// one second of leeway
+		if((event.getTimestamp()-startTime+(300*60*1000))>1){// one second of leeway
 			getRecentCurrentRating().setText(new Double(event.getCurrentOzHrRate()).toString());
 			ozHour.add( timestamp , 
 							event.getCurrentOzHrRate()); 
+
 			if(ozHour.getItemCount()>range*2){
-				ozHour.remove(0);
+				@SuppressWarnings("unchecked")
+				java.util.List<XYDataItem> items = ozHour.getItems();
+				for(int i=0;i<ozHour.getItemCount();i++){
+					if (items.get(i).getXValue()==oldest){
+						ozHour.remove(i);
+						break;
+					}
+				}
+				
+				for(int i=0;i<ozHour.getItemCount();i++){
+					double val = items.get(i).getXValue();
+					if (val<oldest){
+						oldest = val;
+						Log.warning("New oldest packet "+oldest+" " +items.get(i));
+					}
+				}
+
+				
 			}
 			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
 					).toString());
 		}else{
-			Log.error("Timestamp is old "+new Date(event.getTimestamp())+", current is: "+new Date(System.currentTimeMillis()));
-			Log.error("Started at "+new Date(startTime));
+			Log.error(	"Timestamp is old "+new Date(event.getTimestamp())+"\n" +
+						"current is:      "+new Date(System.currentTimeMillis())+"\n" +
+						"Started at       "+new Date(startTime));
 		}
 		
 		if(mainWindow!=null)
