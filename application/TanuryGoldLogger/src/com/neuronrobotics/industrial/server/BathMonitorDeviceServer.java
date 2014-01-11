@@ -182,7 +182,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 				while(true){
 					while(dyio.isAvailable()){
 						try{
-							//ThreadUtil.wait((int) ioPoll);
+							ThreadUtil.wait(1000);
+							BowlerDatagramFactory.setPacketTimeout(dyio.getConnection().getSleepTime());
 							// Software lowpass, pull 100 values average them and push this up
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
@@ -271,7 +272,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		
 	//System.out.println("raw:\t"+in+"\tref:"+reference+"\tcalc:\t"+calcVal+"\tgain:\t"+gain);
 	
-
+		if(calcVal<1.0)
+			calcVal=0;
 		return calcVal;
 	}
 
@@ -284,8 +286,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 			reference =  value;
 		}if(chan == signalChannel){
 			double scaled = scaleValue(value);
-			if(scaled<.9)
-				scaled=0;
+			
 			if(scaled < getAlarmThreshhold()){
 				signal = value;
 				double msSample = ((double)System.currentTimeMillis())-lastSampleTime;
@@ -339,7 +340,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 			e1.printStackTrace();
 		}
 		
-		Log.enableInfoPrint();
+		Log.enableDebugPrint();
 		
 		Log.setUseColoredPrints(true);
 		
