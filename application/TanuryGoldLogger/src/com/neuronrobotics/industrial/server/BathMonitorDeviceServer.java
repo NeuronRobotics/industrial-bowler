@@ -37,7 +37,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 	private double reference;
 	private double signal;
 	private RollingAverageFilter integral; 
-	private int lastPacketDay=0;
+	private Calendar lastPacketDay=null;
 	private Calendar cal = Calendar.getInstance();
 	
 	private DyIO dyio;
@@ -94,15 +94,20 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							
 							pushAsyncPacket(bd);
 							cal = Calendar.getInstance();
-							if(lastPacketDay != cal.get(Calendar.DAY_OF_MONTH)){
+							if(lastPacketDay.get(Calendar.DAY_OF_MONTH) != cal.get(Calendar.DAY_OF_MONTH)){
 								Log.warning("Resetting the daily total "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
-								lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
+								lastPacketDay = cal;
 								//This is where the daily total is reset at midnight
 								configuration.setDailyTotal(0);
 								localTotal=0;
 								
 							}else{
 								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
+							}
+							if(cal.get(Calendar.HOUR_OF_DAY) ==5 && lastPacketDay.get(Calendar.HOUR_OF_DAY) ==4){
+								Log.error("Exiting system");
+								ThreadUtil.wait(1000);
+								System.exit(0);
 							}
 							
 						}
@@ -133,7 +138,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 	}
 	
 	private void setupDevice(DyIO device){
-		lastPacketDay = cal.get(Calendar.DAY_OF_MONTH);
+		lastPacketDay =  Calendar.getInstance();
 		Log.info("Starting configuration XML");
 		configuration = new DeviceConfiguration();
 		Log.info("Starting logger");
