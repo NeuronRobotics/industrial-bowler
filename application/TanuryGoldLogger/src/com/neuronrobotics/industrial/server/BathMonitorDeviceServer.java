@@ -104,9 +104,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							}else{
 								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 							}
-							if(cal.get(Calendar.HOUR_OF_DAY) ==5 && lastPacketDay.get(Calendar.HOUR_OF_DAY) ==4){
+							if(cal.get(Calendar.HOUR_OF_DAY) ==5 && cal.get(Calendar.MINUTE) == 0 ){
 								Log.error("Exiting system");
-								ThreadUtil.wait(1000);
+								ThreadUtil.wait(60000);
 								System.exit(0);
 							}
 							
