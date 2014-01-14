@@ -221,17 +221,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 						}catch(Exception e){
 							
 							Log.error("Exception in main loop, reconnecting "+e.getMessage());
-							dyio.disconnect();
+							try {
+								dyio.getConnection().reconnect();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
 					}
 					Log.error("Main loop exiting, resetting");
-					try {
-						dyio.getConnection().reconnect();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.exit(-1);
-					}
+
+					System.exit(-1);
+					
 				}
 			}
 		}.start();
