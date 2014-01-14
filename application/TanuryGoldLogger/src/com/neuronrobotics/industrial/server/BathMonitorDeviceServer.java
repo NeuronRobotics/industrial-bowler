@@ -104,11 +104,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							}else{
 								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 							}
-							if(cal.get(Calendar.HOUR_OF_DAY) ==5 && cal.get(Calendar.MINUTE) == 0 ){
-								Log.error("Exiting system");
-								ThreadUtil.wait(60000);
-								System.exit(0);
-							}
+
 							
 						}
 						Log.info("Voltage = "+currentVal);
@@ -218,6 +214,12 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							
 							
 							Log.setMinimumPrintLevel(level);
+							Calendar c = Calendar.getInstance();
+							if(c.get(Calendar.HOUR_OF_DAY) ==5 && c.get(Calendar.MINUTE) == 0 ){
+								Log.error("Exiting system");
+								ThreadUtil.wait(60000);
+								System.exit(0);
+							}
 						}catch(Exception e){
 							
 							Log.error("Exception in main loop, reconnecting "+e.getMessage());
