@@ -188,7 +188,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							// Software lowpass, pull 100 values average them and push this up
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
-							Log.enableDebugPrint();
+							//Log.enableDebugPrint();
 							//dyio.getConnection().reconnect();
 							for(int l=0; l<ioPoll; l++){
 								signalAvg += signalChannel.getValue();
@@ -344,16 +344,16 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-		File l = new File("RobotLog"+".txt");
-		try {
-			PrintStream p =new PrintStream(l);
-			Log.setOutStream(new PrintStream(p));
-			Log.setErrStream(new PrintStream(p));						
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		
-		Log.enableDebugPrint();
+//		File l = new File("RobotLog"+".txt");
+//		try {
+//			PrintStream p =new PrintStream(l);
+//			Log.setOutStream(new PrintStream(p));
+//			Log.setErrStream(new PrintStream(p));						
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+		Log.enableErrorPrint();
 		
 		Log.setUseColoredPrints(true);
 		
