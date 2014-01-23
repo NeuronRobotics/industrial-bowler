@@ -28,6 +28,7 @@ import com.neuronrobotics.sdk.common.Log;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -35,6 +36,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
+	private JTabbedPane tabedControl = new JTabbedPane();
 	private XYSeries ozHour = new XYSeries("Amps/Minutes");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
@@ -138,7 +140,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		setLayout(new MigLayout("", "[grow][]", "[grow][]"));
 		
 		JPanel Controls = new JPanel();
-		add(Controls, "cell 0 0,grow");
+		
 		Controls.setLayout(new MigLayout("", "[grow][grow]", "[][][][][][grow]"));
 		
 		lblName = new JLabel(address+" Name");
@@ -233,12 +235,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		Controls.add(textFieldScale, "cell 1 3,growx");
 		textFieldScale.setColumns(10);
 		
-		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
-		Controls.add(lblTotalOzdaily, "cell 0 4,alignx trailing");
 		
-		recentTotal = new JLabel();
-		recentTotal.setText("<value>");
-		Controls.add(recentTotal, "cell 1 4,growx");
 		//recentTotal.setColumns(10);
 		
 		lblSampleRate = new JLabel("Sample Rate");
@@ -317,12 +314,25 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 				false, 
 				false);
 		
+		JPanel localChart = new JPanel(new MigLayout());
 		chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(600, 250));
+		
+		localChart.add(chartPanel, "cell 0 0,growx");
+		
+		lblTotalOzdaily = new JLabel("Total Oz. (Daily)");
+		localChart.add(lblTotalOzdaily, "cell 0 1,alignx trailing");
+		
+		recentTotal = new JLabel();
+		recentTotal.setText("<value>");
+		localChart.add(recentTotal, "cell 0 1,growx");
 
 		xyDataset.addSeries(ozHour);
 		
-		add(chartPanel, "cell 0 1,grow");
+		tabedControl.addTab("Data", localChart);
+		tabedControl.addTab("Control", Controls);
+		
+		add(tabedControl);
 		XYPlot plot = (XYPlot) chart.getPlot();
 		ValueAxis axis = plot.getDomainAxis();
 		axis.setFixedAutoRange(range);
