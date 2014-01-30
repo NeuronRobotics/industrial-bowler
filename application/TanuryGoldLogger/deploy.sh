@@ -3,8 +3,11 @@
 #ssh-keygen -t dsa
 HOME=$PWD
 
-cd $HOME
+cd ../../../java-bowler/javasdk/NRSDK/
+ant
 
+cd $HOME
+cp $NRSDK/target/nrsdk-3.9.1-jar-with-dependencies.jar lib/; 
 
 #build the sources
 if ant; then

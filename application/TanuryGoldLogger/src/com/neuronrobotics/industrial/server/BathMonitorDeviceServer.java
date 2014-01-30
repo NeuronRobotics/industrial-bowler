@@ -111,7 +111,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 						ThreadUtil.wait((int) getPollingRate());
 					}catch(Exception ex){
 						Log.error("Exception in main upstream thread "+ex.getMessage());
-						ex.printStackTrace();
+						Log.error("Main loop exiting, resetting");
+
+						System.exit(-1);
 					}
 				}
 			}
@@ -215,20 +217,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							
 							Log.setMinimumPrintLevel(level);
 							Calendar c = Calendar.getInstance();
-							if(c.get(Calendar.HOUR_OF_DAY) ==5 && c.get(Calendar.MINUTE) == 0 ){
-								Log.error("Exiting system");
+							if(		(c.get(Calendar.HOUR_OF_DAY) ==5 && c.get(Calendar.MINUTE) == 0) ||
+									(c.get(Calendar.HOUR_OF_DAY) ==12 && c.get(Calendar.MINUTE) == 15)){
+								Log.error("Controlled Exiting system");
 								ThreadUtil.wait(60000);
 								System.exit(0);
 							}
 						}catch(Exception e){
 							
 							Log.error("Exception in main loop, reconnecting "+e.getMessage());
-							try {
-								dyio.getConnection().reconnect();
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
+							Log.error("Main loop exiting, resetting");
+
+							System.exit(-1);
 						}
 					}
 					Log.error("Main loop exiting, resetting");
@@ -344,22 +344,22 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		DyIO.disableFWCheck();
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-//		File l = new File("RobotLog"+".txt");
-//		try {
-//			PrintStream p =new PrintStream(l);
-//			Log.setOutStream(new PrintStream(p));
-//			Log.setErrStream(new PrintStream(p));						
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		}
+		File l = new File("RobotLog"+".txt");
+		try {
+			PrintStream p =new PrintStream(l);
+			Log.setOutStream(new PrintStream(p));
+			Log.setErrStream(new PrintStream(p));						
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 //		
-		Log.enableErrorPrint();
+		Log.enableDebugPrint();
 		
 		Log.setUseColoredPrints(true);
 		
 		dyio.connect();
 		
-		System.err.println("DyIO Connected");
+		System.out.println("DyIO Connected");
 		new BathMonitorDeviceServer(dyio, dyio.getAddress());
 		//new BathMonitorDeviceServer(null,new MACAddress());
 	}
