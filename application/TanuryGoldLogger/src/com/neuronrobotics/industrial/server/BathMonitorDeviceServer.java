@@ -183,10 +183,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 				long ts=-1;
 				double LastIntegral=0;
 				while(true){
+					BowlerDatagramFactory.setPacketTimeout(dyio.getConnection().getSleepTime());
 					while(dyio.isAvailable()){
 						try{
-							ThreadUtil.wait(1000);
-							BowlerDatagramFactory.setPacketTimeout(dyio.getConnection().getSleepTime());
+							ThreadUtil.wait(1);
+							
 							// Software lowpass, pull 100 values average them and push this up
 							double signalAvg = 0.0;
 							int level = Log.getMinimumPrintLevel();
@@ -217,8 +218,9 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							
 							Log.setMinimumPrintLevel(level);
 							Calendar c = Calendar.getInstance();
-							if(		(c.get(Calendar.HOUR_OF_DAY) ==5 && c.get(Calendar.MINUTE) == 0) ||
-									(c.get(Calendar.HOUR_OF_DAY) ==12 && c.get(Calendar.MINUTE) == 15)){
+							if(		(c.get(Calendar.HOUR_OF_DAY) ==5 && c.get(Calendar.MINUTE) == 0) 
+									//||(c.get(Calendar.HOUR_OF_DAY) ==12 && c.get(Calendar.MINUTE) == 15)
+									){
 								Log.error("Controlled Exiting system");
 								ThreadUtil.wait(60000);
 								System.exit(0);
