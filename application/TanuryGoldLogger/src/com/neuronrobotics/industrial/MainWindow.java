@@ -99,21 +99,37 @@ public class MainWindow implements IBathMoniterUpdateListener{
 		alarm = new AlarmAccount();
 		tabbedPane.removeAll();
 		tabbedPane.addTab("Dash Board",dashBoard);
+		JPanel bathPanel = new JPanel(new MigLayout());
+		tabbedPane.addTab("Bath Panels", null, bathPanel, null);
+		int i=0;
 		for(BathMoniter b:list){
-			tabbedPane.addTab(b.getName(), null, b, null);
-			b.setMainWindow(this);
+			int x,y;
+			if(i%2>0)
+				x=1;
+			else
+				x=0;
+			y=i/2;
+			bathPanel.add( b, "cell "+x+" "+y+",growx");
+			i++;
 		}
 		tabbedPane.addTab("Alarm Notifications",alarm );
-		dashBoard.updateTableData();
 		updateTabData();
 	}
 	
 	public void updateTabData(){
 		int totalTabs = tabbedPane.getTabCount();
 		for(int i = 1; i < totalTabs-1; i++){
-		   tabbedPane.setTitleAt(i, list.get(i-1).getName());
+		   //tabbedPane.setTitleAt(i, list.get(i-1).getName());
 		}
 		dashBoard.updateTableData();
+		try{
+			frame.revalidate();
+		}catch(Error ex){
+			frame.invalidate();
+			frame.validate();
+		}// ignore on java 6
+		
+		frame.repaint();
 	}
 
 	@Override
