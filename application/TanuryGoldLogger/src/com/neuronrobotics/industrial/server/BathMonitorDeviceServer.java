@@ -82,11 +82,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							
 						}else{
 							
-							configuration.setDailyTotal(localTotal);
+							configuration.setDailyTotal(getLocalTotal());
 							BathMoniterEvent be = new BathMoniterEvent(	getDeviceName(), 
 																		System.currentTimeMillis(), 
 																		currentVal,
-																		localTotal/getScale());
+																		getLocalTotal()/getScale());
 							logger.onValueChange(be, 0);
 							Log.info("Pushing time "+new Timestamp(be.getTimestamp())+" recorded at "+TanuryDataLogger.getDate(be.getTimestamp()));
 					
@@ -95,11 +95,11 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							pushAsyncPacket(bd);
 							cal = Calendar.getInstance();
 							if(lastPacketDay.get(Calendar.DAY_OF_MONTH) != cal.get(Calendar.DAY_OF_MONTH)){
-								Log.warning("Resetting the daily total "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
+								Log.warning("Resetting the daily total "+getLocalTotal()+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
 								lastPacketDay = cal;
 								//This is where the daily total is reset at midnight
 								configuration.setDailyTotal(0);
-								localTotal=0;
+								setLocalTotal(0);
 								
 							}else{
 								//Log.debug("Today is the same, no reset "+localTotal+" was "+lastPacketDay+" is "+cal.get(Calendar.DAY_OF_MONTH));
@@ -128,7 +128,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 			System.exit(1);
 		}
 		
-		localTotal = configuration.getDailyTotal();
+		setLocalTotal(configuration.getDailyTotal());
 		ampTuneValue= configuration.getAmpTuneValue();
 		
 		Log.info("System ONLINE");
@@ -157,6 +157,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 				i!=15	){
 				dyio.setMode(i, DyIOChannelMode.DIGITAL_OUT, false);
 			}
+			dyio.getChannel(i).setAsync(false);
 		}
 		setMymac(dyio.getAddress());
 		Log.info("Starting analog");
@@ -204,10 +205,10 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 							}
 							double diffMs = (double)(System.currentTimeMillis()-ts);
 							double diffHours = diffMs/(60.0*60.0*1000.0);
-							double calcTotalDifference = localTotal-LastIntegral;
+							double calcTotalDifference = getLocalTotal()-LastIntegral;
 							double ampHrIncrease = currentVal * diffHours;
 							ts=System.currentTimeMillis();
-							LastIntegral=localTotal;
+							LastIntegral=getLocalTotal();
 							
 							Log.info(	"Avg Amps\t\t="+currentVal+"" +
 										"\nFor\t\t\t="+diffHours+ "hr "+diffMs+"ms"+
@@ -222,6 +223,8 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 									//||(c.get(Calendar.HOUR_OF_DAY) ==12 && c.get(Calendar.MINUTE) == 15)
 									){
 								Log.error("Controlled Exiting system");
+								configuration.setDailyTotal(0);
+								setLocalTotal(0);
 								ThreadUtil.wait(60000);
 								System.exit(0);
 							}
@@ -309,7 +312,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 				double hrSample = ( msSample/(60.0*60.0*1000.0));
 				double ampHrIncrease = current * hrSample;
 				Log.info("Adding "+ampHrIncrease+" amp-hours "+msSample);
-				localTotal += ampHrIncrease;
+				setLocalTotal(getLocalTotal() + ampHrIncrease);
 				lastSampleTime=System.currentTimeMillis();
 				//integral.add( value);
 			}else{
@@ -397,7 +400,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 
 	public void clearData() {
 		configuration.setDailyTotal(0);
-		localTotal=0;
+		setLocalTotal(0);
 		logger.clearData(name);
 	}
 	
@@ -452,6 +455,14 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 	public double getAmpTune() {
 		// TODO Auto-generated method stub
 		return ampTuneValue=configuration.getAmpTuneValue();
+	}
+
+	public double getLocalTotal() {
+		return localTotal;
+	}
+
+	public void setLocalTotal(double localTotal) {
+		this.localTotal = localTotal;
 	}
 	
 }

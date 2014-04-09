@@ -7,8 +7,9 @@ else
 	echo "[tanuryMonitor]\tStarting Bath Monitor" | wall
 	echo "[tanuryMonitor] Uh Oh.. I don't see the logger... Starting logger."
 	now=$(date +"%Y-%m-%d-%H:%M:%S")
-	java -jar /TanuryDeviceServer.jar >/var/log/Tanury/tanury$now 2>&1 &
-	ln -sf tanury$now /var/log/Tanury/tanury.current
+	rm -rf /var/log/Tanury/tanury*
+	java -jar /TanuryDeviceServer.jar >/var/log/Tanury/tanury.current 2>&1 &
+	#ln -sf tanury$now /var/log/Tanury/tanury.current
 	sleep 10
 	if ps -ef | grep -v grep | grep java ; then
 		logger "  Logger is back!"

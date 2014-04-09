@@ -1,13 +1,24 @@
 
 #Do this if you have not set up the ssh keys
 #ssh-keygen -t dsa
+
+java -jar FindDevices.jar
 HOME=$PWD
 
-cd ../../../java-bowler/javasdk/NRSDK/
-ant
+NRSDK=../../../java-bowler/javasdk/NRSDK/
+NR_JAR=$NRSDK/target/nrsdk-*-jar-with-dependencies.jar
+
+cd $NRSDK
+#ant
 
 cd $HOME
-cp $NRSDK/target/nrsdk-3.9.1-jar-with-dependencies.jar lib/; 
+rm -rf lib/nrsdk-*-jar-with-dependencies.jar
+if (test -e $NR_JAR ); then
+	cp $NR_JAR lib/; 
+else 
+	echo no jar at $NR_JAR
+	exit 1;
+fi
 
 #build the sources
 if ant; then

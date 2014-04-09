@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import com.neuronrobotics.sdk.common.Log;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
@@ -107,6 +108,7 @@ public class DeviceConfiguration {
 		}
 
 		public double getDailyTotal() {
+			
 			return dailyTotal;
 		}
 
@@ -152,6 +154,10 @@ public class DeviceConfiguration {
 	}
 	
 	public double getDailyTotal() {
+		if(Double.isNaN(data.getDailyTotal())){
+			Log.error("The bath total was not a number");
+			setDailyTotal(0);
+		}
 		return data.getDailyTotal();
 	}
 
