@@ -1,0 +1,41 @@
+
+Starting Nmap 6.40 ( http://nmap.org ) at 2014-05-08 14:43 EDT
+Nmap scan report for 192.168.100.1
+Host is up (0.0018s latency).
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 5.4 (protocol 2.0)
+
+Nmap scan report for 192.168.100.156
+Host is up (0.00033s latency).
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.40%I=7%D=5/8%Time=536BD047%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.2p2\x20Ubuntu-6ubuntu0\.1\r\n");
+
+Nmap scan report for 192.168.100.186
+Host is up (0.00039s latency).
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.40%I=7%D=5/8%Time=536BD047%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.2p2\x20Ubuntu-6ubuntu0\.1\r\n");
+
+Nmap scan report for 192.168.100.199
+Host is up (0.00017s latency).
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.40%I=7%D=5/8%Time=536BD047%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.2p2\x20Ubuntu-6ubuntu0\.1\r\n");
+
+Nmap scan report for 192.168.100.200
+Host is up (0.00075s latency).
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.40%I=7%D=5/8%Time=536BD047%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.2p2\x20Ubuntu-6ubuntu0\.1\r\n");
+
+Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 256 IP addresses (24 hosts up) scanned in 11.78 seconds

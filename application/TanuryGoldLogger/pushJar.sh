@@ -19,6 +19,12 @@ do
 	scp tanuryCron.sh root@$VAR:/
 	scp tanuryCronStatus.sh root@$VAR:/
 	
+	scp rcS root@$VAR:/etc/default/
+	
+	scp grub root@$VAR:/etc/default/
+	ssh root@$VAR 'touch /boot/grub/menu.lst'
+	ssh root@$VAR 'update-grub'
+	
 	#ssh root@$VAR 'ntptime;rpi-update'
 	#ssh root@$VAR 'mount -o remount,ro /'
 
