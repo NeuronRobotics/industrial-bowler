@@ -25,52 +25,36 @@ import com.neuronrobotics.jniloader.OpenCVJNILoader;
 import com.neuronrobotics.jniloader.ProcessingPipeline;
 import com.neuronrobotics.jniloader.RGBColorDetector;
 import com.neuronrobotics.jniloader.WhiteBlobDetect;
+import com.neuronrobotics.replicator.driver.DeltaForgeDevice;
+import com.neuronrobotics.sdk.addons.kinematics.math.RotationNR;
+import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR;
+import com.neuronrobotics.sdk.serial.SerialConnection;
 
 public class PopUpMain  {
-	private HSVSlider upperThreshhold;
-	private HSVSlider lowerThreshhold;
 	private ProcessingPipeline pipe = new ProcessingPipeline();
-	
+	ArrayList<ImageIcon> iconsCaptured = new ArrayList<ImageIcon>();
+	ArrayList<ImageIcon> iconsProcessed = new ArrayList<ImageIcon>();
 	public void run() {
-		//FaceDetector faceDetectorObject = new FaceDetector(0);
+
 		Mat inputImage= new Mat();
 		Mat displayImage= new Mat();
 		JFrame frame = new JFrame();
-//		JFrame controlFrame= new JFrame();
-//		controlFrame.setSize(640, 580);
-//		controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		
+
 		JTabbedPane  tabs = new JTabbedPane();
 		frame .setContentPane(tabs);
 		frame.setSize(640, 580);
 		frame.setVisible(true);
 		frame .setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		ArrayList<ImageIcon> iconsCaptured = new ArrayList<ImageIcon>();
-		ArrayList<ImageIcon> iconsProcessed = new ArrayList<ImageIcon>();
-		
-		Scalar upper =new Scalar(30, 150, 0, 0);
-		Scalar lower =new Scalar(240, 166, 0, 0);
-		
-		Scalar upper1 =new Scalar(360, 255, 255, 0);
-		Scalar lower1 =new Scalar(240, 0, 0, 0);
-		
-		JPanel sliders = new JPanel(new MigLayout());
-		sliders.add(new JLabel("Threshhold 1"));
-		sliders.add(upperThreshhold, "wrap");
-		sliders.add(new JLabel("Threshhold 2"));
-		sliders.add(lowerThreshhold, "wrap");
-//		controlFrame.setContentPane(sliders);
-//		controlFrame.setVisible(true);
-		
-		//tabs.addTab("Controls ",sliders);
+		DeltaForgeDevice delt = new DeltaForgeDevice();
+		delt.setConnection(new SerialConnection("/dev/BowlerDevice.74F726000000"));		
+		delt.connect();
+
 		
 		pipe.addAbstractImageProvider(new OpenCVImageProvider(0));
 		pipe.getLatestImage(0,inputImage,displayImage);
 		
-		//detectors.add(new WhiteBlobDetect((int) upper.val[0],(int) upper.val[1], lower));
-		pipe.addDetector(new HaarDetector(HaarDetector.class.getResource("haarcascades/haarcascade_mcs_upperbody.xml")));
+		//pipe.addDetector(new HaarDetector(HaarDetector.class.getResource("haarcascades/haarcascade_mcs_upperbody.xml")));
 		pipe.addDetector(new HaarDetector());
 		int x=0;
 		for (int j=0;j<pipe.getProviderSize();j++){
@@ -100,8 +84,18 @@ public class PopUpMain  {
 				for (int j=0;j<pipe.getDetectorSize();j++){
 					KeyPoint [] data = pipe.getObjects(j,inputImage, displayImage);
 					iconsProcessed.get(j+(i*j)).setImage(AbstractImageProvider.matToBufferedImage(displayImage));
-					//System.out.println("Got: "+data.length);
 					
+					if(data.length>0){
+						double size = ((data[0].size-75)/125)*90-45;
+						System.out.println("Size= "+size);
+						
+						TransformNR current = new TransformNR(	size,
+																(data[0].pt.y/480.0)*90-45,
+																(data[0].pt.x/640.0)*300+50,
+																new RotationNR());
+						
+						delt.sendLinearSection(current, 0, 0,true);
+					}
 				}
 				frame.repaint();
 			}
