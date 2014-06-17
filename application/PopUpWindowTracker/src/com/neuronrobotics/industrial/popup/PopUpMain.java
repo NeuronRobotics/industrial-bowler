@@ -21,7 +21,7 @@ import com.neuronrobotics.jniloader.OpenCVJNILoader;
 import com.neuronrobotics.jniloader.RGBColorDetector;
 import com.neuronrobotics.jniloader.WhiteBlobDetect;
 
-public class OpenCVTest implements IOnSlider {
+public class PopUpMain implements IOnSlider {
 	private HSVSlider upperThreshhold;
 	private HSVSlider lowerThreshhold;
 	private ArrayList<IObjectDetector> detectors;
@@ -153,7 +153,7 @@ public class OpenCVTest implements IOnSlider {
 	public static void main(String[] args) {
 		OpenCVJNILoader.load();
         
-        new OpenCVTest().run();
+        new PopUpMain().run();
 	}
 
 	@Override
