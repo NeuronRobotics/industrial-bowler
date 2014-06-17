@@ -1,5 +1,6 @@
 package com.neuronrobotics.industrial.popup;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -12,6 +13,8 @@ import net.miginfocom.swing.MigLayout;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.features2d.KeyPoint;
+
 import com.neuronrobotics.jniloader.AbstractImageProvider;
 import com.neuronrobotics.jniloader.HSVSlider;
 import com.neuronrobotics.jniloader.HaarDetector;
@@ -19,22 +22,23 @@ import com.neuronrobotics.jniloader.IObjectDetector;
 import com.neuronrobotics.jniloader.IOnSlider;
 import com.neuronrobotics.jniloader.OpenCVImageProvider;
 import com.neuronrobotics.jniloader.OpenCVJNILoader;
+import com.neuronrobotics.jniloader.ProcessingPipeline;
 import com.neuronrobotics.jniloader.RGBColorDetector;
 import com.neuronrobotics.jniloader.WhiteBlobDetect;
 
-public class PopUpMain implements IOnSlider {
+public class PopUpMain  {
 	private HSVSlider upperThreshhold;
 	private HSVSlider lowerThreshhold;
-	private ArrayList<IObjectDetector> detectors;
+	private ProcessingPipeline pipe = new ProcessingPipeline();
 	
 	public void run() {
 		//FaceDetector faceDetectorObject = new FaceDetector(0);
 		Mat inputImage= new Mat();
 		Mat displayImage= new Mat();
 		JFrame frame = new JFrame();
-		JFrame controlFrame= new JFrame();
-		controlFrame.setSize(640, 580);
-		controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		JFrame controlFrame= new JFrame();
+//		controlFrame.setSize(640, 580);
+//		controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
 		JTabbedPane  tabs = new JTabbedPane();
@@ -42,8 +46,7 @@ public class PopUpMain implements IOnSlider {
 		frame.setSize(640, 580);
 		frame.setVisible(true);
 		frame .setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		detectors = new ArrayList<IObjectDetector>();
-		ArrayList<AbstractImageProvider> imageProviders = new ArrayList<AbstractImageProvider>();
+		
 		ArrayList<ImageIcon> iconsCaptured = new ArrayList<ImageIcon>();
 		ArrayList<ImageIcon> iconsProcessed = new ArrayList<ImageIcon>();
 		
@@ -54,36 +57,34 @@ public class PopUpMain implements IOnSlider {
 		Scalar lower1 =new Scalar(240, 0, 0, 0);
 		
 		JPanel sliders = new JPanel(new MigLayout());
-		upperThreshhold = new HSVSlider(this,lower,upper);
-		lowerThreshhold = new HSVSlider(this,lower1,upper1);
 		sliders.add(new JLabel("Threshhold 1"));
 		sliders.add(upperThreshhold, "wrap");
 		sliders.add(new JLabel("Threshhold 2"));
 		sliders.add(lowerThreshhold, "wrap");
-		controlFrame.setContentPane(sliders);
-		controlFrame.setVisible(true);
+//		controlFrame.setContentPane(sliders);
+//		controlFrame.setVisible(true);
 		
 		//tabs.addTab("Controls ",sliders);
 		
-		imageProviders.add(new OpenCVImageProvider(0));
-		imageProviders.get(0).getLatestImage(inputImage,displayImage);
+		pipe.addAbstractImageProvider(new OpenCVImageProvider(0));
+		pipe.getLatestImage(0,inputImage,displayImage);
 		
 		//detectors.add(new WhiteBlobDetect((int) upper.val[0],(int) upper.val[1], lower));
-		detectors.add(new HaarDetector(HaarDetector.class.getResource("haarcascades/haarcascade_mcs_upperbody.xml")));
-		detectors.add(new HaarDetector());
+		pipe.addDetector(new HaarDetector(HaarDetector.class.getResource("haarcascades/haarcascade_mcs_upperbody.xml")));
+		pipe.addDetector(new HaarDetector());
 		int x=0;
-		for (AbstractImageProvider img:imageProviders){
-			img.getLatestImage(inputImage,displayImage);
+		for (int j=0;j<pipe.getProviderSize();j++){
 			
-			ImageIcon tmp = new ImageIcon(img.getLatestImage());
+			BufferedImage tmpImage =pipe.getLatestImage(j,inputImage,displayImage);
+			
+			ImageIcon tmp = new ImageIcon(tmpImage);
 			iconsCaptured.add(tmp);
 			
 			tabs.addTab("Camera "+x, new JLabel(tmp));
-			
-			
-			for (int i=0;i<detectors.size();i++){
-				detectors.get(i).getObjects(inputImage, displayImage);
-				ImageIcon ptmp = new ImageIcon(img.getLatestImage());
+
+			for (int i=0;i<pipe.getDetectorSize();i++){
+				pipe.getObjects(i,inputImage, displayImage);
+				ImageIcon ptmp = new ImageIcon(tmpImage);
 				iconsProcessed.add(ptmp);
 				tabs.addTab("Processed "+x+"."+i, new JLabel(ptmp));
 			}
@@ -92,14 +93,13 @@ public class PopUpMain implements IOnSlider {
 		
 		while (true){
 
-			for (int i=0;i< imageProviders.size();i++){
-				imageProviders.get(i).getLatestImage(inputImage,displayImage);
+			for (int i=0;i< pipe.getProviderSize();i++){
+				pipe.getLatestImage(i,inputImage,displayImage);
 				iconsCaptured.get(i).setImage(AbstractImageProvider.matToBufferedImage(inputImage));
 //				
-				for (int j=0;j<detectors.size();j++){
-					Rect [] data = detectors.get(j).getObjects(inputImage, displayImage);
-					iconsProcessed.get(i*j).setImage(AbstractImageProvider.matToBufferedImage(displayImage));	
-					
+				for (int j=0;j<pipe.getDetectorSize();j++){
+					KeyPoint [] data = pipe.getObjects(j,inputImage, displayImage);
+					iconsProcessed.get(j+(i*j)).setImage(AbstractImageProvider.matToBufferedImage(displayImage));
 					//System.out.println("Got: "+data.length);
 					
 				}
@@ -120,17 +120,6 @@ public class PopUpMain implements IOnSlider {
         new PopUpMain().run();
 	}
 
-	@Override
-	public void onSlider(HSVSlider source, Scalar upper, Scalar lower) {
-		if(source == upperThreshhold){
-			detectors.get(0).setThreshhold(lower, upper);
-			System.out.println("First threshholds, Upper: "+upper+" Lower: "+lower);
-		}
-		if(source == lowerThreshhold){
-			detectors.get(0).setThreshhold2(lower, upper);
-			System.out.println("Second threshholds, Upper: "+upper+" Lower: "+lower);
-		}
-	}
 
 
 }
