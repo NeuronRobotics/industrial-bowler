@@ -14,6 +14,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import com.neuronrobotics.jniloader.AbstractImageProvider;
 import com.neuronrobotics.jniloader.HSVSlider;
+import com.neuronrobotics.jniloader.HaarDetector;
 import com.neuronrobotics.jniloader.IObjectDetector;
 import com.neuronrobotics.jniloader.IOnSlider;
 import com.neuronrobotics.jniloader.OpenCVImageProvider;
@@ -25,8 +26,7 @@ public class PopUpMain implements IOnSlider {
 	private HSVSlider upperThreshhold;
 	private HSVSlider lowerThreshhold;
 	private ArrayList<IObjectDetector> detectors;
-	private RGBColorDetector mainFilter;
-
+	
 	public void run() {
 		//FaceDetector faceDetectorObject = new FaceDetector(0);
 		Mat inputImage= new Mat();
@@ -68,45 +68,9 @@ public class PopUpMain implements IOnSlider {
 		imageProviders.add(new OpenCVImageProvider(0));
 		imageProviders.get(0).getLatestImage(inputImage,displayImage);
 		
-		mainFilter = new RGBColorDetector(inputImage, 
-				lower,
-				upper, 
-				lower1, 
-				upper1);
-
-		
-		//detectors.add(mainFilter);
-		detectors.add(new WhiteBlobDetect((int) upper.val[0],(int) upper.val[1], lower));
-		
-		
-		
-		//Pink tennis ball
-		// First threshholds, Upper: [232.0, 163.0, 255.0, 0.0] Lower: [139.0, 0.0, 0.0, 0.0]
-		
-		//Red hockey puck
-		//First threshholds, Upper: [360.0, 255.0, 255.0, 0.0] Lower: [114.0, 133.0, 0.0, 0.0]
-		
-		//White
-		
-
-
-
-//		detectors.add(new ColorDetector(inputImage, 
-//				new Scalar(200, 200, 200, 0),
-//				new Scalar(255, 255, 255, 0), 
-//				new Scalar(255, 255, 50, 0), 
-//				new Scalar(255, 255, 255, 0)));
-
-//		detectors.add(new ColorDetector(inputImage, 
-//										new Scalar(200, 200, 200, 0),
-//										new Scalar(255, 255, 255, 0), 
-//										new Scalar(50, 255, 255, 0), 
-//										new Scalar(255, 255, 255, 0)));
-//		detectors.add(new ColorDetector(inputImage, 
-//										new Scalar(200, 200, 200, 0),
-//										new Scalar(255, 255, 255, 0), 
-//										new Scalar(50, 255, 255, 0), 
-//										new Scalar(255, 255, 255, 0)));
+		//detectors.add(new WhiteBlobDetect((int) upper.val[0],(int) upper.val[1], lower));
+		detectors.add(new HaarDetector(HaarDetector.class.getResource("haarcascades/haarcascade_mcs_upperbody.xml")));
+		detectors.add(new HaarDetector());
 		int x=0;
 		for (AbstractImageProvider img:imageProviders){
 			img.getLatestImage(inputImage,displayImage);
