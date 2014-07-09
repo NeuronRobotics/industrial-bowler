@@ -290,7 +290,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		
 	//System.out.println("raw:\t"+in+"\tref:"+reference+"\tcalc:\t"+calcVal+"\tgain:\t"+gain);
 	
-		if(calcVal<1.0)
+		if(calcVal<2.0)
 			calcVal=0;
 		return calcVal;
 	}
