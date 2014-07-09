@@ -28,7 +28,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 
 	private JFrame frame;
 	private ArrayList<BathMoniter> list;
-	private DashBoard dashBoard;
+	//private DashBoard dashBoard;
 	private AlarmAccount alarm;
 	private JTabbedPane tabbedPane;
 	private JOptionPane pane = new JOptionPane(null, JOptionPane.ERROR_MESSAGE);
@@ -95,10 +95,10 @@ public class MainWindow implements IBathMoniterUpdateListener{
 				
 		list = BathMoniterFactory.getBathMoniterList();
 
-		dashBoard = new DashBoard(list);
+		//dashBoard = new DashBoard(list);
 		alarm = new AlarmAccount();
 		tabbedPane.removeAll();
-		tabbedPane.addTab("Dash Board",dashBoard);
+		//tabbedPane.addTab("Dash Board",dashBoard);
 		JPanel bathPanel = new JPanel(new MigLayout());
 		tabbedPane.addTab("Bath Panels", null, bathPanel, null);
 		int i=0;
@@ -121,7 +121,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 		for(int i = 1; i < totalTabs-1; i++){
 		   //tabbedPane.setTitleAt(i, list.get(i-1).getName());
 		}
-		dashBoard.updateTableData();
+		//dashBoard.updateTableData();
 		try{
 			frame.revalidate();
 		}catch(Error ex){
@@ -139,26 +139,22 @@ public class MainWindow implements IBathMoniterUpdateListener{
 
 	@Override
 	public void onValueChange(BathMoniterEvent event) {
-		dashBoard.onValueChange(event);
-		try{
-			frame.revalidate();
-		}catch(Error ex){
+		//dashBoard.onValueChange(event);
+
 			frame.invalidate();
 			frame.validate();
-		}// ignore on java 6
-		
 		frame.repaint();
 	}
 
 
 	@Override
 	public void onClearData() {
-		dashBoard.onClearData();
+		//dashBoard.onClearData();
 	}
 
 	@Override
 	public void onAlarmEvenFire(final BathAlarmEvent ev) {
-		dashBoard.onAlarmEvenFire(ev);
+		//dashBoard.onAlarmEvenFire(ev);
 		if(dialog.isShowing()){
 			System.out.println("Dialog already open");
 			return;

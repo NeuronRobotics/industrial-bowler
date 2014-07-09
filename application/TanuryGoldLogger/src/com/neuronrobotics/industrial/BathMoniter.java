@@ -40,6 +40,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	private XYSeries ozHour = new XYSeries("Amps/Minutes");
 	private XYSeriesCollection xyDataset;
 	private ChartPanel chartPanel;
+	private TanuryDataLogger log = new TanuryDataLogger("Log");
 	/**
 	 * 
 	 */
@@ -73,6 +74,9 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	
 	private int range = (60*24)/5;
 	private JTextField ampTuneData;
+	
+	private JTextField textField = new JTextField();
+	
 	
 	public BathMoniter(BathMoniterDevice bath,String address){
 		this(address);
@@ -128,6 +132,10 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		btnAlarm.setText(new Double(getBathDevice().getAlarmLevel()).toString());
 		ampTuneData.setText(new Double(getBathDevice().getAmpTune()).toString());
 		startTime = System.currentTimeMillis();
+
+		
+		add(textField, "cell 0 1,growx");
+		textField.setColumns(10);
 	}
 	
 	private double getScaleValue(){
@@ -424,6 +432,8 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
+		textField.setText(log.getFileName(getName(),System.currentTimeMillis()));
+		log.onValueChange(event, event.getScaledTotalUsedToday());
 	}
 
 
@@ -437,6 +447,7 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 	public void onAlarmEvenFire(BathAlarmEvent ev) {
 		if(mainWindow!=null)
 			mainWindow.onAlarmEvenFire(ev);
+		log.onAlarmEvenFire(ev);
 	}
 	
 

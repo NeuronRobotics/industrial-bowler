@@ -14,6 +14,7 @@ import java.util.Date;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.Log;
 
 public class TanuryDataLogger {
 	private String dataHeader = "Date,Timestamp,Total Troy Oz,Bath Name,Bath Total,Raw Current,TYPE,<Alarm Threshhold>\n";
@@ -50,13 +51,24 @@ public class TanuryDataLogger {
 		Timestamp t = new Timestamp(ts);
 		return t.toString().split("\\ ")[0];
 	}
+	public String getOsName() {	
+		return System.getProperty("os.name");
+	}
+	
+	public boolean isWindows() {
+		////System.out.println("OS name: "+getOsName());
+		return getOsName().toLowerCase().startsWith("windows") ||getOsName().toLowerCase().startsWith("microsoft") || getOsName().toLowerCase().startsWith("ms");
+	}
 	
 	private String getRoot(){
-		return System.getProperty("user.home")+"/Tanury/"+subDir+"/";
+		String slash="/";
+		if(isWindows())
+			slash="\\";
+		return System.getProperty("user.home")+slash+"Tanury"+slash+subDir+slash;
 	}
 	
 	public String getFileName(String bath, long timestamp){
-		String tmp = getRoot()+"/Tanury-Logs-"+getDate(timestamp)+"-"+bath+".csv";
+		String tmp = getRoot()+"Tanury-Logs-"+getDate(timestamp)+"-"+bath+".csv";
 		for (String s: filesAccessed)
 			if(tmp.contains(s))
 				return s;
@@ -83,6 +95,7 @@ public class TanuryDataLogger {
 			
 		}
 		String filenameLocal = getFileName(bathName,timestamp);
+		Log.error("Writing to "+filenameLocal);
 		if(!logContainsTimestamp(timestamp,filenameLocal)){
 			try {
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filenameLocal, true)));
