@@ -25,14 +25,16 @@ import com.neuronrobotics.jniloader.OpenCVJNILoader;
 import com.neuronrobotics.jniloader.ProcessingPipeline;
 import com.neuronrobotics.jniloader.RGBColorDetector;
 import com.neuronrobotics.jniloader.WhiteBlobDetect;
-import com.neuronrobotics.replicator.driver.DeltaForgeDevice;
+import com.neuronrobotics.replicator.driver.BowlerBoardDevice;
 import com.neuronrobotics.sdk.addons.kinematics.math.RotationNR;
 import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR;
+import com.neuronrobotics.sdk.dyio.DyIO;
+import com.neuronrobotics.sdk.dyio.peripherals.ServoChannel;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 
 public class PopUpMain  {
 	private ProcessingPipeline pipe = new ProcessingPipeline();
-	ArrayList<ImageIcon> iconsCaptured = new ArrayList<ImageIcon>();
+	//ArrayList<ImageIcon> iconsCaptured = new ArrayList<ImageIcon>();
 	ArrayList<ImageIcon> iconsProcessed = new ArrayList<ImageIcon>();
 	public void run() {
 
@@ -46,10 +48,18 @@ public class PopUpMain  {
 		frame.setVisible(true);
 		frame .setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		DeltaForgeDevice delt = new DeltaForgeDevice();
+		BowlerBoardDevice delt = new BowlerBoardDevice();
 		delt.setConnection(new SerialConnection("/dev/BowlerDevice.74F726000000"));		
 		delt.connect();
-
+		
+		DyIO.disableFWCheck();
+		DyIO dyio = new DyIO();
+		dyio.setConnection(new SerialConnection("/dev/DyIO.74F726800018"));		
+		dyio.connect();
+		dyio.setServoPowerSafeMode(false);
+		
+		ServoChannel mouth = new ServoChannel(dyio, 11);
+		
 		
 		pipe.addAbstractImageProvider(new OpenCVImageProvider(0));
 		pipe.getLatestImage(0,inputImage,displayImage);
@@ -62,9 +72,9 @@ public class PopUpMain  {
 			BufferedImage tmpImage =pipe.getLatestImage(j,inputImage,displayImage);
 			
 			ImageIcon tmp = new ImageIcon(tmpImage);
-			iconsCaptured.add(tmp);
+			//iconsCaptured.add(tmp);
 			
-			tabs.addTab("Camera "+x, new JLabel(tmp));
+			//tabs.addTab("Camera "+x, new JLabel(tmp));
 
 			for (int i=0;i<pipe.getDetectorSize();i++){
 				pipe.getObjects(i,inputImage, displayImage);
@@ -79,22 +89,25 @@ public class PopUpMain  {
 
 			for (int i=0;i< pipe.getProviderSize();i++){
 				pipe.getLatestImage(i,inputImage,displayImage);
-				iconsCaptured.get(i).setImage(AbstractImageProvider.matToBufferedImage(inputImage));
+				//iconsCaptured.get(i).setImage(AbstractImageProvider.matToBufferedImage(inputImage));
 //				
 				for (int j=0;j<pipe.getDetectorSize();j++){
 					KeyPoint [] data = pipe.getObjects(j,inputImage, displayImage);
 					iconsProcessed.get(j+(i*j)).setImage(AbstractImageProvider.matToBufferedImage(displayImage));
 					
 					if(data.length>0){
+						mouth.SetPosition(255, .1);
 						double size = ((data[0].size-75)/125)*90-45;
 						System.out.println("Size= "+size);
 						
 						TransformNR current = new TransformNR(	size,
-																(data[0].pt.y/480.0)*90-45,
+																(data[0].pt.y/480.0)*80-25,
 																(data[0].pt.x/640.0)*300+50,
 																new RotationNR());
 						
 						delt.sendLinearSection(current, 0, 0,true);
+					}else{
+						mouth.SetPosition(100, .2);
 					}
 				}
 				frame.repaint();
