@@ -28,7 +28,7 @@ public class UdpNetworkTester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		BowlerUDPClient clnt=new BowlerUDPClient(1865);
+		BowlerUDPClient clnt=new BowlerUDPClient();
 		ArrayList<InetAddress>  addrs = clnt.getAllAddresses();
 		for (InetAddress a:addrs){
 			if (myIp.contains(a.getHostAddress())){

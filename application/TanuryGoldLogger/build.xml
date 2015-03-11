@@ -22,6 +22,8 @@
 	<property name="baseDirUpOne" value="${basedir}/.." />
 
 	<property name="jar.module" value="TanuryDeviceServer.jar" />
+	<property name="ant.build.javac.source" value="1.6"/>
+	<property name="ant.build.javac.target" value="1.6"/>
 	<target name="clean" depends=""
 		description="Delete old build and dist directories">
 
