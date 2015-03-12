@@ -13,6 +13,7 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
+import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.Log;
 import com.neuronrobotics.sdk.network.BowlerTCPClient;
 
@@ -39,6 +40,7 @@ public class MainWindow implements IBathMoniterUpdateListener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		BowlerDatagram.setUseBowlerV4(false);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
