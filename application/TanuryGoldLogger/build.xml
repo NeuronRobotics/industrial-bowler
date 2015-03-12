@@ -22,8 +22,8 @@
 	<property name="baseDirUpOne" value="${basedir}/.." />
 
 	<property name="jar.module" value="TanuryDeviceServer.jar" />
-	<property name="ant.build.javac.source" value="1.6"/>
-	<property name="ant.build.javac.target" value="1.6"/>
+	<property name="ant.build.javac.source" value="1.7"/>
+	<property name="ant.build.javac.target" value="1.7"/>
 	<target name="clean" depends=""
 		description="Delete old build and dist directories">
 
@@ -85,26 +85,29 @@
 		<copy todir="${build.home}">
 			<fileset dir="${src.home}" excludes="**/*.java" />
 		</copy>
+
+		
 	</target>
 
 	<target name="dist" depends="javadoc" description="Create binary distribution">
-		<mkdir dir="${dist.home}/docs/api" />
-		<tstamp>
-			<format property="TODAY" pattern="yyyy-MM-dd" />
-		</tstamp>
+		<jar jarfile="${dist.home}/deps.jar">
+	        <zipgroupfileset dir="lib">
+	            <include name="**/*.jar" />
+	        </zipgroupfileset>
+	    </jar>
+	    <sleep seconds="1" />
+		<jar destfile="${dist.home}/${jar.module}" >
 
-		<jar jarfile="${dist.home}/external-libs.jar">
-			<zipgroupfileset dir="lib/">
-				<include name="**/*.jar" />
-			</zipgroupfileset>
-		</jar>
-
-		<jar jarfile="${dist.home}/${jar.module}">
+	        <zipfileset src="${dist.home}/deps.jar" excludes="META-INF/*.SF" />
+	        <manifest>
+	            <attribute name="Main-Class" value="com.mycompany.MyMain" />
+	        </manifest>
+		    
 			<manifest>
-				<attribute name="Main-Class"
-					value="com.neuronrobotics.industrial.server.BathMonitorDeviceServer" />
-				<attribute name="Class-Path" value="." />
-				<attribute name="Built-Date" value="${TODAY}" />
+					<attribute name="Main-Class"
+						value="com.neuronrobotics.industrial.server.BathMonitorDeviceServer" />
+					<attribute name="Class-Path" value="." />
+					<attribute name="Built-Date" value="${TODAY}" />
 			</manifest>
 			<fileset dir="build">
 				<include name="**/*.class" />
@@ -113,12 +116,6 @@
 				<include name="**/*.properties" />
 				<exclude name="test/*.class" />
 			</fileset>
-			<!--<zipgroupfileset dir="lib" includes="*.jar" /> -->
-			<zipfileset src="${dist.home}/external-libs.jar">
-				<exclude name="META-INF/SUN_MICR.SF" />
-				<exclude name="META-INF/SUN_MICR.RSA" />
-			</zipfileset>
-
 		</jar>
 
 	</target>
@@ -127,7 +124,7 @@
 		description="Create Javadoc API documentation">
 
 		<javadoc sourcepath="${src.home}" destdir="${dist.home}/docs/api"
-			packagenames="*" source="1.6" splitindex="true" use="true" version="true">
+			packagenames="*" splitindex="true" use="true" version="true">
 			<classpath refid="compile.classpath" />
 			<bottom><![CDATA[<script type="text/javascript" src="/googleanalytics.js"></script>]]></bottom>
 		</javadoc>

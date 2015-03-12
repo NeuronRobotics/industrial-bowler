@@ -22,6 +22,7 @@ fi
 
 #build the sources
 if ant; then
+	java -jar FindDevices.jar
 	bash pushJar.sh $(java -jar FindDevices.jar);
 	#bash pushJar.sh 192.168.3.102 192.168.3.110 192.168.3.111 192.168.3.112 192.168.3.115;
 	echo Restarting application...;
