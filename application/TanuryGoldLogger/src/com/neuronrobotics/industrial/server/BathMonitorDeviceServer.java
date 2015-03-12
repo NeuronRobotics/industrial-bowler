@@ -347,6 +347,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 			con  = new SerialConnection(args[0]);
 		}
 		DyIO.disableFWCheck();
+		BowlerDatagram.setUseBowlerV4(false);
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
 		File l = new File("RobotLog"+".txt");
@@ -427,7 +428,7 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 					try{
 						for (int i=0;i<logger.getNumberOfLogLines(name,fileIndex);i++){
 							pushAsyncPacket(logger.getLogLine(i, name,fileIndex).getPacket(dyio.getAddress()));
-							ThreadUtil.wait(100);
+							ThreadUtil.wait(10);
 						}
 					}catch (Exception e){
 						
