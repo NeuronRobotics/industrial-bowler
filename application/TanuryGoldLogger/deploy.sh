@@ -5,20 +5,7 @@
 java -jar FindDevices.jar
 HOME=$PWD
 
-NRSDK=../../../java-bowler/javasdk/NRSDK/
-NR_JAR=$NRSDK/target/nrsdk-*-jar-with-dependencies.jar
-
-cd $NRSDK
-#ant
-
 cd $HOME
-rm -rf lib/nrsdk-*-jar-with-dependencies.jar
-if (test -e $NR_JAR ); then
-	cp $NR_JAR lib/; 
-else 
-	echo no jar at $NR_JAR
-	exit 1;
-fi
 
 #build the sources
 if ant; then
