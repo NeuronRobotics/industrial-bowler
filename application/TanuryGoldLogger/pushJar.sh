@@ -11,7 +11,7 @@ do
 	
 	ssh tanury@$VAR 'mkdir -p Tanury/device'
 	
-	#ssh root@$VAR 'mount -o remount,rw /'
+	ssh root@$VAR 'mount -o remount,rw /'
 	
 	scp target/TanuryDeviceServer.jar root@$VAR:/
 
@@ -29,7 +29,7 @@ do
 	scp grub root@$VAR:/etc/default/
 	#ssh root@$VAR 'touch /boot/grub/menu.lst'
 	ssh root@$VAR 'update-grub2'
-	
+	ssh root@$VAR 'apt-get -y --force-yes remove modemmanager '
 	#ssh root@$VAR 'ntptime;rpi-update'
 	#ssh root@$VAR 'mount -o remount,ro /'
 
