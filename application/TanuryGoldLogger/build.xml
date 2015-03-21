@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="deploy" name="Create Runnable Jar for Project NRConsole">
+<project default="deploy" name="Create Runnable Jar for Tannury Gold Logger">
 	<!--this file was created by Eclipse Runnable JAR Export Wizard -->
 	<!--ANT 1.7 is required -->
 	<property file="../NRSDK/src/com/neuronrobotics/sdk/config/build.properties" />
-	
+
 	<property name="app.path" value="/${app.name}" />
 	<property name="build.home" value="${basedir}/build" />
 	<property name="lib.home" value="${basedir}/lib" />
@@ -22,15 +22,14 @@
 	<property name="baseDirUpOne" value="${basedir}/.." />
 
 	<property name="jar.module" value="TanuryDeviceServer.jar" />
-	<property name="ant.build.javac.source" value="1.7"/>
-	<property name="ant.build.javac.target" value="1.7"/>
-	<target name="clean" depends=""
-		description="Delete old build and dist directories">
+	<property name="ant.build.javac.source" value="1.7" />
+	<property name="ant.build.javac.target" value="1.7" />
+	<target name="clean" depends="" description="Delete old build and dist directories">
 
 		<delete dir="${build.home}" />
 		<delete dir="${dist.home}" />
 	</target>
-<!--
+	<!--
 	<target name="nrsdk" depends="clean" description="Build the nrsdk">
 		<echo message="Attempting to build the nrsdk" />
 		<copy
@@ -48,8 +47,7 @@
 		<echo message="Done building the nrsdk" />
 	</target>
 -->
-	<target name="prepare" depends="clean" 
-		description="Create the file structure for assembly">
+	<target name="prepare" depends="clean" description="Create the file structure for assembly">
 		<mkdir dir="${build.home}" />
 
 		<mkdir dir="${build.home}/lib" />
@@ -77,8 +75,7 @@
 
 	<target name="compile" depends="prepare" description="Compile Java sources">
 		<mkdir dir="${build.home}" />
-		<javac srcdir="${src.home}" destdir="${build.home}" debug="${compile.debug}"
-			deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+		<javac srcdir="${src.home}" destdir="${build.home}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
 			<classpath refid="compile.classpath" />
 		</javac>
 
@@ -86,28 +83,24 @@
 			<fileset dir="${src.home}" excludes="**/*.java" />
 		</copy>
 
-		
+
 	</target>
 
 	<target name="dist" depends="javadoc" description="Create binary distribution">
 		<jar jarfile="${dist.home}/deps.jar">
-	        <zipgroupfileset dir="lib">
-	            <include name="**/*.jar" />
-	        </zipgroupfileset>
-	    </jar>
-	    <sleep seconds="1" />
-		<jar destfile="${dist.home}/${jar.module}" >
+			<zipgroupfileset dir="lib">
+				<include name="**/*.jar" />
+			</zipgroupfileset>
+		</jar>
+		<sleep seconds="1" />
+		<jar destfile="${dist.home}/${jar.module}">
 
-	        <zipfileset src="${dist.home}/deps.jar" excludes="META-INF/*.SF" />
-	        <manifest>
-	            <attribute name="Main-Class" value="com.mycompany.MyMain" />
-	        </manifest>
-		    
+			<zipfileset src="${dist.home}/deps.jar" excludes="META-INF/*.SF" />
+
 			<manifest>
-					<attribute name="Main-Class"
-						value="com.neuronrobotics.industrial.server.BathMonitorDeviceServer" />
-					<attribute name="Class-Path" value="." />
-					<attribute name="Built-Date" value="${TODAY}" />
+				<attribute name="Main-Class" value="com.neuronrobotics.industrial.server.BathMonitorDeviceServer" />
+				<attribute name="Class-Path" value="." />
+				<attribute name="Built-Date" value="${TODAY}" />
 			</manifest>
 			<fileset dir="build">
 				<include name="**/*.class" />
@@ -120,16 +113,16 @@
 
 	</target>
 
-	<target name="javadoc" depends="compile"
-		description="Create Javadoc API documentation">
+	<target name="javadoc" depends="compile" description="Create Javadoc API documentation">
 
-		<javadoc sourcepath="${src.home}" destdir="${dist.home}/docs/api"
-			packagenames="*" splitindex="true" use="true" version="true">
+		<javadoc sourcepath="${src.home}" destdir="${dist.home}/docs/api" packagenames="*" splitindex="true" use="true" version="true">
 			<classpath refid="compile.classpath" />
-			<bottom><![CDATA[<script type="text/javascript" src="/googleanalytics.js"></script>]]></bottom>
-		</javadoc>
-	</target>
+			<bottom>
+				<![CDATA[<script type="text/javascript" src="/googleanalytics.js">
+			</script>]]></bottom>
+	</javadoc>
+</target>
 
-	<target name="deploy" depends="dist" description="Builds the full deployment" />
+<target name="deploy" depends="dist" description="Builds the full deployment" />
 
 </project>
