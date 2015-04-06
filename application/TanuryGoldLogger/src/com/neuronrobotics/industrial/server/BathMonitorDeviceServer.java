@@ -1,18 +1,13 @@
 package com.neuronrobotics.industrial.server;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import com.neuronrobotics.industrial.TanuryDataLogger;
 import com.neuronrobotics.industrial.device.BathAlarmEvent;
 import com.neuronrobotics.industrial.device.BathMoniterEvent;
-import com.neuronrobotics.sdk.commands.bcs.core.PingCommand;
 import com.neuronrobotics.sdk.common.BowlerDatagram;
 import com.neuronrobotics.sdk.common.BowlerDatagramFactory;
 import com.neuronrobotics.sdk.common.Log;
@@ -21,9 +16,6 @@ import com.neuronrobotics.sdk.common.device.server.BowlerAbstractServer;
 import com.neuronrobotics.sdk.dyio.DyIO;
 import com.neuronrobotics.sdk.dyio.DyIOChannelMode;
 import com.neuronrobotics.sdk.dyio.peripherals.AnalogInputChannel;
-import com.neuronrobotics.sdk.dyio.peripherals.IAnalogInputListener;
-import com.neuronrobotics.sdk.network.BowlerTCPServer;
-import com.neuronrobotics.sdk.network.BowlerUDPServer;
 import com.neuronrobotics.sdk.serial.SerialConnection;
 import com.neuronrobotics.sdk.util.RollingAverageFilter;
 import com.neuronrobotics.sdk.util.ThreadUtil;
@@ -350,18 +342,18 @@ public class BathMonitorDeviceServer extends BowlerAbstractServer{
 		BowlerDatagram.setUseBowlerV4(false);
 		DyIO dyio = new DyIO(con);
 		System.err.println("Connecting DyIO");
-		File l = new File("RobotLog"+".txt");
-		try {
-			PrintStream p =new PrintStream(l);
-			Log.setOutStream(new PrintStream(p));
-			Log.setErrStream(new PrintStream(p));						
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
+//		File l = new File("RobotLog"+".txt");
+//		try {
+//			PrintStream p =new PrintStream(l);
+//			Log.setOutStream(new PrintStream(p));
+//			Log.setErrStream(new PrintStream(p));						
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		}
 //		
-		Log.enableDebugPrint();
-		
-		Log.setUseColoredPrints(true);
+//		Log.enableDebugPrint();
+//		
+//		Log.setUseColoredPrints(true);
 		
 		dyio.connect();
 		
