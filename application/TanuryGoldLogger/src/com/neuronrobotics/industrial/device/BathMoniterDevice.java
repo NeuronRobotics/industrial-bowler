@@ -45,7 +45,6 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 
 	@Override
 	public void onAsyncResponse(BowlerDatagram data) {
-		
 		if(data.getRPC().contains("bath")){
 			BathMoniterEvent be = new BathMoniterEvent(data);
 			
@@ -54,7 +53,8 @@ public class BathMoniterDevice extends BowlerAbstractDevice{
 				
 				getBathMoniter().onValueChange(be);
 			}
-		}if(data.getRPC().contains("alrm")){
+		}
+		if(data.getRPC().contains("alrm")){
 			
 			if(getBathMoniter() !=null){
 				System.out.println("ASYNC << \n"+data);

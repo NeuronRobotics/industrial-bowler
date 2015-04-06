@@ -419,7 +419,6 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 						Log.warning("New oldest packet "+oldest+" " +items.get(i));
 					}
 				}
-
 				
 			}
 			recentTotal.setText(new Double(	event.getScaledTotalUsedToday() 
@@ -432,8 +431,11 @@ public class BathMoniter extends JPanel implements IBathMoniterUpdateListener{
 		
 		if(mainWindow!=null)
 			mainWindow.onValueChange(event);
-		textField.setText(log.getFileName(getName(),System.currentTimeMillis()));
+		
+		Log.warning("Event named: "+event.getBathName()+" my name: "+getName());
 		log.onValueChange(event, event.getScaledTotalUsedToday());
+		
+		textField.setText(log.getFileName(getName(),System.currentTimeMillis()));
 	}
 
 
